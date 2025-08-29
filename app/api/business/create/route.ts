@@ -45,6 +45,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if phone number is already taken
+    const { data: existingPhone } = await supabaseAdmin
+      .from('businesses')
+      .select('id')
+      .eq('phone_number', phoneNumber)
+      .single();
+
+    if (existingPhone) {
+      return NextResponse.json(
+        { error: 'Phone number already registered to another business' },
+        { status: 409 }
+      );
+    }
+
     // Create business first
     const { data: businessData, error: businessError } = await supabaseAdmin
       .from('businesses')

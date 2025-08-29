@@ -24,7 +24,8 @@ export async function GET() {
           phone_number,
           email,
           address,
-          status
+          status,
+          google_calendar_id
         )
       `)
       .eq('clerk_user_id', userId)
@@ -80,8 +81,14 @@ export async function GET() {
       totalCalls: callsResult.count || 0
     };
 
+    // Add Google Calendar connection status
+    const businessWithCalendarStatus = {
+      ...user.businesses,
+      google_calendar_connected: !!user.businesses?.google_calendar_id
+    };
+
     return NextResponse.json({
-      business: user.businesses,
+      business: businessWithCalendarStatus,
       stats
     });
 

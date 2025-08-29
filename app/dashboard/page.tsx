@@ -14,6 +14,7 @@ interface Business {
   email: string;
   address: string;
   status: string;
+  google_calendar_connected?: boolean;
 }
 
 interface DashboardStats {
@@ -34,6 +35,7 @@ export default function Dashboard() {
     totalCalls: 0
   });
   const [loading, setLoading] = useState(true);
+  const [connectingCalendar, setConnectingCalendar] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -61,6 +63,32 @@ export default function Dashboard() {
       fetchDashboardData();
     }
   }, [user, router]);
+
+  const handleConnectCalendar = async () => {
+    setConnectingCalendar(true);
+    try {
+      if (!business?.id) {
+        alert('Business information not available. Please refresh the page.');
+        return;
+      }
+      
+      // First get the OAuth URL from the API
+      const response = await fetch(`/api/auth/google?businessId=${business.id}`);
+      const data = await response.json();
+      
+      if (data.authUrl) {
+        // Redirect to Google OAuth
+        window.location.href = data.authUrl;
+      } else {
+        throw new Error(data.error || 'Failed to get OAuth URL');
+      }
+    } catch (error) {
+      console.error('Failed to connect calendar:', error);
+      alert('Failed to connect Google Calendar. Please try again.');
+    } finally {
+      setConnectingCalendar(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -161,6 +189,58 @@ export default function Dashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Calls</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalCalls}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Google Calendar Integration */}
+        <div className="mb-8">
+          <Card className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-4 sm:mb-0">
+                <h3 className="text-lg font-semibold mb-2">Google Calendar Integration</h3>
+                <p className="text-gray-600">
+                  {business.google_calendar_connected 
+                    ? 'Your Google Calendar is connected and synced with your bookings.'
+                    : 'Connect your Google Calendar to automatically sync appointments and check availability.'
+                  }
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                {business.google_calendar_connected ? (
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center text-green-600">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Connected
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Disconnect
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    onClick={handleConnectCalendar}
+                    disabled={connectingCalendar}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {connectingCalendar ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Connect Google Calendar
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           </Card>

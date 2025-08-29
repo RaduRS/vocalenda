@@ -21,6 +21,14 @@ export default function SetupWizard() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [validationErrors, setValidationErrors] = useState<{
+    slug?: string;
+    phone?: string;
+  }>({});
+  const [validating, setValidating] = useState<{
+    slug?: boolean;
+    phone?: boolean;
+  }>({});
   const [businessData, setBusinessData] = useState<BusinessData>({
     name: '',
     slug: '',
@@ -53,6 +61,66 @@ export default function SetupWizard() {
     checkBusinessStatus();
   }, [user, router]);
 
+  // Debounce validation checks
+  const debounceValidation = (callback: () => void, delay: number) => {
+    const timeoutId = setTimeout(callback, delay);
+    return () => clearTimeout(timeoutId);
+  };
+
+  const validateSlug = async (slug: string) => {
+    if (!slug.trim()) {
+      setValidationErrors(prev => ({ ...prev, slug: undefined }));
+      return;
+    }
+
+    setValidating(prev => ({ ...prev, slug: true }));
+    try {
+      const response = await fetch('/api/business/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug })
+      });
+      
+      if (response.status === 409) {
+        const error = await response.json();
+        setValidationErrors(prev => ({ ...prev, slug: error.message }));
+      } else {
+        setValidationErrors(prev => ({ ...prev, slug: undefined }));
+      }
+    } catch (error) {
+      console.error('Slug validation failed:', error);
+    } finally {
+      setValidating(prev => ({ ...prev, slug: false }));
+    }
+  };
+
+  const validatePhone = async (phone: string) => {
+    if (!phone.trim()) {
+      setValidationErrors(prev => ({ ...prev, phone: undefined }));
+      return;
+    }
+
+    setValidating(prev => ({ ...prev, phone: true }));
+    try {
+      const response = await fetch('/api/business/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+      
+      if (response.status === 409) {
+        const error = await response.json();
+        setValidationErrors(prev => ({ ...prev, phone: error.message }));
+      } else {
+        setValidationErrors(prev => ({ ...prev, phone: undefined }));
+      }
+    } catch (error) {
+      console.error('Phone validation failed:', error);
+    } finally {
+      setValidating(prev => ({ ...prev, phone: false }));
+    }
+  };
+
   const handleInputChange = (field: keyof BusinessData, value: string) => {
     setBusinessData(prev => ({ ...prev, [field]: value }));
     
@@ -64,6 +132,21 @@ export default function SetupWizard() {
         .replace(/-+/g, '-')
         .trim();
       setBusinessData(prev => ({ ...prev, slug }));
+      
+      // Validate the generated slug
+      if (slug) {
+        debounceValidation(() => validateSlug(slug), 500);
+      }
+    }
+    
+    // Validate slug when manually changed
+    if (field === 'slug') {
+      debounceValidation(() => validateSlug(value), 500);
+    }
+    
+    // Validate phone number
+    if (field === 'phone') {
+      debounceValidation(() => validatePhone(value), 500);
     }
   };
 
@@ -104,9 +187,15 @@ export default function SetupWizard() {
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return businessData.name.trim() && businessData.slug.trim();
+        return businessData.name.trim() && 
+               businessData.slug.trim() && 
+               !validationErrors.slug && 
+               !validating.slug;
       case 2:
-        return businessData.phone.trim() && businessData.email.trim();
+        return businessData.phone.trim() && 
+               businessData.email.trim() && 
+               !validationErrors.phone && 
+               !validating.phone;
       case 3:
         return businessData.address.trim();
       default:
@@ -166,15 +255,30 @@ export default function SetupWizard() {
               <label className="block text-sm font-medium mb-2">Business URL Slug *</label>
               <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
                 <span className="text-gray-500 sm:mr-2 text-sm sm:text-base">vocalenda.com/</span>
-                <input
-                  type="text"
-                  value={businessData.slug}
-                  onChange={(e) => handleInputChange('slug', e.target.value)}
-                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="city-barbershop"
-                />
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={businessData.slug}
+                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                      validationErrors.slug 
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                    placeholder="city-barbershop"
+                  />
+                  {validating.slug && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mt-1">This will be your unique booking URL</p>
+              {validationErrors.slug ? (
+                <p className="text-sm text-red-600 mt-1">{validationErrors.slug}</p>
+              ) : (
+                <p className="text-sm text-gray-500 mt-1">This will be your unique booking URL</p>
+              )}
             </div>
           </div>
         )}
@@ -185,14 +289,29 @@ export default function SetupWizard() {
             
             <div>
               <label className="block text-sm font-medium mb-2">Business Phone Number *</label>
-              <input
-                type="tel"
-                value={businessData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="+44 20 1234 5678"
-              />
-              <p className="text-sm text-gray-500 mt-1">This will be your Twilio phone number for voice bookings</p>
+              <div className="relative">
+                <input
+                  type="tel"
+                  value={businessData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:border-transparent ${
+                    validationErrors.phone 
+                      ? 'border-red-300 focus:ring-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                  placeholder="+44 20 1234 5678"
+                />
+                {validating.phone && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  </div>
+                )}
+              </div>
+              {validationErrors.phone ? (
+                <p className="text-sm text-red-600 mt-1">{validationErrors.phone}</p>
+              ) : (
+                <p className="text-sm text-gray-500 mt-1">This will be your Twilio phone number for voice bookings</p>
+              )}
             </div>
             
             <div>

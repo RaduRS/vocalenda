@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         await handleUserDeleted(data);
         break;
       default:
-        console.log(`Unhandled webhook type: ${type}`);
+        // Unhandled webhook type
     }
   } catch (error) {
     console.error(`Error handling webhook ${type}:`, error);
