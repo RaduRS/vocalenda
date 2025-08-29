@@ -11,7 +11,6 @@ export async function POST(req: Request) {
   // Verify webhook signature
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    console.error('CLERK_WEBHOOK_SECRET is not set');
     return new Response('Webhook secret not configured', { status: 500 });
   }
 
@@ -20,7 +19,6 @@ export async function POST(req: Request) {
   const svix_signature = headerPayload.get('svix-signature');
 
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    console.error('Missing svix headers');
     return new Response('Missing svix headers', { status: 400 });
   }
 
@@ -34,7 +32,6 @@ export async function POST(req: Request) {
       'svix-signature': svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error('Error verifying webhook:', err);
     return new Response('Invalid webhook signature', { status: 400 });
   }
 
@@ -55,7 +52,6 @@ export async function POST(req: Request) {
         // Unhandled webhook type
     }
   } catch (error) {
-    console.error(`Error handling webhook ${type}:`, error);
     return new Response('Webhook processing failed', { status: 500 });
   }
 
@@ -67,7 +63,6 @@ async function handleUserCreated(userData: WebhookEvent['data']) {
   const primaryEmail = user.email_addresses.find(email => email.id === user.primary_email_address_id);
   
   if (!primaryEmail) {
-    console.error('No primary email found for user:', user.id);
     return;
   }
 
@@ -84,15 +79,15 @@ async function handleUserCreated(userData: WebhookEvent['data']) {
         is_active: true,
       });
 
-    if (error) {
-      console.error('Error creating user in Supabase:', error);
+    // If user already exists (duplicate key error), that's fine - ignore it
+    if (error && error.code !== '23505') {
       throw error;
     }
-
-    // User successfully created in Supabase
   } catch (error) {
-    console.error('Failed to create user in database:', error);
-    throw error;
+    // Only throw if it's not a duplicate key error
+    if (error && typeof error === 'object' && 'code' in error && error.code !== '23505') {
+      throw error;
+    }
   }
 }
 
@@ -101,7 +96,6 @@ async function handleUserUpdated(userData: WebhookEvent['data']) {
   const primaryEmail = user.email_addresses.find(email => email.id === user.primary_email_address_id);
   
   if (!primaryEmail) {
-    console.error('No primary email found for user:', user.id);
     return;
   }
 
@@ -118,11 +112,9 @@ async function handleUserUpdated(userData: WebhookEvent['data']) {
       .eq('clerk_user_id', user.id);
 
     if (error) {
-      console.error('Error updating user in Supabase:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to update user in database:', error);
     throw error;
   }
 }
@@ -141,11 +133,9 @@ async function handleUserDeleted(userData: WebhookEvent['data']) {
       .eq('clerk_user_id', deletedUser.id);
 
     if (error) {
-      console.error('Error deactivating user in Supabase:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to deactivate user in database:', error);
     throw error;
   }
 }

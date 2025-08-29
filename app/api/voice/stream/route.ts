@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getCalendarService } from '@/lib/calendar';
 import { generateConfirmationMessage } from '@/lib/sms-templates';
+import { Json } from '@/lib/database.types';
 
 interface DeepgramMessage {
   type: string;
@@ -24,10 +25,16 @@ interface BusinessConfig {
     email: string | null;
     address: string | null;
     timezone: string;
-    business_hours: unknown;
+    business_hours: Json | null;
     status: string;
     settings: unknown;
     google_calendar_id: string | null;
+    payment_methods: string[] | null;
+    holidays: Json | null;
+    ai_greeting: string | null;
+    key_information: string | null;
+    customer_notes_enabled: boolean | null;
+    booking_policies: Json | null;
     created_at: string;
     updated_at: string;
   } | null;
@@ -171,26 +178,97 @@ function generateSystemPrompt(businessConfig: BusinessConfig, callContext: CallC
     `${s.name} (${s.duration_minutes} minutes, £${s.price})`
   ).join(', ');
   
+  // Format business hours
+  let businessHoursText = '';
+  if (business?.business_hours) {
+    try {
+      const hours = business.business_hours as Record<string, { open: string; close: string; closed: boolean }>;
+      const daysOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      businessHoursText = daysOrder.map(day => {
+        const dayHours = hours[day];
+        if (dayHours?.closed) {
+          return `${day.charAt(0).toUpperCase() + day.slice(1)}: Closed`;
+        }
+        return `${day.charAt(0).toUpperCase() + day.slice(1)}: ${dayHours?.open || 'N/A'} - ${dayHours?.close || 'N/A'}`;
+      }).join('\n');
+    } catch (e) {
+      businessHoursText = 'Business hours not available';
+    }
+  }
+  
+  // Format payment methods
+  const paymentMethodsText = business?.payment_methods?.length 
+    ? business.payment_methods.map(method => {
+        switch(method) {
+          case 'cash': return 'Cash';
+          case 'card': return 'Card';
+          case 'apple_pay': return 'Apple Pay';
+          case 'google_pay': return 'Google Pay';
+          case 'bank_transfer': return 'Bank Transfer';
+          default: return method;
+        }
+      }).join(', ')
+    : 'Please ask about payment options';
+  
+  // Format holidays
+  let holidaysText = '';
+  if (business?.holidays) {
+    try {
+      const holidays = business.holidays as Array<{ date: string; description: string }>;
+      if (holidays.length > 0) {
+        holidaysText = holidays.map(h => `${h.date}: ${h.description}`).join('\n');
+      }
+    } catch (e) {
+      // Ignore holiday parsing errors
+    }
+  }
+  
+  // Format booking policies
+  let bookingPoliciesText = '';
+  if (business?.booking_policies) {
+    try {
+      const policies = business.booking_policies as {
+        cancellation_policy?: string;
+        advance_booking_days?: number;
+        min_advance_hours?: number;
+        booking_confirmation_required?: boolean;
+      };
+      const policyLines = [];
+      if (policies.cancellation_policy) policyLines.push(`Cancellation: ${policies.cancellation_policy}`);
+      if (policies.advance_booking_days) policyLines.push(`Advance booking: Up to ${policies.advance_booking_days} days`);
+      if (policies.min_advance_hours) policyLines.push(`Minimum notice: ${policies.min_advance_hours} hours`);
+      bookingPoliciesText = policyLines.join('\n');
+    } catch (e) {
+      // Ignore policy parsing errors
+    }
+  }
+  
+  // Use AI greeting if available, otherwise use greeting_message
+  const greeting = business?.ai_greeting || businessConfig?.config?.greeting_message;
+  
   return `You are a professional and friendly receptionist for ${business?.name || 'this business'}.
 
-Business Information:
+${greeting ? `Greeting: ${greeting}\n\n` : ''}Business Information:
 - Name: ${business?.name}
 - Address: ${business?.address || 'Not specified'}
 - Phone: ${business?.phone_number}
 - Services: ${servicesText}
+- Payment Methods: ${paymentMethodsText}
 
-Your role:
+${businessHoursText ? `Business Hours:\n${businessHoursText}\n\n` : ''}${business?.key_information ? `Key Information: ${business.key_information}\n\n` : ''}${holidaysText ? `Holidays/Closures:\n${holidaysText}\n\n` : ''}${bookingPoliciesText ? `Booking Policies:\n${bookingPoliciesText}\n\n` : ''}Your role:
 - Help customers book, reschedule, or cancel appointments
 - Answer questions about services and availability
 - Be warm, professional, and efficient
 - Always confirm booking details before finalizing
 - Use the caller's phone number (${callContext.callerPhone}) as their contact
+- Inform customers about accepted payment methods when relevant
 
 Important rules:
 - Only book appointments for available time slots
 - Confirm customer name and preferred service before booking
 - Provide clear confirmation details after booking
 - If you can't help with something, offer to take a message
+- Respect business hours and holiday closures
 
 ${customPrompt ? `Additional instructions: ${customPrompt}` : ''}`;
 }

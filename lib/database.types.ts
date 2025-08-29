@@ -101,6 +101,9 @@ export type Database = {
           booking_rules: Json | null
           faq_data: Json | null
           integration_settings: Json | null
+          ai_response_mode: string | null
+          allowed_ai_topics: string[] | null
+          restricted_ai_topics: string[] | null
           created_at: string
           updated_at: string
         }
@@ -112,6 +115,9 @@ export type Database = {
           booking_rules?: Json | null
           faq_data?: Json | null
           integration_settings?: Json | null
+          ai_response_mode?: string | null
+          allowed_ai_topics?: string[] | null
+          restricted_ai_topics?: string[] | null
           created_at?: string
           updated_at?: string
         }
@@ -123,6 +129,9 @@ export type Database = {
           booking_rules?: Json | null
           faq_data?: Json | null
           integration_settings?: Json | null
+          ai_response_mode?: string | null
+          allowed_ai_topics?: string[] | null
+          restricted_ai_topics?: string[] | null
           created_at?: string
           updated_at?: string
         }
@@ -150,6 +159,13 @@ export type Database = {
           status: 'active' | 'inactive' | 'suspended'
           settings: Json
           google_calendar_id: string | null
+          business_type: string | null
+          payment_methods: string[] | null
+          holidays: Json | null
+          ai_greeting: string | null
+          key_information: string | null
+          customer_notes_enabled: boolean | null
+          booking_policies: Json | null
           created_at: string
           updated_at: string
         }
@@ -166,6 +182,13 @@ export type Database = {
           status?: 'active' | 'inactive' | 'suspended'
           settings?: Json
           google_calendar_id?: string | null
+          business_type?: string | null
+          payment_methods?: string[] | null
+          holidays?: Json | null
+          ai_greeting?: string | null
+          key_information?: string | null
+          customer_notes_enabled?: boolean | null
+          booking_policies?: Json | null
           created_at?: string
           updated_at?: string
         }
@@ -182,6 +205,13 @@ export type Database = {
           status?: 'active' | 'inactive' | 'suspended'
           settings?: Json
           google_calendar_id?: string | null
+          business_type?: string | null
+          payment_methods?: string[] | null
+          holidays?: Json | null
+          ai_greeting?: string | null
+          key_information?: string | null
+          customer_notes_enabled?: boolean | null
+          booking_policies?: Json | null
           created_at?: string
           updated_at?: string
         }
@@ -590,8 +620,38 @@ export type Database = {
           p_business_name: string
           p_business_slug: string
           p_phone_number: string
+          p_business_type?: string
+          p_address?: string
+          p_timezone?: string
         }
         Returns: string
+      }
+      update_ai_configuration: {
+        Args: {
+          p_business_id: string
+          p_ai_response_mode?: string
+          p_allowed_topics?: string[]
+          p_restricted_topics?: string[]
+          p_ai_prompt?: string
+          p_greeting_message?: string
+          p_booking_rules?: Json
+          p_faq_data?: Json
+        }
+        Returns: boolean
+      }
+      update_business_settings: {
+        Args: {
+          p_business_id: string
+          p_business_type?: string
+          p_payment_methods?: string[]
+          p_business_hours?: Json
+          p_holidays?: Json
+          p_ai_greeting?: string
+          p_key_information?: string
+          p_customer_notes_enabled?: boolean
+          p_booking_policies?: Json
+        }
+        Returns: boolean
       }
       current_user_has_role: {
         Args: {
