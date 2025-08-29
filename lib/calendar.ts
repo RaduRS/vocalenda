@@ -40,8 +40,8 @@ class CalendarService {
   constructor(tokens: GoogleTokens) {
     this.oauth2Client = new google.auth.OAuth2(
       process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
+      process.env.GOOGLE_CLIENT_SECRET
+      // No redirect URI needed for API calls with existing tokens
     );
     
     this.oauth2Client.setCredentials(tokens);

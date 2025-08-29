@@ -9,11 +9,14 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
+// OAuth2 client will be configured per request to handle dynamic redirect URIs
+const getOAuth2Client = (redirectUri: string) => {
+  return new google.auth.OAuth2(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri
+  );
+};
 
 // Generate Google OAuth URL
 export async function GET(request: NextRequest) {
@@ -49,12 +52,18 @@ export async function GET(request: NextRequest) {
       'https://www.googleapis.com/auth/calendar.events'
     ];
 
+    // Construct redirect URI dynamically based on the request
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const host = request.headers.get('host') || 'localhost:3000';
+    const redirectUri = `${protocol}://${host}/auth/google/callback`;
+    
+    const oauth2Client = getOAuth2Client(redirectUri);
+
     const authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
       state: businessId, // Pass business ID in state
       prompt: 'consent', // Force consent to get refresh token
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
       login_hint: user.email // Suggest the specific email that should be used
     });
 
@@ -97,6 +106,13 @@ export async function POST(request: NextRequest) {
     if (userError || !user || user.business_id !== businessId) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
+
+    // Construct redirect URI dynamically based on the request
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    const host = request.headers.get('host') || 'localhost:3000';
+    const redirectUri = `${protocol}://${host}/auth/google/callback`;
+    
+    const oauth2Client = getOAuth2Client(redirectUri);
 
     // Exchange code for tokens
     const { tokens } = await oauth2Client.getToken(code);
