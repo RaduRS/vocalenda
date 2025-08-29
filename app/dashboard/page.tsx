@@ -36,6 +36,7 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
+  const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -87,6 +88,43 @@ export default function Dashboard() {
       alert('Failed to connect Google Calendar. Please try again.');
     } finally {
       setConnectingCalendar(false);
+    }
+  };
+
+  const handleDisconnectCalendar = async () => {
+    if (!confirm('Are you sure you want to disconnect Google Calendar? This will revoke all permissions and remove the integration.')) {
+      return;
+    }
+
+    setDisconnectingCalendar(true);
+    try {
+      if (!business?.id) {
+        alert('Business information not available. Please refresh the page.');
+        return;
+      }
+
+      const response = await fetch('/api/auth/google/disconnect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ businessId: business.id }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update the business state to reflect disconnection
+        setBusiness(prev => prev ? { ...prev, google_calendar_connected: false } : null);
+        alert('Google Calendar disconnected successfully!');
+      } else {
+        throw new Error(data.error || 'Failed to disconnect Google Calendar');
+      }
+    } catch (error) {
+      console.error('Failed to disconnect calendar:', error);
+      alert('Failed to disconnect Google Calendar. Please try again.');
+    } finally {
+      setDisconnectingCalendar(false);
     }
   };
 
@@ -216,8 +254,13 @@ export default function Dashboard() {
                       </svg>
                       Connected
                     </div>
-                    <Button variant="outline" size="sm">
-                      Disconnect
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleDisconnectCalendar}
+                      disabled={disconnectingCalendar}
+                    >
+                      {disconnectingCalendar ? 'Disconnecting...' : 'Disconnect'}
                     </Button>
                   </div>
                 ) : (
