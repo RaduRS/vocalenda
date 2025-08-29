@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
-import Link from "next/link";
+import { SignUpButton, SignInButton } from "@clerk/nextjs";
 
 export default function Home() {
   const structuredData = {
@@ -41,16 +41,16 @@ export default function Home() {
               Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 sm:mt-8 px-4">
-              <Link href="/auth/signup">
+              <SignUpButton>
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                   Get Started
                 </Button>
-              </Link>
-              <Link href="/auth/login">
+              </SignUpButton>
+              <SignInButton>
                 <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                  Login
+                  Sign in
                 </Button>
-              </Link>
+              </SignInButton>
             </div>
           </div>
         </section>

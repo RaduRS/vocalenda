@@ -267,13 +267,13 @@ CREATE POLICY "users_insert_own" ON users
 CREATE POLICY "users_update_own_or_admin" ON users
     FOR UPDATE USING (
         clerk_user_id = get_current_clerk_user_id() OR
-        (business_id = get_current_user_business_id() AND current_user_has_role(ARRAY['owner', 'admin']))
+        (business_id = get_current_user_business_id() AND current_user_has_role(ARRAY['owner'::user_role, 'admin'::user_role]))
     );
 
 CREATE POLICY "users_delete_admin_only" ON users
     FOR DELETE USING (
         business_id = get_current_user_business_id() AND 
-        current_user_has_role(ARRAY['owner', 'admin'])
+        current_user_has_role(ARRAY['owner'::user_role, 'admin'::user_role])
     );
 
 -- Businesses table policies
@@ -286,13 +286,13 @@ CREATE POLICY "businesses_insert_authenticated" ON businesses
 CREATE POLICY "businesses_update_owner_admin" ON businesses
     FOR UPDATE USING (
         id = get_current_user_business_id() AND 
-        current_user_has_role(ARRAY['owner', 'admin'])
+        current_user_has_role(ARRAY['owner'::user_role, 'admin'::user_role])
     );
 
 CREATE POLICY "businesses_delete_owner_only" ON businesses
     FOR DELETE USING (
         id = get_current_user_business_id() AND 
-        current_user_has_role(ARRAY['owner'])
+        current_user_has_role(ARRAY['owner'::user_role])
     );
 
 -- Services table policies
@@ -398,9 +398,16 @@ BEGIN
     VALUES (p_business_name, p_business_slug, p_phone_number, p_email)
     RETURNING id INTO v_business_id;
     
-    -- Create owner user
+    -- Update existing user or create new one
     INSERT INTO users (business_id, clerk_user_id, email, first_name, last_name, role)
     VALUES (v_business_id, p_clerk_user_id, p_email, p_first_name, p_last_name, 'owner')
+    ON CONFLICT (clerk_user_id) 
+    DO UPDATE SET 
+        business_id = EXCLUDED.business_id,
+        email = EXCLUDED.email,
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.last_name,
+        role = EXCLUDED.role
     RETURNING id INTO v_user_id;
     
     RETURN v_business_id;
