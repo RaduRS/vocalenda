@@ -119,15 +119,9 @@ export async function POST(request: NextRequest) {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
 
-    // Verify the Google account matches the current user's email
+    // Get Google user info
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
     const { data: googleUser } = await oauth2.userinfo.get();
-    
-    if (googleUser.email !== user.email) {
-      return NextResponse.json({ 
-        error: `Security error: Google account (${googleUser.email}) does not match your registered email (${user.email}). Please use the correct Google account.` 
-      }, { status: 403 });
-    }
 
     // Get user's calendar list to find primary calendar
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
@@ -170,10 +164,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update business with calendar ID
+    // Update business with calendar ID and Google email
     const { error: updateError } = await supabase
       .from('businesses')
-      .update({ google_calendar_id: primaryCalendar.id })
+      .update({ 
+        google_calendar_id: primaryCalendar.id,
+        email: googleUser.email 
+      })
       .eq('id', businessId);
 
     if (updateError) {
