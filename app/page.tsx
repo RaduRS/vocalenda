@@ -1,103 +1,145 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Vocalenda",
+    "description": "Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "GBP"
+    }
+  };
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20">
+          <div className="text-center space-y-4 sm:space-y-6 mb-12 sm:mb-16">
+            <Badge variant="secondary" className="mb-4">
+              🚀 Voice AI Booking Platform
+            </Badge>
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
+              <span className="text-black dark:text-white">Vo</span>
+              <span className="text-purple-600 dark:text-purple-400">cal</span>
+              <span className="text-blue-600 dark:text-blue-400">enda</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-4">
+              Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 sm:mt-8 px-4">
+              <Link href="/auth/signup">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+                  Get Started
+                </Button>
+              </Link>
+              <Link href="/auth/login">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  Login
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="container mx-auto px-4 pb-12 sm:pb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
+          <Card className="border-slate-200 dark:border-slate-800">
+            <CardHeader className="text-center">
+              <Phone className="h-8 w-8 mx-auto text-blue-600 dark:text-blue-400 mb-2" />
+              <CardTitle className="text-lg">Voice AI</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                 Natural conversations with GPT-4o-mini AI for seamless booking experiences
+               </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 dark:border-slate-800">
+            <CardHeader className="text-center">
+              <Calendar className="h-8 w-8 mx-auto text-green-600 dark:text-green-400 mb-2" />
+              <CardTitle className="text-lg">Google Calendar</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Real-time availability checking and automatic appointment scheduling
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 dark:border-slate-800">
+            <CardHeader className="text-center">
+              <MessageSquare className="h-8 w-8 mx-auto text-purple-600 dark:text-purple-400 mb-2" />
+              <CardTitle className="text-lg">SMS Confirmations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Automatic SMS confirmations sent from the same number customers called
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 dark:border-slate-800">
+            <CardHeader className="text-center">
+              <Zap className="h-8 w-8 mx-auto text-orange-600 dark:text-orange-400 mb-2" />
+              <CardTitle className="text-lg">Multi-Tenant</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Dedicated phone numbers and isolated data for each business
+              </CardDescription>
+            </CardContent>
+          </Card>
+           </div>
+         </section>
+
+         {/* Tech Stack */}
+         <section className="container mx-auto px-4 pb-12 sm:pb-16">
+           <div className="text-center">
+             <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-slate-900 dark:text-slate-100">
+               Built with Modern Technology
+             </h2>
+             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-4">
+                {[
+                  "Next.js",
+                  "TypeScript",
+                  "Supabase",
+                  "Twilio",
+                  "GPT-4o-mini",
+                  "Google Calendar",
+                  "shadcn/ui",
+                  "Tailwind CSS"
+                ].map((tech) => (
+                  <Badge key={tech} variant="secondary" className="text-xs sm:text-sm py-1 px-2 sm:px-3">
+                    {tech}
+                  </Badge>
+                ))}
+              </div>
+           </div>
+         </section>
+
+         {/* Footer */}
+         <footer className="bg-slate-100 dark:bg-slate-900 py-8 sm:py-12">
+           <div className="container mx-auto px-4 text-center text-slate-600 dark:text-slate-400">
+             <p className="text-sm sm:text-base">&copy; 2025 Vocalenda. Multi-tenant voice booking automation for modern businesses.</p>
+           </div>
+         </footer>
+       </main>
+    </>
   );
 }
