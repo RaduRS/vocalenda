@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Business ID required' }, { status: 400 });
     }
 
-    // Verify user owns this business
+    // Verify user owns this business and get user email
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('business_id')
+      .select('business_id, email')
       .eq('clerk_user_id', userId)
       .single();
 
@@ -54,7 +54,8 @@ export async function GET(request: NextRequest) {
       scope: scopes,
       state: businessId, // Pass business ID in state
       prompt: 'consent', // Force consent to get refresh token
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      login_hint: user.email // Suggest the specific email that should be used
     });
 
     return NextResponse.json({ authUrl });
@@ -86,10 +87,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify user owns this business
+    // Verify user owns this business and get user email
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('business_id')
+      .select('business_id, email')
       .eq('clerk_user_id', userId)
       .single();
 
@@ -100,6 +101,16 @@ export async function POST(request: NextRequest) {
     // Exchange code for tokens
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
+
+    // Verify the Google account matches the current user's email
+    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+    const { data: googleUser } = await oauth2.userinfo.get();
+    
+    if (googleUser.email !== user.email) {
+      return NextResponse.json({ 
+        error: `Security error: Google account (${googleUser.email}) does not match your registered email (${user.email}). Please use the correct Google account.` 
+      }, { status: 403 });
+    }
 
     // Get user's calendar list to find primary calendar
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
