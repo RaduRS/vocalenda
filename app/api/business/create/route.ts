@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
@@ -10,6 +10,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get user data from Clerk to ensure we use the correct email
+    const clerk = await clerkClient();
+    const user = await clerk.users.getUser(userId);
+    const primaryEmail = user.emailAddresses.find(email => email.id === user.primaryEmailAddressId);
+    
+    if (!primaryEmail) {
+      return NextResponse.json({ error: 'No primary email found' }, { status: 400 });
+    }
+
     const body = await request.json();
     const {
       clerkUserId,
@@ -18,13 +27,15 @@ export async function POST(request: NextRequest) {
       name: businessName,
       slug: businessSlug,
       phone: phoneNumber,
-      email,
       address,
       timezone
     } = body;
+    
+    // Use the email from Clerk, not from the request body
+    const email = primaryEmail.emailAddress;
 
     // Validate required fields
-    if (!businessName || !businessSlug || !phoneNumber || !email) {
+    if (!businessName || !businessSlug || !phoneNumber) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }

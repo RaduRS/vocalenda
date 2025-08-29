@@ -33,10 +33,20 @@ export default function SetupWizard() {
     name: '',
     slug: '',
     phone: '',
-    email: user?.primaryEmailAddress?.emailAddress || '',
+    email: '',
     address: '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
   });
+
+  // Update email when user data is available
+  useEffect(() => {
+    if (user?.primaryEmailAddress?.emailAddress) {
+      setBusinessData(prev => ({
+        ...prev,
+        email: user.primaryEmailAddress?.emailAddress || ''
+      }));
+    }
+  }, [user]);
 
   // Check if user already has a business and redirect to dashboard
   useEffect(() => {
@@ -315,14 +325,11 @@ export default function SetupWizard() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">Business Email *</label>
-              <input
-                type="email"
-                value={businessData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="contact@citybarbershop.com"
-              />
+              <label className="block text-sm font-medium mb-2">Business Email</label>
+              <div className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-700">
+                {user?.primaryEmailAddress?.emailAddress}
+              </div>
+              <p className="text-sm text-gray-500 mt-1">This email will be used for Google Calendar integration and must match your account email</p>
             </div>
           </div>
         )}
