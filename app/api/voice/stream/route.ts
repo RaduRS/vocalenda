@@ -1,20 +1,7 @@
-import { NextRequest } from 'next/server';
-import { WebSocketServer } from 'ws';
 import WebSocket from 'ws';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getCalendarService } from '@/lib/calendar';
 import { generateConfirmationMessage } from '@/lib/sms-templates';
-
-interface TwilioMessage {
-  event: string;
-  start?: {
-    streamSid: string;
-    customParameters: Record<string, string>;
-  };
-  media?: {
-    payload: string;
-  };
-}
 
 interface DeepgramMessage {
   type: string;
@@ -78,142 +65,12 @@ interface CallContext {
 }
 
 // This will be handled by the WebSocket upgrade in Next.js
-export async function GET(request: NextRequest) {
+export async function GET() {
   return new Response('WebSocket endpoint - use WebSocket connection', {
     status: 426,
     headers: {
       'Upgrade': 'websocket',
     },
-  });
-}
-
-// WebSocket handler for Twilio Media Streams
-export async function handleWebSocket(ws: WebSocket, request: NextRequest) {
-  console.log('New WebSocket connection established');
-  
-  let deepgramWs: WebSocket | null = null;
-  let businessId: string | null = null;
-  let callSid: string | null = null;
-  let businessConfig: BusinessConfig | null = null;
-
-  ws.on('message', async (message: Buffer) => {
-    try {
-      const data = JSON.parse(message.toString());
-      
-      switch (data.event) {
-        case 'connected':
-          console.log('Twilio connected:', data);
-          break;
-          
-        case 'start':
-          console.log('Media stream started:', data);
-          
-          // Extract parameters from Twilio
-          const customParameters = data.start?.customParameters || {};
-          businessId = customParameters.business_id;
-          callSid = customParameters.call_sid;
-          const callerPhone = customParameters.caller_phone;
-          const businessPhone = customParameters.business_phone;
-          const timezone = customParameters.timezone || 'UTC';
-          
-          if (!businessId) {
-            console.error('No business_id provided');
-            ws.close();
-            return;
-          }
-          
-          // Load business configuration
-          businessConfig = await loadBusinessConfig(businessId);
-          
-          if (!businessConfig) {
-            console.error('Failed to load business configuration');
-            ws.close();
-            return;
-          }
-          
-          // Initialize Deepgram connection
-          deepgramWs = await initializeDeepgram(businessConfig, {
-            businessId,
-            callSid: callSid || '',
-            callerPhone,
-            businessPhone,
-            timezone: businessConfig.business?.timezone || timezone || 'UTC'
-          });
-          
-          // Set up Deepgram message handling
-          deepgramWs.on('message', (deepgramMessage: Buffer) => {
-            const deepgramData = JSON.parse(deepgramMessage.toString());
-            
-            // Handle different types of Deepgram messages
-            if (deepgramData.type === 'Results') {
-              // Speech-to-text results
-              console.log('Transcript:', deepgramData.channel?.alternatives?.[0]?.transcript);
-            } else if (deepgramData.type === 'SpeechStarted') {
-              // User started speaking
-              console.log('User started speaking');
-            } else if (deepgramData.type === 'UtteranceEnd') {
-              // User finished speaking
-              console.log('User finished speaking');
-            } else if (deepgramData.type === 'TtsAudio') {
-              // AI response audio - forward to Twilio
-              const audioMessage = {
-                event: 'media',
-                streamSid: data.start?.streamSid,
-                media: {
-                  payload: deepgramData.data
-                }
-              };
-              ws.send(JSON.stringify(audioMessage));
-            } else if (deepgramData.type === 'FunctionCall') {
-              // Handle tool calls
-              if (deepgramWs && businessConfig) {
-                handleFunctionCall(deepgramWs, deepgramData, businessConfig);
-              }
-            }
-          });
-          
-          deepgramWs.on('error', (error: Error) => {
-            console.error('Deepgram WebSocket error:', error);
-          });
-          
-          deepgramWs.on('close', () => {
-            console.log('Deepgram WebSocket closed');
-          });
-          
-          break;
-          
-        case 'media':
-          // Forward audio to Deepgram
-          if (deepgramWs && deepgramWs.readyState === 1) {
-            const audioData = {
-              type: 'Audio',
-              data: data.media.payload
-            };
-            deepgramWs.send(JSON.stringify(audioData));
-          }
-          break;
-          
-        case 'stop':
-          console.log('Media stream stopped');
-          if (deepgramWs) {
-            deepgramWs.close();
-          }
-          break;
-      }
-    } catch (error) {
-      console.error('Error processing WebSocket message:', error);
-    }
-  });
-  
-  ws.on('close', () => {
-    console.log('Twilio WebSocket connection closed');
-    if (deepgramWs) {
-      deepgramWs.close();
-    }
-  });
-  
-  ws.on('error', (error: Error) => {
-    console.error('Twilio WebSocket error:', error);
   });
 }
 
@@ -440,7 +297,6 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
     };
     
     deepgramWs.send(JSON.stringify(response));
-    
   } catch (error) {
     console.error('Error handling function call:', error);
     
@@ -453,6 +309,136 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
     
     deepgramWs.send(JSON.stringify(errorResponse));
   }
+}
+
+// WebSocket handler for Twilio Media Streams
+async function handleWebSocket(ws: WebSocket) {
+  console.log('New WebSocket connection established');
+  
+  let deepgramWs: WebSocket | null = null;
+  let businessId: string | null = null;
+  let callSid: string | null = null;
+  let businessConfig: BusinessConfig | null = null;
+
+  ws.on('message', async (message: Buffer) => {
+    try {
+      const data = JSON.parse(message.toString());
+      
+      switch (data.event) {
+        case 'connected':
+          console.log('Twilio connected:', data);
+          break;
+          
+        case 'start':
+          console.log('Media stream started:', data);
+          
+          // Extract parameters from Twilio
+          const customParameters = data.start?.customParameters || {};
+          businessId = customParameters.business_id;
+          callSid = customParameters.call_sid;
+          const callerPhone = customParameters.caller_phone;
+          const businessPhone = customParameters.business_phone;
+          const timezone = customParameters.timezone || 'UTC';
+          
+          if (!businessId) {
+            console.error('No business_id provided');
+            ws.close();
+            return;
+          }
+          
+          // Load business configuration
+          businessConfig = await loadBusinessConfig(businessId);
+          
+          if (!businessConfig) {
+            console.error('Failed to load business configuration');
+            ws.close();
+            return;
+          }
+          
+          // Initialize Deepgram connection
+          deepgramWs = await initializeDeepgram(businessConfig, {
+            businessId,
+            callSid: callSid || '',
+            callerPhone,
+            businessPhone,
+            timezone: businessConfig.business?.timezone || timezone || 'UTC'
+          });
+          
+          // Set up Deepgram message handling
+          deepgramWs.on('message', (deepgramMessage: Buffer) => {
+            const deepgramData = JSON.parse(deepgramMessage.toString());
+            
+            // Handle different types of Deepgram messages
+            if (deepgramData.type === 'Results') {
+              // Speech-to-text results
+              console.log('Transcript:', deepgramData.channel?.alternatives?.[0]?.transcript);
+            } else if (deepgramData.type === 'SpeechStarted') {
+              // User started speaking
+              console.log('User started speaking');
+            } else if (deepgramData.type === 'UtteranceEnd') {
+              // User finished speaking
+              console.log('User finished speaking');
+            } else if (deepgramData.type === 'TtsAudio') {
+              // AI response audio - forward to Twilio
+              const audioMessage = {
+                event: 'media',
+                streamSid: data.start?.streamSid,
+                media: {
+                  payload: deepgramData.data
+                }
+              };
+              ws.send(JSON.stringify(audioMessage));
+            } else if (deepgramData.type === 'FunctionCall') {
+              // Handle tool calls
+              if (deepgramWs && businessConfig) {
+                handleFunctionCall(deepgramWs, deepgramData, businessConfig);
+              }
+            }
+          });
+          
+          deepgramWs.on('error', (error: Error) => {
+            console.error('Deepgram WebSocket error:', error);
+          });
+          
+          deepgramWs.on('close', () => {
+            console.log('Deepgram WebSocket closed');
+          });
+          
+          break;
+          
+        case 'media':
+          // Forward audio to Deepgram
+          if (deepgramWs && deepgramWs.readyState === 1) {
+            const audioData = {
+              type: 'Audio',
+              data: data.media.payload
+            };
+            deepgramWs.send(JSON.stringify(audioData));
+          }
+          break;
+          
+        case 'stop':
+          console.log('Media stream stopped');
+          if (deepgramWs) {
+            deepgramWs.close();
+          }
+          break;
+      }
+    } catch (error) {
+      console.error('Error processing WebSocket message:', error);
+    }
+  });
+  
+  ws.on('close', () => {
+    console.log('Twilio WebSocket connection closed');
+    if (deepgramWs) {
+      deepgramWs.close();
+    }
+  });
+  
+  ws.on('error', (error: Error) => {
+    console.error('Twilio WebSocket error:', error);
+  });
 }
 
 // Get available slots for a specific date and service
