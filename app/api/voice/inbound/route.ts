@@ -46,8 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the WebSocket URL for streaming
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vocalenda.vercel.app';
-    const streamUrl = `${baseUrl.replace('http', 'ws')}/api/voice/stream`;
+    const streamUrl = process.env.WEBSOCKET_URL || 'ws://localhost:8080';
 
     // Return TwiML to start media stream
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
