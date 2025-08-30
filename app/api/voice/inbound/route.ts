@@ -1,13 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+// Handle GET requests for Twilio webhook verification
+export async function GET(request: NextRequest) {
+  // Twilio sometimes sends GET requests to verify the webhook URL
+  return new NextResponse('Webhook endpoint is active', {
+    status: 200,
+    headers: { 'Content-Type': 'text/plain' },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Get the incoming phone number from Twilio
-    const formData = await request.formData();
-    const to = formData.get('To') as string;
-    const from = formData.get('From') as string;
-    const callSid = formData.get('CallSid') as string;
+    // Handle both form data and URL-encoded content types
+    let to: string, from: string, callSid: string;
+    
+    const contentType = request.headers.get('content-type') || '';
+    
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      const formData = await request.formData();
+      to = formData.get('To') as string;
+      from = formData.get('From') as string;
+      callSid = formData.get('CallSid') as string;
+    } else {
+      // Fallback: try to parse as text and extract parameters
+      const body = await request.text();
+      const params = new URLSearchParams(body);
+      to = params.get('To') || '';
+      from = params.get('From') || '';
+      callSid = params.get('CallSid') || '';
+    }
 
     console.log('Incoming call:', { to, from, callSid });
 
