@@ -119,7 +119,7 @@ async function loadBusinessConfig(businessId: string) {
 // Initialize Deepgram Voice Agent connection
 async function initializeDeepgram(businessConfig: BusinessConfig, callContext: CallContext) {
   
-  const deepgramWs = new WebSocket('wss://agent.deepgram.com/agent', {
+  const deepgramWs = new WebSocket('wss://agent.deepgram.com/v1/agent/converse', {
     headers: {
       'Authorization': `Token ${process.env.DEEPGRAM_API_KEY}`
     }
