@@ -13,24 +13,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Get the incoming phone number from Twilio
-    // Handle both form data and URL-encoded content types
-    let to: string, from: string, callSid: string;
+    // Parse Twilio webhook data (application/x-www-form-urlencoded)
+    const body = await request.text();
+    const params = new URLSearchParams(body);
     
-    const contentType = request.headers.get('content-type') || '';
-    
-    if (contentType.includes('application/x-www-form-urlencoded')) {
-      const formData = await request.formData();
-      to = formData.get('To') as string;
-      from = formData.get('From') as string;
-      callSid = formData.get('CallSid') as string;
-    } else {
-      // Fallback: try to parse as text and extract parameters
-      const body = await request.text();
-      const params = new URLSearchParams(body);
-      to = params.get('To') || '';
-      from = params.get('From') || '';
-      callSid = params.get('CallSid') || '';
-    }
+    const to = params.get('To') || '';
+    const from = params.get('From') || '';
+    const callSid = params.get('CallSid') || '';
 
     console.log('Incoming call:', { to, from, callSid });
 
