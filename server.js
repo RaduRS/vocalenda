@@ -227,7 +227,7 @@ async function initializeDeepgram(businessConfig, callContext) {
       },
       agent: {
         listen: {
-          model: "nova-2",
+          model: "nova-3",
         },
         think: {
           provider: {
