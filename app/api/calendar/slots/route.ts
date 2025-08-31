@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Parse business hours with enhanced validation
-    const businessHours = business.business_hours as Record<string, { start: string; end: string; closed?: boolean }>;
+    const businessHours = business.business_hours as Record<string, { open: string; close: string; closed?: boolean }>;
     if (!businessHours || typeof businessHours !== 'object') {
       console.error(`Invalid business hours format for business ${businessId}:`, businessHours);
       return NextResponse.json(
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     console.log(`Date: ${date}, Day of week: ${dayOfWeek}, JS getDay(): ${jsDay}, UK day index: ${ukDay}`);
     
     const dayHours = businessHours[dayOfWeek];
-    if (!dayHours || dayHours.closed === true || !dayHours.start || !dayHours.end) {
+    if (!dayHours || dayHours.closed === true || !dayHours.open || !dayHours.close) {
       console.log(`Business closed on ${dayOfWeek}. Hours:`, dayHours);
       return NextResponse.json(
         { error: `Business is closed on ${dayOfWeek}s` },
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
       business.google_calendar_id,
       requestDate,
       service.duration_minutes,
-      { start: dayHours.start, end: dayHours.end },
+      { start: dayHours.open, end: dayHours.close },
       business.timezone
     );
 

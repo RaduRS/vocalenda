@@ -577,7 +577,7 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
     }
 
     // Parse business hours with enhanced validation
-    const businessHours = business.business_hours as Record<string, { start: string; end: string; closed?: boolean }>;
+    const businessHours = business.business_hours as Record<string, { open: string; close: string; closed?: boolean }>;
     if (!businessHours || typeof businessHours !== 'object') {
       console.error(`Invalid business hours format for business ${business.id}:`, businessHours);
       return { error: 'Business hours not configured' };
@@ -597,7 +597,7 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
     console.log(`Voice API - Date: ${date}, Day of week: ${dayOfWeek}, JS getDay(): ${jsDay}, UK day index: ${ukDay}`);
     
     const dayHours = businessHours[dayOfWeek];
-    if (!dayHours || dayHours.closed === true || !dayHours.start || !dayHours.end) {
+    if (!dayHours || dayHours.closed === true || !dayHours.open || !dayHours.close) {
       console.log(`Voice API - Business closed on ${dayOfWeek}. Hours:`, dayHours);
       return { available_slots: [], message: `Business is closed on ${dayOfWeek}s` };
     }
@@ -608,7 +608,7 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
       business.google_calendar_id,
       requestDate,
       serviceDuration,
-      { start: dayHours.start, end: dayHours.end },
+      { start: dayHours.open, end: dayHours.close },
       business.timezone
     );
 
