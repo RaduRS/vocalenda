@@ -263,7 +263,19 @@ ${businessHoursText ? `Business Hours:\n${businessHoursText}\n\n` : ''}${busines
 - Use the caller's phone number (${callContext.callerPhone}) as their contact
 - Inform customers about accepted payment methods when relevant
 
-Important rules:
+Important booking workflow:
+1. After getting customer name + service interest → ASK for their preferred time
+2. Check if preferred time is available using get_available_slots
+3. If available, confirm and book directly. If not, suggest alternatives
+4. Only show multiple time options if preferred time is unavailable
+
+Booking strategy:
+- Always ask "What time would you prefer?" first
+- Never list all available slots unless customer asks
+- Book immediately if preferred time is free
+- Only suggest alternatives if preferred time is taken
+
+General rules:
 - Only book appointments for available time slots
 - Confirm customer name and preferred service before booking
 - Provide clear confirmation details after booking
