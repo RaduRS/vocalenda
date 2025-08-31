@@ -549,15 +549,39 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
       return { error: 'Calendar service unavailable' };
     }
 
-    // Parse business hours
-    const businessHours = business.business_hours as Record<string, { start: string; end: string }>;
-    const requestDate = new Date(date);
-    const dayOfWeek = requestDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      console.error(`Invalid date format: ${date}`);
+      return { error: 'Invalid date format. Use YYYY-MM-DD' };
+    }
+
+    // Parse business hours with enhanced validation
+    const businessHours = business.business_hours as Record<string, { start: string; end: string; closed?: boolean }>;
+    if (!businessHours || typeof businessHours !== 'object') {
+      console.error(`Invalid business hours format for business ${business.id}:`, businessHours);
+      return { error: 'Business hours not configured' };
+    }
+
+    const requestDate = new Date(date + 'T00:00:00'); // Ensure proper date parsing
+    if (isNaN(requestDate.getTime())) {
+      console.error(`Invalid date: ${date}`);
+      return { error: 'Invalid date provided' };
+    }
+
+    // UK format: Monday is first day of week (index 0)
+    const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const jsDay = requestDate.getDay(); // JavaScript: 0=Sunday, 1=Monday, ..., 6=Saturday
+    const ukDay = jsDay === 0 ? 6 : jsDay - 1; // Convert to UK format: 0=Monday, 1=Tuesday, ..., 6=Sunday
+    const dayOfWeek = dayNames[ukDay];
+    console.log(`Voice API - Date: ${date}, Day of week: ${dayOfWeek}, JS getDay(): ${jsDay}, UK day index: ${ukDay}`);
     
     const dayHours = businessHours[dayOfWeek];
-    if (!dayHours || !dayHours.start || !dayHours.end) {
-      return { available_slots: [] };
+    if (!dayHours || dayHours.closed === true || !dayHours.start || !dayHours.end) {
+      console.log(`Voice API - Business closed on ${dayOfWeek}. Hours:`, dayHours);
+      return { available_slots: [], message: `Business is closed on ${dayOfWeek}s` };
     }
+
+    console.log(`Voice API - Business hours for ${dayOfWeek}:`, dayHours);
 
     const availableSlots = await calendarService.getAvailableSlots(
       business.google_calendar_id,

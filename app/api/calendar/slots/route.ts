@@ -11,6 +11,18 @@ const supabase = createClient(
 // Get available time slots for a business
 export async function GET(request: NextRequest) {
   try {
+    // Check for internal API call first
+    const internalSecret = request.headers.get('x-internal-secret');
+    const isInternalCall = internalSecret === process.env.INTERNAL_API_SECRET;
+    
+    // If not internal call, require authentication
+    if (!isInternalCall) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
     const { searchParams } = new URL(request.url);
     const businessId = searchParams.get('businessId');
     const date = searchParams.get('date');
@@ -62,18 +74,51 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Parse business hours (assuming format like { "monday": { "start": "09:00", "end": "17:00" } })
-    const businessHours = business.business_hours as Record<string, { start: string; end: string }>;
-    const requestDate = new Date(date);
-    const dayOfWeek = requestDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    
-    const dayHours = businessHours[dayOfWeek];
-    if (!dayHours || !dayHours.start || !dayHours.end) {
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      console.error(`Invalid date format: ${date}`);
       return NextResponse.json(
-        { error: 'Business is closed on this day' },
+        { error: 'Invalid date format. Use YYYY-MM-DD' },
         { status: 400 }
       );
     }
+
+    // Parse business hours with enhanced validation
+    const businessHours = business.business_hours as Record<string, { start: string; end: string; closed?: boolean }>;
+    if (!businessHours || typeof businessHours !== 'object') {
+      console.error(`Invalid business hours format for business ${businessId}:`, businessHours);
+      return NextResponse.json(
+        { error: 'Business hours not configured' },
+        { status: 500 }
+      );
+    }
+
+    const requestDate = new Date(date + 'T00:00:00'); // Ensure proper date parsing
+    if (isNaN(requestDate.getTime())) {
+      console.error(`Invalid date: ${date}`);
+      return NextResponse.json(
+        { error: 'Invalid date provided' },
+        { status: 400 }
+      );
+    }
+
+    // UK format: Monday is first day of week (index 0)
+    const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const jsDay = requestDate.getDay(); // JavaScript: 0=Sunday, 1=Monday, ..., 6=Saturday
+    const ukDay = jsDay === 0 ? 6 : jsDay - 1; // Convert to UK format: 0=Monday, 1=Tuesday, ..., 6=Sunday
+    const dayOfWeek = dayNames[ukDay];
+    console.log(`Date: ${date}, Day of week: ${dayOfWeek}, JS getDay(): ${jsDay}, UK day index: ${ukDay}`);
+    
+    const dayHours = businessHours[dayOfWeek];
+    if (!dayHours || dayHours.closed === true || !dayHours.start || !dayHours.end) {
+      console.log(`Business closed on ${dayOfWeek}. Hours:`, dayHours);
+      return NextResponse.json(
+        { error: `Business is closed on ${dayOfWeek}s` },
+        { status: 400 }
+      );
+    }
+
+    console.log(`Business hours for ${dayOfWeek}:`, dayHours);
 
     // Get available slots
     const availableSlots = await calendarService.getAvailableSlots(
