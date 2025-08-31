@@ -369,9 +369,10 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
     
     // Send function response back to Deepgram
     const response = {
-      type: 'FunctionResponse',
-      function_call_id: functionCallData.function_call_id,
-      result: result
+      type: 'FunctionCallResponse',
+      id: functionCallData.function_call_id,
+      name: functionCallData.function_name,
+      content: JSON.stringify(result)
     };
     
     deepgramWs.send(JSON.stringify(response));
@@ -380,9 +381,10 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
     
     // Send error response
     const errorResponse = {
-      type: 'FunctionResponse',
-      function_call_id: functionCallData.function_call_id,
-      result: { error: 'Function execution failed' }
+      type: 'FunctionCallResponse',
+      id: functionCallData.function_call_id,
+      name: functionCallData.function_name,
+      content: JSON.stringify({ error: 'Function execution failed' })
     };
     
     deepgramWs.send(JSON.stringify(errorResponse));
