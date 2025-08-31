@@ -107,9 +107,6 @@ wss.on("connection", async (ws, req) => {
 
               // Check if this is binary audio data
               if (Buffer.isBuffer(deepgramMessage)) {
-                console.log(
-                  `Processing binary audio data from Deepgram (${deepgramMessage.length} bytes)`
-                );
 
                 // Validate audio data integrity
                 if (deepgramMessage.length === 0) {
@@ -712,9 +709,6 @@ async function initializeDeepgram(businessConfig, callContext) {
         if (message instanceof Buffer && message.length > 0) {
           // First check: if it's clearly not text-based, skip it
           if (message.length > 100 && !message.toString('utf8', 0, 10).includes('{')) {
-            console.log(
-              `[${timestamp}] 🔊 INIT: Ignoring binary audio data (${message.length} bytes)`
-            );
             return;
           }
           
