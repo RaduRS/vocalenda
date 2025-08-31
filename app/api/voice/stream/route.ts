@@ -371,7 +371,7 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
     const response = {
       type: 'FunctionResponse',
       function_call_id: functionCallData.function_call_id,
-      result: JSON.stringify(result)
+      result: result
     };
     
     deepgramWs.send(JSON.stringify(response));
@@ -382,7 +382,7 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
     const errorResponse = {
       type: 'FunctionResponse',
       function_call_id: functionCallData.function_call_id,
-      result: JSON.stringify({ error: 'Function execution failed' })
+      result: { error: 'Function execution failed' }
     };
     
     deepgramWs.send(JSON.stringify(errorResponse));
@@ -529,19 +529,40 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
       return { error: 'Calendar not connected' };
     }
 
-    // Get default service if not specified
-    let serviceId = service_id;
+    // Get service details and duration
+    let serviceId: string | undefined = service_id;
     let serviceDuration = 60; // default 60 minutes
+    let service = null;
     
     if (serviceId) {
-      const service = businessConfig.services.find(s => s.id === serviceId);
+      // First try to find by ID (UUID)
+      service = businessConfig.services.find(s => s.id === serviceId);
+      
+      // If not found by ID, try to find by name (case-insensitive)
+      if (!service) {
+        service = businessConfig.services.find(s => 
+          s.name.toLowerCase() === serviceId!.toLowerCase()
+        );
+        if (service) {
+          serviceId = service.id; // Use the actual UUID
+          console.log(`Voice API - Found service by name '${service_id}' -> ID: ${serviceId}`);
+        }
+      }
+      
       if (service) {
         serviceDuration = service.duration_minutes;
+        console.log(`Voice API - Using service: ${service.name} (Duration: ${service.duration_minutes} minutes)`);
+      } else {
+        console.error(`Voice API - Service not found with ID/Name: ${serviceId}`);
+        console.error(`Voice API - Available services:`, businessConfig.services.map(s => `${s.name} (${s.id})`));
+        return { error: `Service not found: ${serviceId}. Available services: ${businessConfig.services.map(s => s.name).join(', ')}` };
       }
     } else if (businessConfig.services.length > 0) {
       // Use first available service as default
-      serviceId = businessConfig.services[0].id;
-      serviceDuration = businessConfig.services[0].duration_minutes;
+      service = businessConfig.services[0];
+      serviceId = service.id;
+      serviceDuration = service.duration_minutes;
+      console.log(`Voice API - Using default service: ${service.name}`);
     }
 
     const calendarService = await getCalendarService(business.id);
@@ -623,10 +644,25 @@ async function createBooking(businessConfig: BusinessConfig, params: {
     }
 
     // Find the service
-    const service = businessConfig.services.find(s => s.id === service_id);
+    let service = businessConfig.services.find(s => s.id === service_id);
+    
+    // If not found by ID, try to find by name (case-insensitive)
     if (!service) {
-      return { error: 'Service not found' };
+      service = businessConfig.services.find(s => 
+        s.name.toLowerCase() === service_id.toLowerCase()
+      );
+      if (service) {
+        console.log(`Voice API - Booking - Found service by name '${service_id}' -> ID: ${service.id}`);
+      }
     }
+    
+    if (!service) {
+      console.error(`Voice API - Booking - Service not found with ID/Name: ${service_id}`);
+      console.error(`Voice API - Available services:`, businessConfig.services.map(s => `${s.name} (${s.id})`));
+      return { error: `Service not found: ${service_id}. Available services: ${businessConfig.services.map(s => s.name).join(', ')}` };
+    }
+    
+    console.log(`Voice API - Booking - Using service: ${service.name} (Duration: ${service.duration_minutes} minutes)`);
 
     // Parse date and time
     const appointmentDate = new Date(`${date}T${time}:00`);
