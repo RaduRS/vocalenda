@@ -1,0 +1,29 @@
+{
+  "name": "vocalenda-ws-stream",
+  "version": "1.0.0",
+  "description": "WebSocket stream server for Vocalenda voice AI",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@deepgram/sdk": "^3.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "twilio": "^5.0.0",
+    "ws": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "websocket",
+    "voice",
+    "ai",
+    "twilio",
+    "deepgram"
+  ],
+  "author": "Vocalenda",
+  "license": "MIT"
+}
