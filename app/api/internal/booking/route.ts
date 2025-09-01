@@ -135,33 +135,37 @@ Price: ${service.price ? `${service.currency || '$'} ${service.price}` : 'Not sp
 ${notes ? `\nNotes: ${notes}` : ''}
     `.trim();
 
+    // Convert datetime strings to proper timezone-aware ISO strings for Google Calendar
+    const startDateTime = startTime.includes('T') ? startTime : `${startTime}T00:00:00`;
+    const endDateTime = endTime.includes('T') ? endTime : `${endTime}T00:00:00`;
+    
+    // Create timezone-aware datetime strings
+    const startTimeForCalendar = startDateTime.endsWith('Z') ? startDateTime : `${startDateTime}.000`;
+    const endTimeForCalendar = endDateTime.endsWith('Z') ? endDateTime : `${endDateTime}.000`;
+
     const calendarEventId = await calendarService.createEvent(
       business.google_calendar_id,
       {
         summary: `${service.name} - ${customerName}`,
         description: eventDescription,
         start: {
-          dateTime: startTime,
+          dateTime: startTimeForCalendar,
           timeZone: business.timezone
         },
         end: {
-          dateTime: endTime,
+          dateTime: endTimeForCalendar,
           timeZone: business.timezone
         }
       }
     );
 
     // Create appointment record
-    // Extract date and time components from the ISO strings to avoid timezone conversion issues
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+    // Extract date and time components from the datetime strings to avoid timezone conversion issues
+    const appointmentDate = startDateTime.split('T')[0];
     
-    // Format date as YYYY-MM-DD
-    const appointmentDate = startDate.toISOString().split('T')[0];
-    
-    // Extract time in HH:MM format from the original ISO string to preserve the intended time
-    const startTimeFormatted = startTime.split('T')[1].slice(0, 5);
-    const endTimeFormatted = endTime.split('T')[1].slice(0, 5);
+    // Extract time in HH:MM:SS format from the datetime string to preserve the intended time
+    const startTimeFormatted = startDateTime.split('T')[1].slice(0, 8);
+    const endTimeFormatted = endDateTime.split('T')[1].slice(0, 8);
     
     const { data: appointment, error: appointmentError } = await supabase
       .from('appointments')

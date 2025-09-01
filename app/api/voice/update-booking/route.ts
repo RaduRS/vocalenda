@@ -245,6 +245,10 @@ export async function POST(request: NextRequest) {
             (await supabaseAdmin.from('services').select('name').eq('id', updates.service_id).single()).data?.name :
             existingBooking.services?.name;
 
+          // Format datetime for Google Calendar with proper timezone handling
+          const startTimeForCalendar = newStartTime.endsWith('Z') ? newStartTime : `${newStartTime}.000`;
+          const endTimeForCalendar = newEndTime.endsWith('Z') ? newEndTime : `${newEndTime}.000`;
+
           await calendarService.updateEvent(
             business.google_calendar_id,
             existingBooking.google_calendar_event_id,
@@ -252,11 +256,11 @@ export async function POST(request: NextRequest) {
               summary: `${serviceName} - ${customer_name}`,
               description: `Service: ${serviceName}\nCustomer: ${customer_name}\nPhone: ${existingBooking.customers.phone || 'Not provided'}`,
               start: {
-                dateTime: new Date(newStartTime).toISOString(),
+                dateTime: startTimeForCalendar,
                 timeZone: business.timezone
               },
               end: {
-                dateTime: new Date(newEndTime).toISOString(),
+                dateTime: endTimeForCalendar,
                 timeZone: business.timezone
               }
             }

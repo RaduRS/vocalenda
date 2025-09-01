@@ -678,9 +678,14 @@ async function createBooking(businessConfig: BusinessConfig, params: {
     
     console.log(`Voice API - Booking - Using service: ${service.name} (Duration: ${service.duration_minutes} minutes)`);
 
-    // Parse date and time
-    const appointmentDate = new Date(`${date}T${time}:00`);
+    // Parse date and time in business timezone format
+    const appointmentDateTime = `${date}T${time}:00`;
+    const appointmentDate = new Date(`${appointmentDateTime}Z`); // For availability check
     const endTime = new Date(appointmentDate.getTime() + service.duration_minutes * 60000);
+    
+    // Create timezone-aware datetime strings for calendar
+    const startTimeForCalendar = `${appointmentDateTime}.000`;
+    const endTimeForCalendar = new Date(appointmentDate.getTime() + service.duration_minutes * 60000).toISOString().slice(0, 19) + '.000';
 
     const calendarService = await getCalendarService(business.id);
     if (!calendarService) {
@@ -724,11 +729,11 @@ async function createBooking(businessConfig: BusinessConfig, params: {
         summary: `${service.name} - ${customer_name}`,
         description: `Service: ${service.name}\nCustomer: ${customer_name}\nPhone: ${customer_phone || 'Not provided'}`,
         start: {
-          dateTime: appointmentDate.toISOString(),
+          dateTime: startTimeForCalendar,
           timeZone: business.timezone
         },
         end: {
-          dateTime: endTime.toISOString(),
+          dateTime: endTimeForCalendar,
           timeZone: business.timezone
         }
       }
