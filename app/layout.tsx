@@ -9,6 +9,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import Script from "next/script";
 
 import "./globals.css";
 
@@ -69,6 +70,20 @@ export default function RootLayout({
         signUpUrl="/sign-up"
     >
       <html lang="en">
+        <head>
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK"
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){window.dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-V5TDZDW6VK');
+            `}
+          </Script>
+        </head>
 
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
