@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
             existingBooking.google_calendar_event_id,
             {
               summary: `${serviceName} - ${customer_name}`,
-              description: `Service: ${serviceName}\nCustomer: ${customer_name}\nPhone: ${existingBooking.customers.phone || 'Not provided'}`,
+              description: `Service: ${serviceName}\nCustomer: ${customer_name}\nPhone: ${existingBooking.customers?.phone || 'Not provided'}`,
               start: {
                 dateTime: startTimeForCalendar,
                 timeZone: business.timezone
