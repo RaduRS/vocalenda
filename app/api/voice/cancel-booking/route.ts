@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       .from('appointments')
       .select(`
         *,
-        customers!inner(*),
+        customers(*),
         services(*)
       `)
       .eq('business_id', business_id)
@@ -88,9 +88,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Find booking with exact customer name match
+    // Handle both regular bookings (with customer records) and voice bookings (stored in notes)
     const existingBooking = existingBookings?.find(booking => {
-      const fullName = `${booking.customers.first_name} ${booking.customers.last_name}`.trim();
-      return fullName.toLowerCase() === customer_name.toLowerCase();
+      if (booking.customers) {
+        // Regular booking with customer record
+        const fullName = `${booking.customers.first_name} ${booking.customers.last_name}`.trim();
+        return fullName.toLowerCase() === customer_name.toLowerCase();
+      } else {
+        // Voice booking - check notes field for customer name
+        const notesMatch = booking.notes && booking.notes.includes(`Customer: ${customer_name}`);
+        return notesMatch;
+      }
     });
 
     if (!existingBooking) {
@@ -151,7 +159,9 @@ export async function POST(request: NextRequest) {
       message: 'Booking cancelled successfully',
       booking: {
         id: cancelledBooking.id,
-        customer_name: `${cancelledBooking.customers.first_name} ${cancelledBooking.customers.last_name}`.trim(),
+        customer_name: cancelledBooking.customers 
+          ? `${cancelledBooking.customers.first_name} ${cancelledBooking.customers.last_name}`.trim()
+          : customer_name, // Use the provided customer name for voice bookings
         service_name: cancelledBooking.services?.name,
         date: cancelledBooking.appointment_date,
         start_time: cancelledBooking.start_time,
