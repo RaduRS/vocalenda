@@ -1,5 +1,11 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Clock, Mail, Phone } from "lucide-react";
 
 export default function ComingSoon() {
@@ -10,18 +16,19 @@ export default function ComingSoon() {
           <Badge variant="secondary" className="mb-4">
             🚧 Coming Soon
           </Badge>
-          
+
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
             <span className="text-black dark:text-white">Vo</span>
             <span className="text-purple-600 dark:text-purple-400">cal</span>
             <span className="text-blue-600 dark:text-blue-400">enda</span>
           </h1>
-          
+
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 px-4">
-            We&apos;re working hard to bring you the future of voice-powered appointment booking. 
-            Our AI-driven platform will revolutionize how businesses handle customer appointments.
+            We&apos;re working hard to bring you the future of voice-powered
+            appointment booking. Our AI-driven platform will revolutionize how
+            businesses handle customer appointments.
           </p>
-          
+
           <Card className="border-slate-200 dark:border-slate-800 max-w-md mx-auto mt-8">
             <CardHeader className="text-center">
               <Clock className="h-12 w-12 mx-auto text-blue-600 dark:text-blue-400 mb-4" />
@@ -29,13 +36,13 @@ export default function ComingSoon() {
             </CardHeader>
             <CardContent className="text-center">
               <CardDescription className="text-base">
-                Expected launch: <strong>Q2 2025</strong>
+                Expected launch: <strong>Q4 2025</strong>
                 <br />
                 Stay tuned for updates!
               </CardDescription>
             </CardContent>
           </Card>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 max-w-lg mx-auto">
             <Card className="border-slate-200 dark:border-slate-800">
               <CardHeader className="text-center pb-3">
@@ -48,7 +55,7 @@ export default function ComingSoon() {
                 </CardDescription>
               </CardContent>
             </Card>
-            
+
             <Card className="border-slate-200 dark:border-slate-800">
               <CardHeader className="text-center pb-3">
                 <Mail className="h-6 w-6 mx-auto text-purple-600 dark:text-purple-400 mb-2" />
@@ -61,11 +68,11 @@ export default function ComingSoon() {
               </CardContent>
             </Card>
           </div>
-          
+
           <div className="mt-12 text-sm text-slate-500 dark:text-slate-400">
             <p>For early access inquiries, please contact us at:</p>
             <p className="font-medium text-slate-700 dark:text-slate-300 mt-1">
-              hello@vocalenda.com
+              socials@vocalenda.com
             </p>
           </div>
         </div>

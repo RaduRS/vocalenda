@@ -9,6 +9,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -68,6 +69,7 @@ export default function RootLayout({
         signUpUrl="/sign-up"
     >
       <html lang="en">
+
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
