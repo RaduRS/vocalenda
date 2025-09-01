@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Found existing booking to cancel:', existingBooking.id);
 
-    // Update the booking status to cancelled
+    // Atomic update: only cancel if status is still 'confirmed' to prevent race conditions
     const { data: cancelledBooking, error: updateError } = await supabaseAdmin
       .from('appointments')
       .update({
@@ -120,6 +120,7 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString()
       })
       .eq('id', existingBooking.id)
+      .eq('status', 'confirmed') // Only update if still confirmed
       .select(`
         *,
         customers(*),
@@ -132,6 +133,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Failed to cancel booking in database' },
         { status: 500 }
+      );
+    }
+
+    // Check if the booking was actually updated (race condition check)
+    if (!cancelledBooking) {
+      console.log('⚠️ Booking was already cancelled by another request');
+      return NextResponse.json(
+        { 
+          success: true, 
+          message: 'Booking was already cancelled',
+          booking: {
+            id: existingBooking.id,
+            customer_name: customer_name,
+            service_name: existingBooking.services?.name,
+            date: existingBooking.appointment_date,
+            start_time: existingBooking.start_time,
+            end_time: existingBooking.end_time,
+            status: 'cancelled'
+          }
+        },
+        { status: 200 }
       );
     }
 

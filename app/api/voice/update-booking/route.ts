@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update the booking in database
+    // Update the booking in database (only if still confirmed)
     const { data: updatedBooking, error: updateError } = await supabaseAdmin
       .from('appointments')
       .update({
@@ -211,6 +211,7 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString()
       })
       .eq('id', existingBooking.id)
+      .eq('status', 'confirmed') // Only update if still confirmed
       .select(`
         *,
         customers(*),
@@ -223,6 +224,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Failed to update booking in database' },
         { status: 500 }
+      );
+    }
+
+    // Check if the booking was actually updated (may have been cancelled)
+    if (!updatedBooking) {
+      console.log('⚠️ Booking cannot be updated - may have been cancelled');
+      return NextResponse.json(
+        { error: 'Booking cannot be updated - it may have been cancelled or no longer exists' },
+        { status: 409 }
       );
     }
 
