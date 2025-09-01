@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the existing booking by exact customer name, date, and time
-    const currentDateTime = `${current_date}T${current_time}:00`;
+    // Note: start_time is stored as just the time (e.g., "13:00:00") and appointment_date as date
+    const currentTimeWithSeconds = current_time.includes(':') && current_time.split(':').length === 2 ? `${current_time}:00` : current_time;
     
     const { data: existingBookings, error: findError } = await supabaseAdmin
       .from('appointments')
@@ -86,7 +87,8 @@ export async function POST(request: NextRequest) {
         services(*)
       `)
       .eq('business_id', business_id)
-      .eq('start_time', currentDateTime)
+      .eq('appointment_date', current_date)
+      .eq('start_time', currentTimeWithSeconds)
       .neq('status', 'cancelled');
 
     if (findError) {
@@ -150,14 +152,19 @@ export async function POST(request: NextRequest) {
       const finalDate = new_date || current_date;
       const finalTime = new_time || current_time;
       
-      newStartTime = `${finalDate}T${finalTime}:00`;
-      const startDateTime = new Date(newStartTime);
+      // Create datetime for calendar operations
+      const newStartDateTime = `${finalDate}T${finalTime}:00`;
+      const startDateTime = new Date(newStartDateTime);
       const endDateTime = new Date(startDateTime.getTime() + serviceDuration * 60000);
-      newEndTime = endDateTime.toISOString().slice(0, 19);
+      
+      // Store just the time part in start_time field (matching database schema)
+      const finalTimeWithSeconds = finalTime.includes(':') && finalTime.split(':').length === 2 ? `${finalTime}:00` : finalTime;
+      newStartTime = newStartDateTime; // For calendar operations
+      newEndTime = endDateTime.toISOString().slice(0, 19); // For calendar operations
 
       updates.appointment_date = finalDate;
-      updates.start_time = newStartTime;
-      updates.end_time = newEndTime;
+      updates.start_time = finalTimeWithSeconds; // Store just time, not datetime
+      updates.end_time = endDateTime.toTimeString().slice(0, 8); // Store just time, not datetime
     }
 
     // Check availability for new time slot (if time is changing)

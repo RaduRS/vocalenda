@@ -152,15 +152,26 @@ ${notes ? `\nNotes: ${notes}` : ''}
     );
 
     // Create appointment record
+    // Extract date and time components from the ISO strings to avoid timezone conversion issues
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    
+    // Format date as YYYY-MM-DD
+    const appointmentDate = startDate.toISOString().split('T')[0];
+    
+    // Extract time in HH:MM format from the original ISO string to preserve the intended time
+    const startTimeFormatted = startTime.split('T')[1].slice(0, 5);
+    const endTimeFormatted = endTime.split('T')[1].slice(0, 5);
+    
     const { data: appointment, error: appointmentError } = await supabase
       .from('appointments')
       .insert({
         business_id: businessId,
         customer_id: customerId || null,
         service_id: serviceId,
-        appointment_date: new Date(startTime).toISOString().split('T')[0],
-        start_time: new Date(startTime).toTimeString().slice(0, 5),
-        end_time: new Date(endTime).toTimeString().slice(0, 5),
+        appointment_date: appointmentDate,
+        start_time: startTimeFormatted,
+        end_time: endTimeFormatted,
         status: 'confirmed',
         notes,
         google_calendar_event_id: calendarEventId
