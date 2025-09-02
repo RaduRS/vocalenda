@@ -355,10 +355,10 @@ export default function BusinessSettings() {
                 </Label>
                 <Input
                   id="phone"
-                  value={businessData.phone || 'Phone number managed by admin'}
+                  value={businessData.phone || 'Admin will assign'}
                   readOnly
                   className="bg-gray-50 cursor-not-allowed"
-                  placeholder="Phone number managed by admin"
+                  placeholder="Admin will assign"
                 />
                 <p className="text-sm text-gray-500 mt-1">Contact support to update your phone number</p>
               </div>

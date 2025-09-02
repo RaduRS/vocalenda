@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name: businessName,
         slug: businessSlug,
-        phone_number: (phoneNumber && phoneNumber !== 'Phone number will be assigned by admin') ? phoneNumber : null, // Phone numbers assigned by admin
+        phone_number: (phoneNumber && phoneNumber !== 'Admin will assign') ? phoneNumber : null, // Phone numbers assigned by admin
         email: email,
         address,
         timezone,

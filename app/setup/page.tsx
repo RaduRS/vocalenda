@@ -49,7 +49,7 @@ export default function SetupWizard() {
   const [businessData, setBusinessData] = useState<Partial<ComprehensiveBusinessData>>({
     name: '',
     slug: '',
-    phone: 'Phone number will be assigned by admin',
+    phone: 'Admin will assign',
     email: '',
     address: '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -880,10 +880,10 @@ export default function SetupWizard() {
                 <Input
                   id="phone"
                   type="tel"
-                  value={businessData.phone || 'Phone number will be assigned by admin'}
+                  value={businessData.phone || 'Admin will assign'}
                   readOnly
                   className="mt-1 bg-gray-50 cursor-not-allowed"
-                  placeholder="Phone number will be assigned by admin"
+                  placeholder="Admin will assign"
                 />
                 <p className="text-sm text-gray-500 mt-1">Your Twilio phone number will be configured by our team</p>
               </div>
