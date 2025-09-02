@@ -227,6 +227,6 @@ export const setupWizardSteps: SetupWizardStep[] = [
     title: 'Contact Details',
     description: 'Finalize your contact information',
     fields: ['phone', 'email', 'slug'],
-    isValid: (data) => !!(data.phone && data.email && data.slug)
+    isValid: (data) => !!(data.email && data.slug)
   }
 ];

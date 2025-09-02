@@ -49,7 +49,7 @@ export default function SetupWizard() {
   const [businessData, setBusinessData] = useState<Partial<ComprehensiveBusinessData>>({
     name: '',
     slug: '',
-    phone: '',
+    phone: 'Phone number will be assigned by admin',
     email: '',
     address: '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
