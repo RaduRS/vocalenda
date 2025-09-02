@@ -13,7 +13,13 @@ h1 {
 
 /* Specific fix for H1 elements within sectioning elements */
 section h1, article h1, aside h1, nav h1 {
-  font-size: 2rem;
+  font-size: 2rem !important;
+}
+
+/* Additional specificity for nested sectioning elements */
+section h1, article h1, aside h1, nav h1,
+section > h1, article > h1, aside > h1, nav > h1 {
+  font-size: 2rem !important;
 }
 
 @custom-variant dark (&:is(.dark *));

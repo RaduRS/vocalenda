@@ -102,9 +102,9 @@ export default function RootLayout({
                   height={32}
                   className="rounded-md"
                 />
-                <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
                   Vocalenda
-                </h1>
+                </div>
               </div>
 
               <div className="flex items-center space-x-3">
