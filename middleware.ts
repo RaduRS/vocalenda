@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { getClientIP, isIPAllowed } from "@/lib/ip-config";
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
@@ -8,16 +7,9 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 const isAuthRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
-const isComingSoonRoute = createRouteMatcher(['/coming-soon']);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-  const clientIP = getClientIP(req);
-  
-  // Check if IP is allowed (skip IP check for coming-soon page to avoid redirect loops)
-  if (!isComingSoonRoute(req) && !isIPAllowed(clientIP)) {
-    return NextResponse.redirect(new URL('/coming-soon', req.url));
-  }
   
   // If user is not signed in and trying to access protected route, redirect to sign-in
   if (isProtectedRoute(req) && !userId) {
