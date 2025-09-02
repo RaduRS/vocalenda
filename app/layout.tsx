@@ -9,6 +9,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { CookieBanner } from "@/components/ui/cookie-banner";
 import Script from "next/script";
 import Image from "next/image";
 
@@ -68,7 +69,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -85,16 +85,21 @@ export default function RootLayout({
     >
       <html lang="en">
         <head>
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK"
-            strategy="afterInteractive"
-          />
           <Script id="google-analytics" strategy="afterInteractive">
             {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){window.dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-V5TDZDW6VK');
+              if (typeof window !== 'undefined' && localStorage.getItem('cookies-accepted') === 'true') {
+                (function() {
+                  var script = document.createElement('script');
+                  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK';
+                  script.async = true;
+                  document.head.appendChild(script);
+                  
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){window.dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', 'G-V5TDZDW6VK');
+                })();
+              }
             `}
           </Script>
         </head>
@@ -152,6 +157,7 @@ export default function RootLayout({
             </div>
           </header>
           {children}
+          <CookieBanner />
         </body>
       </html>
     </ClerkProvider>

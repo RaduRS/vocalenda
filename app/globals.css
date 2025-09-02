@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Fix for deprecated H1 font-size warning */
+h1 {
+  font-size: 2rem;
+}
+
+/* Ensure consistent H1 styling regardless of context */
+:where(h1) {
+  font-size: 2rem;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
