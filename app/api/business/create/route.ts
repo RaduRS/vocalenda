@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     // Use the email from Clerk, not from the request body
     const email = primaryEmail.emailAddress;
 
-    // Validate required fields
-    if (!businessName || !businessSlug || !phoneNumber) {
+    // Validate required fields (phone number is managed by admin)
+    if (!businessName || !businessSlug) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name: businessName,
         slug: businessSlug,
-        phone_number: phoneNumber || null, // Phone numbers assigned by admin
+        phone_number: (phoneNumber && phoneNumber !== 'Phone number will be assigned by admin') ? phoneNumber : null, // Phone numbers assigned by admin
         email: email,
         address,
         timezone,
