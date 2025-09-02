@@ -9,14 +9,21 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Vocalenda",
-    "description": "Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.",
+    "description": "Transform your business with automated voice booking. Your customers call, we handle everything - from checking availability to confirming appointments. Never miss a booking again.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "GBP"
-    }
+    },
+    "featureList": [
+      "24/7 AI voice booking",
+      "Real-time calendar integration",
+      "Automatic SMS confirmations",
+      "Natural conversation AI",
+      "Zero double bookings"
+    ]
   };
 
   return (
@@ -38,7 +45,7 @@ export default function Home() {
               <span className="text-blue-600 dark:text-blue-400">enda</span>
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-4">
-              Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.
+              Transform your business with AI voice booking. Your customers call, our AI handles everything - from checking availability to confirming appointments. No more missed calls or double bookings.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 sm:mt-8 px-4">
               <SignUpButton>
@@ -65,7 +72,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <CardDescription>
-                 Natural conversations with GPT-4o-mini AI for seamless booking experiences
+                 Natural conversations that feel human. Your customers book appointments as easily as talking to your staff.
                </CardDescription>
             </CardContent>
           </Card>
@@ -108,35 +115,41 @@ export default function Home() {
            </div>
          </section>
 
-         {/* Tech Stack */}
+         {/* Benefits Section */}
          <section className="container mx-auto px-4 pb-12 sm:pb-16">
            <div className="text-center">
              <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-slate-900 dark:text-slate-100">
-               Built with Modern Technology
+               Why Businesses Choose Vocalenda
              </h2>
-             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-4">
-                {[
-                  "Next.js",
-                  "TypeScript",
-                  "Supabase",
-                  "Twilio",
-                  "GPT-4o-mini",
-                  "Google Calendar",
-                  "shadcn/ui",
-                  "Tailwind CSS"
-                ].map((tech) => (
-                  <Badge key={tech} variant="secondary" className="text-xs sm:text-sm py-1 px-2 sm:px-3">
-                    {tech}
-                  </Badge>
-                ))}
-              </div>
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+               <div className="text-center">
+                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">24/7</div>
+                 <p className="text-slate-600 dark:text-slate-400">Never miss a booking opportunity, even after hours</p>
+               </div>
+               <div className="text-center">
+                 <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">90%</div>
+                 <p className="text-slate-600 dark:text-slate-400">Reduction in time spent on phone bookings</p>
+               </div>
+               <div className="text-center">
+                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">Zero</div>
+                 <p className="text-slate-600 dark:text-slate-400">Double bookings with real-time calendar sync</p>
+               </div>
+             </div>
            </div>
          </section>
 
          {/* Footer */}
          <footer className="bg-slate-100 dark:bg-slate-900 py-8 sm:py-12">
            <div className="container mx-auto px-4 text-center text-slate-600 dark:text-slate-400">
-             <p className="text-sm sm:text-base">&copy; 2025 Vocalenda. Multi-tenant voice booking automation for modern businesses.</p>
+             <p className="text-sm sm:text-base mb-4">&copy; 2025 Vocalenda. Intelligent voice booking that works around the clock.</p>
+             <div className="flex justify-center space-x-6 text-sm">
+               <a href="/privacy" className="hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
+                 Privacy Policy
+               </a>
+               <a href="/terms" className="hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
+                 Terms of Service
+               </a>
+             </div>
            </div>
          </footer>
        </main>

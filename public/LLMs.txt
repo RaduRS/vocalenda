@@ -1,0 +1,61 @@
+# Vocalenda - Automated Voice Booking System
+
+## Service Overview
+Vocalenda is an automated voice booking platform that transforms how businesses handle appointment scheduling. When customers call, our intelligent system manages the entire booking process - from checking availability to confirming appointments.
+
+## Key Features
+- 24/7 automated phone booking system
+- Real-time calendar integration with Google Calendar
+- Smart appointment scheduling and management
+- Zero double bookings with intelligent conflict detection
+- Seamless customer experience with natural voice interactions
+- Business dashboard for appointment and customer management
+
+## Target Audience
+- Small to medium businesses requiring appointment scheduling
+- Service-based businesses (salons, clinics, consultants, etc.)
+- Any business that takes appointments via phone calls
+- Businesses looking to automate their booking process
+
+## Technology Stack
+- Next.js 14 with TypeScript
+- Supabase for database and authentication
+- Clerk for user management
+- Google Calendar API integration
+- Twilio for voice communications
+- Tailwind CSS for responsive design
+
+## Business Benefits
+- Reduce missed appointments by 90%
+- 24/7 availability for customer bookings
+- Eliminate double bookings completely
+- Free up staff time from phone management
+- Improve customer satisfaction with instant booking
+- Seamless integration with existing calendar systems
+
+## Use Cases
+1. **Healthcare Practices**: Automated appointment scheduling for clinics and private practices
+2. **Beauty & Wellness**: Salon and spa booking automation
+3. **Professional Services**: Consultant and advisor appointment management
+4. **Home Services**: Contractor and service provider scheduling
+5. **Fitness & Training**: Personal trainer and gym class bookings
+
+## Contact Information
+- Website: https://vocalenda.com
+- Support: Available through dashboard
+- Integration: Google Calendar, Twilio Voice
+
+## Privacy & Security
+- GDPR compliant data handling
+- Secure authentication with Clerk
+- Encrypted data storage with Supabase
+- Privacy policy and terms of service available
+
+## API Endpoints
+- Authentication: /api/auth/*
+- Business Management: /api/business/*
+- Calendar Integration: /api/calendar/*
+- Dashboard Data: /api/dashboard
+- Voice Webhooks: /api/voice/*
+
+Last Updated: January 2025

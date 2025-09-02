@@ -10,6 +10,7 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Script from "next/script";
+import Image from "next/image";
 
 import "./globals.css";
 
@@ -24,30 +25,43 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vocalenda - Multi-Tenant Voice Booking Automation",
+  title: "Vocalenda - AI Voice Booking That Never Sleeps",
   description:
-    "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+    "Transform your business with automated voice booking that never sleeps. Smart appointment scheduling, 24/7 availability, and seamless calendar integration.",
   keywords:
-    "voice booking, appointment automation, AI phone calls, business automation, calendar booking, voice AI, appointment scheduling, multi-tenant, dedicated phone numbers",
+    "voice booking, appointment automation, AI phone calls, business automation, calendar booking, voice AI, appointment scheduling, 24/7 booking, automated receptionist",
   authors: [{ name: "Vocalenda" }],
   creator: "Vocalenda",
   publisher: "Vocalenda",
   robots: "index, follow",
+  icons: {
+    icon: "/vocalenda-logo.jpg",
+    shortcut: "/vocalenda-logo.jpg",
+    apple: "/vocalenda-logo.jpg",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://vocalenda.com",
-    title: "Vocalenda - Voice Booking Automation",
+    title: "Vocalenda - AI Voice Booking That Never Sleeps",
     description:
-      "Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.",
+      "Transform your business with automated voice booking. Your customers call, our AI handles everything - from checking availability to confirming appointments. Never miss a booking again.",
     siteName: "Vocalenda",
+    images: [
+      {
+        url: "https://vocalenda.com/vocalenda-logo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Vocalenda - AI Voice Booking That Never Sleeps",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vocalenda - Voice Booking Automation",
+    title: "Vocalenda - AI Voice Booking That Never Sleeps",
     description:
-      "Voice booking platform that helps businesses automate appointments and free up valuable time. Let customers book naturally through AI-powered phone conversations.",
-    creator: "@vocalenda",
+      "Transform your business with automated voice booking. Your customers call, our AI handles everything - from checking availability to confirming appointments. Never miss a booking again.",
+    creator: "@vocalenda.app",
   },
 };
 
@@ -91,6 +105,13 @@ export default function RootLayout({
           <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60">
             <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
               <div className="flex items-center space-x-2">
+                <Image
+                  src="/vocalenda-logo.jpg"
+                  alt="Vocalenda Logo"
+                  width={32}
+                  height={32}
+                  className="rounded-md"
+                />
                 <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                   Vocalenda
                 </h1>

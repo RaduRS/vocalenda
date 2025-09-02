@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -65,7 +65,7 @@ export default function Dashboard() {
     }
   }, [user, router]);
 
-  const handleConnectCalendar = async () => {
+  const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
     try {
       if (!business?.id) {
@@ -89,9 +89,9 @@ export default function Dashboard() {
     } finally {
       setConnectingCalendar(false);
     }
-  };
+  }, [business?.id]);
 
-  const handleDisconnectCalendar = async () => {
+  const handleDisconnectCalendar = useCallback(async () => {
     if (!confirm('Are you sure you want to disconnect Google Calendar? This will revoke all permissions and remove the integration.')) {
       return;
     }
@@ -126,14 +126,116 @@ export default function Dashboard() {
     } finally {
       setDisconnectingCalendar(false);
     }
-  };
+  }, [business?.id]);
+
+  // Memoize stats cards to prevent unnecessary re-renders
+  const statsCards = useMemo(() => [
+    {
+      title: 'Total Appointments',
+      value: stats.totalAppointments,
+      icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+      color: 'blue'
+    },
+    {
+      title: 'Today\'s Appointments',
+      value: stats.todayAppointments,
+      icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+      color: 'green'
+    },
+    {
+      title: 'Total Customers',
+      value: stats.totalCustomers,
+      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+      color: 'purple'
+    },
+    {
+      title: 'Total Calls',
+      value: stats.totalCalls,
+      icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
+      color: 'orange'
+    }
+  ], [stats]);
+
+  const getColorClasses = useCallback((color: string) => {
+    const colorMap = {
+      blue: 'bg-blue-100 text-blue-600',
+      green: 'bg-green-100 text-green-600',
+      purple: 'bg-purple-100 text-purple-600',
+      orange: 'bg-orange-100 text-orange-600'
+    };
+    return colorMap[color as keyof typeof colorMap] || 'bg-gray-100 text-gray-600';
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header Skeleton */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
+              <div>
+                <div className="h-8 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
+                <div className="h-5 bg-gray-200 rounded w-32 animate-pulse"></div>
+              </div>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="h-10 bg-gray-200 rounded w-24 animate-pulse"></div>
+                <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Content Skeleton */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Stats Cards Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-gray-200 rounded-lg w-12 h-12 animate-pulse"></div>
+                  <div className="ml-4 flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
+                    <div className="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+          
+          {/* Calendar Integration Skeleton */}
+          <Card className="p-6 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-4 sm:mb-0 flex-1">
+                <div className="h-6 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded w-full max-w-md animate-pulse"></div>
+              </div>
+              <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+            </div>
+          </Card>
+          
+          {/* Business Info Cards Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i}>
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div>
+                    <div className="h-5 bg-gray-200 rounded w-full animate-pulse"></div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            
+            <Card className="p-6">
+              <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
+                ))}
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
     );
@@ -175,61 +277,21 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+          {statsCards.map((card, index) => (
+            <Card key={card.title} className="p-6 hover:shadow-lg transition-shadow duration-200">
+              <div className="flex items-center">
+                <div className={`p-2 rounded-lg ${getColorClasses(card.color)}`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={card.icon} />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">{card.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Appointments</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalAppointments}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Today&apos;s Appointments</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.todayAppointments}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Customers</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalCustomers}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Calls</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalCalls}</p>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          ))}
         </div>
 
         {/* Google Calendar Integration */}
@@ -237,11 +299,11 @@ export default function Dashboard() {
           <Card className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="mb-4 sm:mb-0">
-                <h3 className="text-lg font-semibold mb-2">Google Calendar Integration</h3>
+                <h3 className="text-lg font-semibold mb-2">📅 Calendar Sync</h3>
                 <p className="text-gray-600">
                   {business.google_calendar_connected 
-                    ? 'Your Google Calendar is connected and synced with your bookings.'
-                    : 'Connect your Google Calendar to automatically sync appointments and check availability.'
+                    ? '✅ Your calendar is synced! Customers can only book when you\'re available, and new appointments automatically appear in your Google Calendar.'
+                    : '🔗 Connect your Google Calendar so customers can only book when you\'re free. All appointments will automatically sync to your calendar.'
                   }
                 </p>
               </div>
@@ -311,32 +373,33 @@ export default function Dashboard() {
                 <p className="text-gray-900">{business.address}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">Booking URL</p>
-                <p className="text-blue-600">vocalenda.com/{business.slug}</p>
+                <p className="text-sm font-medium text-gray-600">Your AI Booking Number</p>
+                <p className="text-gray-900 font-mono text-lg">{business.phone_number}</p>
+                <p className="text-sm text-gray-500 mt-1">Customers call this number to book appointments 24/7</p>
               </div>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+            <h3 className="text-lg font-semibold mb-4">📊 Manage Your Business</h3>
             <div className="space-y-3">
               <Button className="w-full justify-start" variant="outline">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                View Appointments
+                📅 View All Appointments
               </Button>
               <Button className="w-full justify-start" variant="outline">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                Manage Customers
+                👥 Customer Directory
               </Button>
               <Button className="w-full justify-start" variant="outline">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                Call History
+                📞 AI Call History
               </Button>
               <Button 
                 className="w-full justify-start" 
@@ -347,7 +410,7 @@ export default function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Business Settings
+                ⚙️ Business Settings
               </Button>
             </div>
           </Card>
