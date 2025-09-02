@@ -10,7 +10,7 @@ import {
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { CookieBanner } from "@/components/ui/cookie-banner";
-import Script from "next/script";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import Image from "next/image";
 
 import "./globals.css";
@@ -78,39 +78,14 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-      afterSignInUrl="/setup"
-        afterSignUpUrl="/setup"
-        signInUrl="/sign-in"
-        signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/setup"
+      signUpFallbackRedirectUrl="/setup"
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
     >
       <html lang="en">
         <head>
-          <Script
-            id="google-analytics"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-              if (typeof window !== 'undefined' && localStorage.getItem('cookies-accepted') === 'true') {
-                (function() {
-                  var script = document.createElement('script');
-                  script.src = 'https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK';
-                  script.async = true;
-                  // Get nonce from meta tag if available
-                  var nonceMeta = document.querySelector('meta[name="csp-nonce"]');
-                  if (nonceMeta) {
-                    script.nonce = nonceMeta.getAttribute('content');
-                  }
-                  document.head.appendChild(script);
-                  
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){window.dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', 'G-V5TDZDW6VK');
-                })();
-              }
-            `,
-            }}
-          />
+          <GoogleAnalytics />
           <meta name="csp-nonce" content="" id="csp-nonce" />
         </head>
 
@@ -131,12 +106,12 @@ export default function RootLayout({
                   Vocalenda
                 </h1>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 <SignedOut>
                   <SignInButton>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
                     >
@@ -144,7 +119,7 @@ export default function RootLayout({
                     </Button>
                   </SignInButton>
                   <SignUpButton>
-                    <Button 
+                    <Button
                       size="sm"
                       className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white font-medium transition-colors duration-200"
                     >
@@ -153,12 +128,14 @@ export default function RootLayout({
                   </SignUpButton>
                 </SignedOut>
                 <SignedIn>
-                  <UserButton 
+                  <UserButton
                     appearance={{
                       elements: {
                         avatarBox: "w-8 h-8",
-                        userButtonPopoverCard: "shadow-lg border border-slate-200 dark:border-slate-700",
-                        userButtonPopoverActionButton: "hover:bg-slate-50 dark:hover:bg-slate-800",
+                        userButtonPopoverCard:
+                          "shadow-lg border border-slate-200 dark:border-slate-700",
+                        userButtonPopoverActionButton:
+                          "hover:bg-slate-50 dark:hover:bg-slate-800",
                       },
                     }}
                   />
