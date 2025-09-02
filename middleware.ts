@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { randomBytes } from "crypto";
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
@@ -31,8 +30,10 @@ export default clerkMiddleware(async (auth, req) => {
   // Create response with security headers
   const response = NextResponse.next();
   
-  // Generate nonce for scripts
-  const nonce = randomBytes(16).toString('base64');
+  // Generate nonce for scripts using Web Crypto API
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  const nonce = btoa(String.fromCharCode(...array));
   const isDevelopment = process.env.NODE_ENV === 'development';
   
   // Enhanced security headers for A+ rating
