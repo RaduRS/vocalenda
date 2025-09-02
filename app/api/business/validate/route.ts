@@ -27,20 +27,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Validate phone if provided
+    // Phone validation removed - phone numbers are managed by admin
     if (phone) {
-      const { data: existingPhone } = await supabase
-        .from('businesses')
-        .select('id')
-        .eq('phone_number', phone)
-        .single();
-
-      if (existingPhone) {
-        return NextResponse.json(
-          { message: 'This phone number is already registered. Please use a different number.' },
-          { status: 409 }
-        );
-      }
+      return NextResponse.json(
+        { message: 'Phone numbers are managed by admin and cannot be validated through this endpoint.' },
+        { status: 400 }
+      );
     }
 
     // If we get here, validation passed

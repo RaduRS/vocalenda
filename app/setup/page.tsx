@@ -132,32 +132,7 @@ export default function SetupWizard() {
     }
   };
 
-  const validatePhone = async (phone: string) => {
-    if (!phone.trim()) {
-      setValidationErrors(prev => ({ ...prev, phone: undefined }));
-      return;
-    }
-
-    setValidating(prev => ({ ...prev, phone: true }));
-    try {
-      const response = await fetch('/api/business/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-      
-      if (response.status === 409) {
-        const error = await response.json();
-        setValidationErrors(prev => ({ ...prev, phone: error.message }));
-      } else {
-        setValidationErrors(prev => ({ ...prev, phone: undefined }));
-      }
-    } catch (error) {
-      console.error('Phone validation failed:', error);
-    } finally {
-      setValidating(prev => ({ ...prev, phone: false }));
-    }
-  };
+  // Phone validation removed - phone numbers are managed by admin
 
   const handleInputChange = (field: keyof ComprehensiveBusinessData, value: string | string[] | boolean | object) => {
     setBusinessData(prev => ({ ...prev, [field]: value }));
@@ -182,10 +157,7 @@ export default function SetupWizard() {
       debounceValidation(() => validateSlug(value), 500);
     }
     
-    // Validate phone number
-    if (field === 'phone' && typeof value === 'string') {
-      debounceValidation(() => validatePhone(value), 500);
-    }
+    // Phone number is read-only, no validation needed
 
     // Validate business hours
     if (field === 'business_hours') {
@@ -903,34 +875,17 @@ export default function SetupWizard() {
               <div>
                 <Label htmlFor="phone" className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  Business Phone Number *
+                  Business Phone Number
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={businessData.phone || ''}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="+1 (555) 123-4567"
-                    className={cn(
-                      "mt-1",
-                      validationErrors.phone && "border-red-300 focus:ring-red-500"
-                    )}
-                  />
-                  {validating.phone && (
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    </div>
-                  )}
-                </div>
-                {validationErrors.phone ? (
-                  <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {validationErrors.phone}
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-500 mt-1">This will be your Twilio phone number for voice bookings</p>
-                )}
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={businessData.phone || 'Phone number will be assigned by admin'}
+                  readOnly
+                  className="mt-1 bg-gray-50 cursor-not-allowed"
+                  placeholder="Phone number will be assigned by admin"
+                />
+                <p className="text-sm text-gray-500 mt-1">Your Twilio phone number will be configured by our team</p>
               </div>
               
               <div>

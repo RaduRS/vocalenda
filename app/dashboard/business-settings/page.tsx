@@ -355,10 +355,12 @@ export default function BusinessSettings() {
                 </Label>
                 <Input
                   id="phone"
-                  value={businessData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="Enter phone number"
+                  value={businessData.phone || 'Phone number managed by admin'}
+                  readOnly
+                  className="bg-gray-50 cursor-not-allowed"
+                  placeholder="Phone number managed by admin"
                 />
+                <p className="text-sm text-gray-500 mt-1">Contact support to update your phone number</p>
               </div>
               <div>
                 <Label htmlFor="email">Email Address</Label>

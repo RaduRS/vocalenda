@@ -65,19 +65,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if phone number is already taken
-    const { data: existingPhone } = await supabaseAdmin
-      .from('businesses')
-      .select('id')
-      .eq('phone_number', phoneNumber)
-      .single();
-
-    if (existingPhone) {
-      return NextResponse.json(
-        { error: 'Phone number already registered to another business' },
-        { status: 409 }
-      );
-    }
+    // Phone numbers are managed by admin, skip validation
+    // Note: Phone number uniqueness will be enforced at database level when admin assigns numbers
 
     // Create business with comprehensive data
     const { data: businessData, error: businessError } = await supabaseAdmin
@@ -85,7 +74,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name: businessName,
         slug: businessSlug,
-        phone_number: phoneNumber,
+        phone_number: phoneNumber || null, // Phone numbers assigned by admin
         email: email,
         address,
         timezone,
