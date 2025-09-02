@@ -85,13 +85,21 @@ export default function RootLayout({
     >
       <html lang="en">
         <head>
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
+          <Script
+            id="google-analytics"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
               if (typeof window !== 'undefined' && localStorage.getItem('cookies-accepted') === 'true') {
                 (function() {
                   var script = document.createElement('script');
                   script.src = 'https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK';
                   script.async = true;
+                  // Get nonce from meta tag if available
+                  var nonceMeta = document.querySelector('meta[name="csp-nonce"]');
+                  if (nonceMeta) {
+                    script.nonce = nonceMeta.getAttribute('content');
+                  }
                   document.head.appendChild(script);
                   
                   window.dataLayer = window.dataLayer || [];
@@ -100,8 +108,10 @@ export default function RootLayout({
                   gtag('config', 'G-V5TDZDW6VK');
                 })();
               }
-            `}
-          </Script>
+            `,
+            }}
+          />
+          <meta name="csp-nonce" content="" id="csp-nonce" />
         </head>
 
         <body
