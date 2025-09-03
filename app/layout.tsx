@@ -101,8 +101,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@vocalenda",
-    creator: "@vocalenda",
+    site: "@vocalenda_app",
+    creator: "@vocalenda_app",
     title: "Vocalenda - Multi-Tenant Voice Booking Automation",
     description:
       "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
