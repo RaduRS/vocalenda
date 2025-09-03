@@ -27,8 +27,8 @@ section > h1, article > h1, aside > h1, nav > h1 {
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -139,5 +139,64 @@ section > h1, article > h1, aside > h1, nav > h1 {
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Improved Typography Scale */
+  h1 {
+    @apply text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight;
+    font-size: clamp(2rem, 5vw, 4rem);
+  }
+  
+  h2 {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight leading-tight;
+  }
+  
+  h3 {
+    @apply text-xl sm:text-2xl font-semibold leading-snug;
+  }
+  
+  h4 {
+    @apply text-lg sm:text-xl font-medium leading-snug;
+  }
+  
+  h5 {
+    @apply text-base sm:text-lg font-medium leading-normal;
+  }
+  
+  h6 {
+    @apply text-sm sm:text-base font-medium leading-normal;
+  }
+  
+  p {
+    @apply leading-relaxed;
+  }
+  
+  /* Improved spacing for better readability */
+  .prose {
+    @apply max-w-none;
+  }
+  
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    @apply mb-4 mt-8 first:mt-0;
+  }
+  
+  .prose p {
+    @apply mb-4 last:mb-0;
+  }
+  
+  /* Better button typography */
+  button {
+    @apply font-medium;
+  }
+  
+  /* Improved link styles */
+  a {
+    @apply transition-colors duration-200;
   }
 }

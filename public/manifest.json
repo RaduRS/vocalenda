@@ -1,0 +1,37 @@
+{
+  "name": "Vocalenda - Multi-Tenant Voice Booking Automation",
+  "short_name": "Vocalenda",
+  "description": "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/vocalenda-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/vocalenda-logo.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "platform": "wide",
+      "label": "Vocalenda Voice Booking Platform"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

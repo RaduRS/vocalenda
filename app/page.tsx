@@ -10,53 +10,113 @@ import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 
 export default function Home() {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Vocalenda",
-    description:
-      "Transform your business with automated voice booking. Your customers call, we handle everything - from checking availability to confirming appointments. Never miss a booking again.",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "GBP",
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Vocalenda",
+      alternateName: "Vocalenda Voice Booking",
+      description: "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+      url: "https://vocalenda.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://vocalenda.com/vocalenda-logo.jpg",
+        width: 512,
+        height: 512
+      },
+      foundingDate: "2024",
+      sameAs: [
+        "https://vocalenda.com"
+      ],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer service",
+        email: "support@vocalenda.com"
+      }
     },
-    featureList: [
-      "24/7 AI voice booking",
-      "Real-time calendar integration",
-      "Automatic SMS confirmations",
-      "Natural conversation AI",
-      "Zero double bookings",
-    ],
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Vocalenda",
+      description:
+        "Transform your business with automated voice booking. Your customers call, we handle everything - from checking availability to confirming appointments. Never miss a booking again.",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "GBP",
+      },
+      featureList: [
+        "24/7 AI voice booking",
+        "Real-time calendar integration",
+        "Automatic SMS confirmations",
+        "Natural conversation AI",
+        "Zero double bookings",
+      ],
+      publisher: {
+        "@type": "Organization",
+        name: "Vocalenda",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://vocalenda.com/vocalenda-logo.jpg"
+        }
+      }
+    }
+  ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      {structuredData.map((data, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+        />
+      ))}
       <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
         {/* Hero Section */}
-        <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20">
-          <div className="text-center space-y-4 sm:space-y-6 mb-12 sm:mb-16">
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
-              <span className="text-black dark:text-white">Vo</span>
-              <span className="text-purple-600 dark:text-purple-400">cal</span>
-              <span className="text-blue-600 dark:text-blue-400">enda</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto px-4">
-              Transform your business with AI voice booking. Your customers
-              call, our AI handles everything - from checking availability to
-              confirming appointments. No more missed calls or double bookings.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 sm:mt-8 px-4">
+        <section className="container mx-auto px-4 py-12 sm:py-20 lg:py-32">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Main Headline */}
+            <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight px-2">
+                Vocalenda
+              </h1>
+              <h2 className="text-lg sm:text-2xl lg:text-3xl font-medium text-[#6c47ff] dark:text-[#8b7aff] leading-relaxed px-2">
+                AI Voice Agent That Never Sleeps
+              </h2>
+            </div>
+            
+            {/* Value Proposition */}
+            <div className="space-y-6 sm:space-y-8 mb-8 sm:mb-12">
+              <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed px-4">
+                Your customers call, AI handles everything. Zero missed bookings.
+              </p>
+              
+              {/* Key Benefits */}
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 text-sm sm:text-base text-slate-500 dark:text-slate-400 px-4">
+                <div className="flex items-center justify-center gap-2">
+                  <Phone className="w-4 h-4 text-[#6c47ff] flex-shrink-0" />
+                  <span>24/7 Availability</span>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#6c47ff] flex-shrink-0" />
+                  <span>Real-time Booking</span>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Zap className="w-4 h-4 text-[#6c47ff] flex-shrink-0" />
+                  <span>Instant Setup</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <SignUpButton>
                 <Button
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                  className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
                 >
                   Get Started
                 </Button>
@@ -65,9 +125,9 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto"
+                  className="border-[#6c47ff]/20 text-[#6c47ff] hover:bg-[#6c47ff]/5 dark:border-[#8b7aff]/30 dark:text-[#8b7aff] dark:hover:bg-[#6c47ff]/10 px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200 w-full sm:w-auto"
                 >
-                  Sign in
+                  Sign In
                 </Button>
               </SignInButton>
             </div>
