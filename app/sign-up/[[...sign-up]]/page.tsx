@@ -1,5 +1,15 @@
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign Up - Vocalenda",
+  description: "Create your Vocalenda account and start automating your bookings with AI voice agents.",
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export default function SignUpPage() {
   return (
