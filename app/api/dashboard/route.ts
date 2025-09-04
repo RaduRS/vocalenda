@@ -81,10 +81,29 @@ export async function GET() {
       totalCalls: callsResult.count || 0
     };
 
-    // Add Google Calendar connection status
+    // Check Google Calendar connection status more thoroughly
+    let googleCalendarConnected = false;
+    
+    if (user.businesses?.google_calendar_id) {
+      // Check if we have valid Google tokens in business_config
+      const { data: config } = await supabase
+        .from('business_config')
+        .select('integration_settings')
+        .eq('business_id', businessId)
+        .single();
+      
+      googleCalendarConnected = !!(config?.integration_settings && 
+         typeof config.integration_settings === 'object' && 
+         config.integration_settings !== null &&
+         'google' in config.integration_settings &&
+         typeof config.integration_settings.google === 'object' &&
+         config.integration_settings.google !== null &&
+         'access_token' in config.integration_settings.google);
+    }
+    
     const businessWithCalendarStatus = {
       ...user.businesses,
-      google_calendar_connected: !!user.businesses?.google_calendar_id
+      google_calendar_connected: googleCalendarConnected
     };
 
     return NextResponse.json({

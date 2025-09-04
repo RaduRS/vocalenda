@@ -36,8 +36,10 @@ interface CalendarEvent {
 class CalendarService {
   private oauth2Client: OAuth2Client;
   private calendar: calendar_v3.Calendar;
+  private businessId: string;
 
-  constructor(tokens: GoogleTokens) {
+  constructor(tokens: GoogleTokens, businessId: string) {
+    this.businessId = businessId;
     this.oauth2Client = new google.auth.OAuth2(
       process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET
@@ -45,7 +47,59 @@ class CalendarService {
     );
     
     this.oauth2Client.setCredentials(tokens);
+    
+    // Set up automatic token refresh
+    this.oauth2Client.on('tokens', async (tokens) => {
+      console.log('🔄 Refreshing Google tokens for business:', this.businessId);
+      await this.saveRefreshedTokens({
+        access_token: tokens.access_token || '',
+        refresh_token: tokens.refresh_token || '',
+        token_type: tokens.token_type || 'Bearer',
+        expiry_date: tokens.expiry_date || Date.now() + 3600000
+      });
+    });
+    
     this.calendar = google.calendar({ version: 'v3', auth: this.oauth2Client });
+  }
+
+  // Save refreshed tokens back to the database
+  private async saveRefreshedTokens(tokens: Partial<GoogleTokens>): Promise<void> {
+    try {
+      // Get current integration settings
+      const { data: config } = await supabase
+        .from('business_config')
+        .select('integration_settings')
+        .eq('business_id', this.businessId)
+        .single();
+
+      if (config?.integration_settings) {
+        const integrationSettings = config.integration_settings as Record<string, unknown>;
+        const currentGoogle = (integrationSettings.google as GoogleTokens) || {} as GoogleTokens;
+        
+        // Update with new tokens while preserving other data
+        const updatedGoogle = {
+          ...currentGoogle,
+          access_token: tokens.access_token || currentGoogle.access_token,
+          refresh_token: tokens.refresh_token || currentGoogle.refresh_token,
+          expiry_date: tokens.expiry_date || currentGoogle.expiry_date,
+          token_type: tokens.token_type || currentGoogle.token_type
+        };
+
+        const updatedSettings = {
+          ...integrationSettings,
+          google: updatedGoogle
+        };
+
+        await supabase
+          .from('business_config')
+          .update({ integration_settings: updatedSettings })
+          .eq('business_id', this.businessId);
+
+        console.log('✅ Google tokens refreshed and saved successfully');
+      }
+    } catch (error) {
+      console.error('❌ Failed to save refreshed Google tokens:', error);
+    }
   }
 
   // Check if a time slot is available
@@ -209,7 +263,7 @@ export async function getCalendarService(businessId: string): Promise<CalendarSe
     }
 
     const googleTokens = config.integration_settings.google;
-    return new CalendarService(googleTokens);
+    return new CalendarService(googleTokens, businessId);
   } catch (error) {
     console.error('Error getting calendar service:', error);
     return null;
