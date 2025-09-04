@@ -15,7 +15,10 @@ export function setCallSession(callSid, sessionData) {
   if (!callSid) return;
   const existing = callSessions.get(callSid) || {};
   callSessions.set(callSid, { ...existing, ...sessionData });
-  console.log(`📝 Session updated for call ${callSid}:`, callSessions.get(callSid));
+  console.log(
+    `📝 Session updated for call ${callSid}:`,
+    callSessions.get(callSid)
+  );
 }
 
 /**
@@ -343,18 +346,18 @@ export async function createBooking(businessConfig, params, callSid = null) {
     );
 
     const { customer_name, service_id, date, time, customer_phone } = params;
-    
+
     // Get caller phone from session if not provided in params
     const session = getCallSession(callSid);
     const phoneToUse = customer_phone || session.callerPhone;
-    
+
     // Store customer info in session for future use
     if (callSid && customer_name) {
       setCallSession(callSid, {
         customerName: customer_name,
         lastBookingDate: date,
         lastBookingTime: time,
-        lastServiceId: service_id
+        lastServiceId: service_id,
       });
     }
 
@@ -419,7 +422,9 @@ export async function createBooking(businessConfig, params, callSid = null) {
     // For calendar events, we need to send the datetime in the business timezone
     // The calendar API expects the time as it should appear in the business timezone
     const startTime = appointmentDateTime;
-    const endTime = new Date(`${appointmentDateTime}Z`).getTime() + service.duration_minutes * 60000;
+    const endTime =
+      new Date(`${appointmentDateTime}Z`).getTime() +
+      service.duration_minutes * 60000;
     const endTimeString = new Date(endTime).toISOString().slice(0, 19);
 
     console.log(
@@ -438,7 +443,9 @@ export async function createBooking(businessConfig, params, callSid = null) {
       customerName: customer_name,
       customerPhone: phoneToUse || null,
       customerEmail: null, // Voice calls don't typically capture email
-      notes: `Voice booking - Customer: ${customer_name}${phoneToUse ? ` - Phone: ${phoneToUse}` : ''}`,
+      notes: `Voice booking - Customer: ${customer_name}${
+        phoneToUse ? ` - Phone: ${phoneToUse}` : ""
+      }`,
     };
 
     console.log("📞 Calling internal Next.js booking API...");
@@ -517,20 +524,20 @@ export async function updateBooking(businessConfig, params, callSid = null) {
       new_time,
       new_service_id,
     } = params;
-    
+
     // Get session data to fill in missing customer information
     const session = getCallSession(callSid);
     console.log("📋 Session data:", session);
-    
+
     // Use session data as fallback for missing information
     const customerNameToUse = customer_name || session.customerName;
     const currentDateToUse = current_date || session.lastBookingDate;
     const currentTimeToUse = current_time || session.lastBookingTime;
-    
+
     console.log("🔄 Using customer info:", {
       customerName: customerNameToUse,
       currentDate: currentDateToUse,
-      currentTime: currentTimeToUse
+      currentTime: currentTimeToUse,
     });
 
     const business = businessConfig.business;
@@ -547,7 +554,7 @@ export async function updateBooking(businessConfig, params, callSid = null) {
       current_date: currentDateToUse,
       current_time: currentTimeToUse,
     };
-    
+
     // Update session with new booking details if provided
     if (callSid && (new_date || new_time || new_service_id)) {
       const sessionUpdate = {};
@@ -560,9 +567,13 @@ export async function updateBooking(businessConfig, params, callSid = null) {
     // Only include new values if they are defined
     if (new_date !== undefined) requestBody.new_date = new_date;
     if (new_time !== undefined) requestBody.new_time = new_time;
-    if (new_service_id !== undefined) requestBody.new_service_id = new_service_id;
+    if (new_service_id !== undefined)
+      requestBody.new_service_id = new_service_id;
 
-    console.log("📦 Update request body:", JSON.stringify(requestBody, null, 2));
+    console.log(
+      "📦 Update request body:",
+      JSON.stringify(requestBody, null, 2)
+    );
 
     // Call the internal Next.js API to update the booking
     const response = await fetch(
@@ -701,7 +712,7 @@ export async function endCall(callSid, params) {
     });
 
     console.log(`✅ Call ended successfully:`, call.status);
-    
+
     // Clear call session when call ends
     clearCallSession(callSid);
 

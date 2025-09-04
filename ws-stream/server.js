@@ -3,7 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import { validateConfig } from "./config.js";
 import { loadBusinessConfig } from "./businessConfig.js";
-import { initializeDeepgram, handleDeepgramMessage } from "./deepgram.js";
+import { initializeDeepgram, handleDeepgramMessage, cleanupAudioSystem, closeDeepgramConnection } from "./deepgram.js";
 import { clearCallSession } from "./functionHandlers.js";
 
 // Validate configuration on startup
@@ -88,6 +88,9 @@ wss.on("connection", async (ws, req) => {
             });
             console.log("✅ Deepgram connection initialized successfully");
             console.log("Final readyState:", deepgramWs.readyState);
+            
+            // Enable KeepAlive messages now that Twilio connection is active
+            deepgramWs.setTwilioConnectionActive(true);
           } catch (error) {
             console.error("❌ Failed to initialize Deepgram:", error);
             ws.close();
@@ -131,6 +134,8 @@ wss.on("connection", async (ws, req) => {
             console.log(
               `Deepgram WebSocket closed. Code: ${code}, Reason: ${reason}`
             );
+            // Clean up audio system when Deepgram closes
+            cleanupAudioSystem();
             // Only close Twilio connection if it's an unexpected close
             if (code !== 1000 && code !== 1001) {
               console.error(
@@ -185,8 +190,9 @@ wss.on("connection", async (ws, req) => {
 
         case "stop":
           console.log("Media stream stopped");
+          // Close the Deepgram connection when media stream stops to prevent timeouts
           if (deepgramWs) {
-            deepgramWs.close();
+            closeDeepgramConnection(deepgramWs);
           }
           break;
       }
@@ -197,10 +203,13 @@ wss.on("connection", async (ws, req) => {
 
   ws.on("close", () => {
     console.log("Twilio WebSocket connection closed");
+    
+    // Close the Deepgram connection to prevent CLIENT_MESSAGE_TIMEOUT errors
     if (deepgramWs) {
-      deepgramWs.close();
+      closeDeepgramConnection(deepgramWs);
     }
-    // Clear call session when connection closes
+    
+    // Clear the call session if needed
     if (callSid) {
       clearCallSession(callSid);
     }

@@ -167,11 +167,13 @@ export function getAvailableFunctions() {
           },
           new_date: {
             type: "string",
-            description: "New appointment date in YYYY-MM-DD format (optional if only changing time)",
+            description:
+              "New appointment date in YYYY-MM-DD format (optional if only changing time)",
           },
           new_time: {
             type: "string",
-            description: "New appointment time in HH:MM format (optional if only changing date)",
+            description:
+              "New appointment time in HH:MM format (optional if only changing date)",
           },
           new_service_id: {
             type: "string",

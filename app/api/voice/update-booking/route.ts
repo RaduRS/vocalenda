@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
+import { findBookingByFuzzyName } from '@/lib/fuzzy-matching';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -99,19 +100,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find booking with exact customer name match
-    // Handle both regular bookings (with customer records) and voice bookings (stored in notes)
-    const existingBooking = existingBookings?.find(booking => {
-      if (booking.customers) {
-        // Regular booking with customer record
-        const fullName = `${booking.customers.first_name} ${booking.customers.last_name}`.trim();
-        return fullName.toLowerCase() === customer_name.toLowerCase();
-      } else {
-        // Voice booking - check notes field for customer name
-        const notesMatch = booking.notes && booking.notes.includes(`Customer: ${customer_name}`);
-        return notesMatch;
-      }
-    });
+    // Find booking using fuzzy name matching
+    const existingBooking = findBookingByFuzzyName(existingBookings || [], customer_name);
 
     if (!existingBooking) {
       console.error('Booking not found for:', { customer_name, current_date, current_time });
