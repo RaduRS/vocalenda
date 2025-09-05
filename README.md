@@ -93,7 +93,7 @@ Voice webhook (POST /api/voice/inbound):
 
 Verify signature; look up shop by dialed To number.
 
-Return TwiML `<Connect><Stream url="wss://…/api/voice/stream">` with custom parameters: shop_id, call_sid; optionally tenant_id and timezone.
+Return TwiML `<Connect><Stream url="wss://…:8080">` with custom parameters: shop_id, call_sid; optionally tenant_id and timezone. (WebSocket server runs on port 8080)
 
 Twilio Console: set the number’s voice webhook to that route; optionally set inbound processing region for latency/data locality.
 

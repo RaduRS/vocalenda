@@ -12,7 +12,7 @@ A customer calls the Twilio phone number assigned to a specific barbershop.
 
 Twilio receives the call and sends an HTTP POST request to your app's webhook (e.g., /api/voice/inbound).
 
-Your app identifies the shop_id from the phone number and responds with TwiML: <Connect><Stream url="wss://vocalenda.com/api/stream">.
+Your app identifies the shop_id from the phone number and responds with TwiML: <Connect><Stream url="wss://vocalenda.com:8080">.
 
 Twilio then opens a WebSocket connection to your app and starts streaming the caller's audio in real-time.
 
