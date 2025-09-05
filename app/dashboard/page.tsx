@@ -40,9 +40,16 @@ export default function Dashboard() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const response = await fetch('/api/dashboard');
+      const response = await fetch('/api/dashboard', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       if (response.ok) {
         const data = await response.json();
+        console.log('Dashboard data received:', data);
+        console.log('Google Calendar connected status:', data.business?.google_calendar_connected);
         setBusiness(data.business);
         setStats(data.stats);
         
