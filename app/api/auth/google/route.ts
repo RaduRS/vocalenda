@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
     // Generate OAuth URL with state containing business ID
     const scopes = [
       'https://www.googleapis.com/auth/calendar',
-      'https://www.googleapis.com/auth/calendar.events',
       'https://www.googleapis.com/auth/userinfo.email'
     ];
 

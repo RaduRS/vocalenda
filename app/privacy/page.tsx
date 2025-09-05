@@ -105,26 +105,54 @@ export default function PrivacyPolicy() {
                 this sensitive data.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                Voice data is processed using third-party AI services (including
-                but not limited to Deepgram and OpenAI) under strict data
-                processing agreements that ensure your privacy is maintained.
+                Voice data is processed using third-party AI services under strict data
+                processing agreements:
               </p>
+              <ul className="list-disc list-inside text-gray-700 space-y-1 mt-2">
+                 <li><strong>Deepgram</strong>: AI voice agent processing (handles full voice interactions)</li>
+                 <li><strong>OpenAI</strong>: Natural language understanding and response generation</li>
+                 <li>All third-party processors operate under strict confidentiality agreements</li>
+                 <li>No voice data is stored permanently by these services</li>
+               </ul>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl text-blue-600">
-                Google Calendar Integration
+                Google Services Integration
               </CardTitle>
             </CardHeader>
-            <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
-                With your explicit consent, we integrate with Google Calendar to
-                manage your appointments. We only access calendar data necessary
-                for appointment scheduling and management. You can revoke this
-                access at any time through your Google account settings.
-              </p>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  OAuth Permissions and Limited Use
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-3">
+                   Our application integrates with Google services and strictly complies with Google&apos;s Limited Use requirements. We request only the minimum necessary permissions:
+                 </p>
+                <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
+                  <li>
+                    <strong>Calendar Access</strong> (<code className="bg-gray-100 px-1 rounded text-sm">https://www.googleapis.com/auth/calendar</code>): 
+                    Used exclusively to manage appointments on your behalf, including creating, updating, and canceling calendar events
+                  </li>
+                  <li>
+                    <strong>Email Access</strong> (<code className="bg-gray-100 px-1 rounded text-sm">https://www.googleapis.com/auth/userinfo.email</code>): 
+                    Used only for account identification and service-related communication
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  Data Use Restrictions
+                </h3>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <li>Your Google user data is used exclusively for providing our appointment management services</li>
+                  <li>We do not sell, transfer, or use your Google data for advertising or other commercial purposes</li>
+                  <li>Data access is limited to what is necessary for core functionality</li>
+                  <li>You can revoke access at any time through your Google account settings</li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
 
@@ -143,10 +171,11 @@ export default function PrivacyPolicy() {
                 <li>With your explicit consent</li>
                 <li>
                   With trusted service providers who assist in our operations
-                  (under strict confidentiality agreements)
+                  (Deepgram for speech processing, OpenAI for AI responses, under strict confidentiality agreements)
                 </li>
                 <li>To comply with legal obligations or protect our rights</li>
                 <li>In connection with a business transfer or merger</li>
+                <li><strong>Google Data</strong>: Never shared with third parties except as required for core service functionality</li>
               </ul>
             </CardContent>
           </Card>
