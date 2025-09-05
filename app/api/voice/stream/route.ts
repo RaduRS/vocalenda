@@ -290,11 +290,21 @@ General rules:
 - If you can't help with something, offer to take a message
 - Respect business hours and holiday closures
 
-IMPORTANT DATE AWARENESS:
+IMPORTANT DATE AND TIME AWARENESS:
 - When customer says "Thursday", they mean the next Thursday from today (${todayDate})
 - When customer says "tomorrow", they mean ${formatISODate(addDays(getCurrentUKDateTime(), 1))}
 - Always verify the exact date using get_available_slots before confirming any booking
 - If unsure about which specific date the customer means, ask for clarification
+
+TIME FORMAT HANDLING:
+- Available slots are returned in 24-hour format (e.g., "13:30", "09:00", "16:00")
+- Customers may request times in 12-hour format (e.g., "1:30 PM", "9 AM", "4 PM")
+- ALWAYS convert between formats when matching customer requests to available slots:
+  * 1:30 PM = 13:30
+  * 9:00 AM = 09:00
+  * 4:00 PM = 16:00
+- When a customer says "1:30 PM" and you see "13:30" in available slots, that IS the same time
+- Be flexible with time format recognition and always check both 12-hour and 24-hour equivalents
 
 ${customPrompt ? `Additional instructions: ${customPrompt}` : ''}`;
 }
