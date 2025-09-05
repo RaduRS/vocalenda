@@ -94,7 +94,7 @@ export async function handleFunctionCall(
 
     switch (function_name) {
       case "get_services":
-        console.log("🔍 Processing get_services request...");
+        console.log("🔧 Processing get_services function call");
         console.log(
           "📊 Raw services from config:",
           businessConfig.services.length,
@@ -114,6 +114,28 @@ export async function handleFunctionCall(
           JSON.stringify(result, null, 2)
         );
         console.log("✅ get_services processing complete");
+        break;
+
+      case "get_staff_members":
+        console.log("👥 Processing get_staff_members function call");
+        console.log(
+          "📊 Raw staff from config:",
+          businessConfig.staffMembers?.length || 0,
+          "staff members found"
+        );
+
+        result = (businessConfig.staffMembers || []).map((staff) => ({
+          id: staff.id,
+          name: staff.name,
+          specialties: staff.specialties || [],
+          working_hours: staff.working_hours,
+        }));
+
+        console.log(
+          "👥 Mapped staff result:",
+          JSON.stringify(result, null, 2)
+        );
+        console.log("✅ get_staff_members processing complete");
         break;
 
       case "get_available_slots":
@@ -143,10 +165,16 @@ export async function handleFunctionCall(
           result = {
             date: parameters.date,
             day_of_week: dayName,
-            formatted: `${dayName}, ${parsedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+            formatted: `${dayName}, ${parsedDate.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}`,
           };
         } catch (error) {
-          result = { error: 'Invalid date format. Please use DD/MM/YYYY format.' };
+          result = {
+            error: "Invalid date format. Please use DD/MM/YYYY format.",
+          };
         }
         break;
 
@@ -464,20 +492,23 @@ export async function createBooking(businessConfig, params, callSid = null) {
     }
 
     // Convert time to 24-hour format if needed
-    const timeIn24h = time.includes("AM") ||
+    const timeIn24h =
+      time.includes("AM") ||
       time.includes("PM") ||
       time.includes("am") ||
       time.includes("pm")
-      ? convert12to24Hour(time)
-      : time;
-    
+        ? convert12to24Hour(time)
+        : time;
+
     // Calculate end time by adding service duration
-    const [hours, minutes] = timeIn24h.split(':').map(Number);
+    const [hours, minutes] = timeIn24h.split(":").map(Number);
     const startMinutes = hours * 60 + minutes;
     const endMinutes = startMinutes + service.duration_minutes;
     const endHours = Math.floor(endMinutes / 60);
     const endMins = endMinutes % 60;
-    const endTimeIn24h = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+    const endTimeIn24h = `${endHours.toString().padStart(2, "0")}:${endMins
+      .toString()
+      .padStart(2, "0")}`;
 
     // Send separate date and time components to avoid timezone conversion issues
     const startTime = `${timeIn24h}:00`;

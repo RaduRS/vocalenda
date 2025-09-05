@@ -2,7 +2,7 @@
  * Utility functions and constants for the Vocalenda Stream Server
  */
 
-import { formatISODate, getCurrentUKDateTime } from './dateUtils.js';
+import { formatISODate, getCurrentUKDateTime } from "./dateUtils.js";
 
 /**
  * Get today's date in YYYY-MM-DD format
@@ -25,14 +25,22 @@ export function generateSystemPrompt(businessConfig, callContext) {
   // Get today's date in YYYY-MM-DD format
   const today = getTodayDate();
   const todayDate = getCurrentUKDateTime();
-  const todayDayName = todayDate.toLocaleDateString('en-GB', { weekday: 'long' });
+  const todayDayName = todayDate.toLocaleDateString("en-GB", {
+    weekday: "long",
+  });
 
-  let prompt = `You are an AI receptionist for ${business.name}. Today is ${today} (${todayDayName}). Your PRIMARY job is booking appointments using functions.
+  let prompt = `You are an AI receptionist for ${
+    business.name
+  }. Today is ${today} (${todayDayName}). Your PRIMARY job is booking appointments using functions.
 
 🗓️ MANDATORY DATE VERIFICATION PROTOCOL:
 - Today is ${todayDayName}, ${today}
 - When customers say "Thursday" they mean the next Thursday
-- When customers say "tomorrow" they mean ${new Date(todayDate.getTime() + 24*60*60*1000).toISOString().split('T')[0]}
+- When customers say "tomorrow" they mean ${
+    new Date(todayDate.getTime() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0]
+  }
 - 🚨 ABSOLUTE RULE: BEFORE mentioning ANY day name for ANY date, you MUST call get_day_of_week function first
 - 🚨 FORBIDDEN: NEVER state what day a date is without calling get_day_of_week function
 - 🚨 MANDATORY: If you mention "September 11th is Wednesday" without calling get_day_of_week, you are VIOLATING the protocol
@@ -57,6 +65,20 @@ BUSINESS: ${business.name}`;
     if (service.price) prompt += `£${service.price}`;
     prompt += `,`;
   });
+
+  // Add staff information if available
+  const staffMembers = businessConfig.staffMembers || [];
+  if (staffMembers.length > 0) {
+    prompt += `\n\nSTAFF MEMBERS:`;
+    staffMembers.forEach((staff) => {
+      prompt += ` ${staff.name}`;
+      if (staff.specialties && staff.specialties.length > 0) {
+        prompt += ` (${staff.specialties.join(', ')})`;
+      }
+      prompt += `,`;
+    });
+    prompt += `\n\n📋 STAFF BOOKING NOTES:\n- Customers can request specific staff members by name\n- If no preference is mentioned, any available staff member can provide the service\n- Always mention available staff when discussing services if customers ask`;
+  }
 
   prompt += `\n\n🚨 MANDATORY FUNCTION RULES:
 1. AFTER getting customer name + service interest → ASK for their preferred time
@@ -132,6 +154,15 @@ export function getAvailableFunctions() {
       },
     },
     {
+      name: "get_staff_members",
+      description: "Get list of available staff members who can provide services",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
       name: "get_available_slots",
       description:
         "REQUIRED: Call this function IMMEDIATELY whenever you mention checking availability or when a customer asks about booking for any date. NEVER say you'll check without actually calling this function right away. Use this to check real-time availability before discussing times.",
@@ -171,7 +202,8 @@ export function getAvailableFunctions() {
           },
           time: {
             type: "string",
-            description: "Time in HH:MM format (24-hour). Convert from 12-hour format if needed (e.g., '3:00 PM' becomes '15:00')",
+            description:
+              "Time in HH:MM format (24-hour). Convert from 12-hour format if needed (e.g., '3:00 PM' becomes '15:00')",
           },
           customer_phone: {
             type: "string",
@@ -190,15 +222,18 @@ export function getAvailableFunctions() {
         properties: {
           customer_name: {
             type: "string",
-            description: "EXACT customer name (optional for same-call operations - will use session data)",
+            description:
+              "EXACT customer name (optional for same-call operations - will use session data)",
           },
           current_date: {
             type: "string",
-            description: "Current appointment date in YYYY-MM-DD format (optional for same-call operations)",
+            description:
+              "Current appointment date in YYYY-MM-DD format (optional for same-call operations)",
           },
           current_time: {
             type: "string",
-            description: "Current appointment time in HH:MM format (optional for same-call operations)",
+            description:
+              "Current appointment time in HH:MM format (optional for same-call operations)",
           },
           new_date: {
             type: "string",
@@ -227,15 +262,18 @@ export function getAvailableFunctions() {
         properties: {
           customer_name: {
             type: "string",
-            description: "EXACT customer name (optional for same-call operations - will use session data)",
+            description:
+              "EXACT customer name (optional for same-call operations - will use session data)",
           },
           date: {
             type: "string",
-            description: "Appointment date in YYYY-MM-DD format (optional for same-call operations)",
+            description:
+              "Appointment date in YYYY-MM-DD format (optional for same-call operations)",
           },
           time: {
             type: "string",
-            description: "Appointment time in HH:MM format (optional for same-call operations)",
+            description:
+              "Appointment time in HH:MM format (optional for same-call operations)",
           },
           reason: {
             type: "string",

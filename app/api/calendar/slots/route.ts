@@ -70,8 +70,9 @@ export async function GET(request: NextRequest) {
     // Get calendar service
     const calendarService = await getCalendarService(businessId);
     if (!calendarService) {
+      console.error(`Calendar service not available for business ${businessId}. Check Google Calendar integration.`);
       return NextResponse.json(
-        { error: 'Calendar service not available' },
+        { error: 'Google Calendar integration not configured or tokens expired. Please reconnect your Google Calendar.' },
         { status: 500 }
       );
     }
