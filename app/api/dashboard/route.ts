@@ -110,18 +110,21 @@ export async function GET() {
           console.log('Using integration_settings as object:', integrationSettings);
         }
         
-        googleCalendarConnected = !!(integrationSettings && 
+        const hasGoogleTokens = !!(integrationSettings && 
             typeof integrationSettings === 'object' && 
             integrationSettings !== null &&
             'google' in integrationSettings &&
             typeof integrationSettings.google === 'object' &&
             integrationSettings.google !== null &&
             'access_token' in integrationSettings.google);
+            
+        // Both google_calendar_id AND valid tokens are required for connection
+        googleCalendarConnected = !!(user.businesses?.google_calendar_id && hasGoogleTokens);
          
          console.log('Google Calendar connection check:');
          console.log('- hasGoogleCalendarId:', !!user.businesses?.google_calendar_id);
          console.log('- integrationSettings:', integrationSettings);
-         console.log('- hasGoogleTokens:', !!(integrationSettings?.google?.access_token));
+         console.log('- hasGoogleTokens:', hasGoogleTokens);
          console.log('- Final googleCalendarConnected:', googleCalendarConnected);
       }
     }
