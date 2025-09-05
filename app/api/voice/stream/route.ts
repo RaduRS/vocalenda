@@ -3,8 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { getCalendarService } from '@/lib/calendar';
 import { generateConfirmationMessage } from '@/lib/sms-templates';
 import { Json } from '@/lib/database.types';
-import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime } from '@/lib/date-utils';
-import { addMinutes } from 'date-fns';
+import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime, getCurrentUKDateTime, formatISODate } from '@/lib/date-utils';
+import { addMinutes, addDays } from 'date-fns';
 
 interface DeepgramMessage {
   type: string;
@@ -176,6 +176,10 @@ function generateSystemPrompt(businessConfig: BusinessConfig, callContext: CallC
   const services = businessConfig?.services || [];
   const customPrompt = businessConfig?.config?.ai_prompt;
   
+  // Get current date and day information
+  const todayDate = formatISODate(getCurrentUKDateTime());
+  const todayDayName = getDayOfWeekName(parseISODate(todayDate));
+  
   const servicesText = services.map((s) => 
     `${s.name} (${s.duration_minutes} minutes, £${s.price})`
   ).join(', ');
@@ -250,6 +254,8 @@ function generateSystemPrompt(businessConfig: BusinessConfig, callContext: CallC
   
   return `You are a professional and friendly receptionist for ${business?.name || 'this business'}.
 
+Today's date: ${todayDate} (${todayDayName})
+
 ${greeting ? `Greeting: ${greeting}\n\n` : ''}Business Information:
 - Name: ${business?.name}
 - Address: ${business?.address || 'Not specified'}
@@ -283,6 +289,12 @@ General rules:
 - Provide clear confirmation details after booking
 - If you can't help with something, offer to take a message
 - Respect business hours and holiday closures
+
+IMPORTANT DATE AWARENESS:
+- When customer says "Thursday", they mean the next Thursday from today (${todayDate})
+- When customer says "tomorrow", they mean ${formatISODate(addDays(getCurrentUKDateTime(), 1))}
+- Always verify the exact date using get_available_slots before confirming any booking
+- If unsure about which specific date the customer means, ask for clarification
 
 ${customPrompt ? `Additional instructions: ${customPrompt}` : ''}`;
 }
