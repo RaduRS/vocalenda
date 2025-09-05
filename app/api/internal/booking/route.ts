@@ -95,20 +95,29 @@ export async function POST(request: NextRequest) {
     const firstName = nameParts[0] || customerName;
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
     
-    if (!customerPhone) {
-      return NextResponse.json(
-        { error: 'Phone number is required for voice bookings' },
-        { status: 400 }
-      );
-    }
+    // Use the provided phone number (which should be the caller's phone for voice bookings)
+     // If no phone is provided, this is likely an error in the voice system
+     if (!customerPhone) {
+       console.error('❌ No phone number provided for booking - this should not happen for voice bookings');
+       return NextResponse.json(
+         { error: 'Phone number is required for bookings' },
+         { status: 400 }
+       );
+     }
+     
+     const phoneToUse = customerPhone;
     
-    // Check if customer already exists
-    const { data: existingCustomer } = await supabase
-      .from('customers')
-      .select('id')
-      .eq('phone', customerPhone)
-      .eq('business_id', businessId)
-      .single();
+    // Check if customer already exists (only if we have a real phone number)
+    let existingCustomer = null;
+    if (customerPhone) {
+      const { data } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('phone', customerPhone)
+        .eq('business_id', businessId)
+        .single();
+      existingCustomer = data;
+    }
 
     if (existingCustomer) {
       customerId = existingCustomer.id;
@@ -120,7 +129,7 @@ export async function POST(request: NextRequest) {
           business_id: businessId,
           first_name: firstName,
           last_name: lastName,
-          phone: customerPhone
+          phone: phoneToUse
         })
         .select('id')
         .single();
