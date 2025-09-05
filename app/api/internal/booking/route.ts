@@ -107,22 +107,26 @@ export async function POST(request: NextRequest) {
      
      const phoneToUse = customerPhone;
     
-    // Check if customer already exists (only if we have a real phone number)
-    let existingCustomer = null;
-    if (customerPhone) {
-      const { data } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('phone', customerPhone)
-        .eq('business_id', businessId)
-        .single();
-      existingCustomer = data;
+    // Check if customer already exists
+    console.log('🔍 Checking for existing customer:', { phone: phoneToUse, businessId });
+    const { data: existingCustomer, error: lookupError } = await supabase
+      .from('customers')
+      .select('id')
+      .eq('phone', phoneToUse)
+      .eq('business_id', businessId)
+      .single();
+
+    if (lookupError && lookupError.code !== 'PGRST116') {
+      console.error('❌ Error looking up customer:', lookupError);
+      return NextResponse.json({ error: 'Database error during customer lookup' }, { status: 500 });
     }
 
     if (existingCustomer) {
+      console.log('✅ Found existing customer:', existingCustomer.id);
       customerId = existingCustomer.id;
     } else {
       // Create new customer
+      console.log('👤 Creating new customer:', { businessId, firstName, lastName, phone: phoneToUse });
       const { data: newCustomer, error: customerError } = await supabase
         .from('customers')
         .insert({
@@ -134,12 +138,41 @@ export async function POST(request: NextRequest) {
         .select('id')
         .single();
 
-      if (customerError || !newCustomer) {
-        console.error('Error creating customer:', customerError);
-        return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
-      }
+      if (customerError) {
+         console.error('❌ Error creating customer:', customerError);
+         console.error('❌ Customer data attempted:', { businessId, firstName, lastName, phone: phoneToUse });
+         
+         // Check if it's a unique constraint violation
+         if (customerError.code === '23505' && customerError.message?.includes('customers_business_id_phone_key')) {
+           console.log('🔄 Unique constraint violation - attempting to find existing customer');
+           // Try to find the existing customer again
+           const { data: retryCustomer } = await supabase
+             .from('customers')
+             .select('id')
+             .eq('phone', phoneToUse)
+             .eq('business_id', businessId)
+             .single();
+           
+           if (retryCustomer) {
+             console.log('✅ Found existing customer after constraint violation:', retryCustomer.id);
+             customerId = retryCustomer.id;
+           } else {
+             return NextResponse.json({ error: 'Customer creation failed due to database constraint' }, { status: 500 });
+           }
+         } else {
+           return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
+         }
+       }
 
-      customerId = newCustomer.id;
+       if (!newCustomer && !customerId) {
+         console.error('❌ Customer creation returned no data');
+         return NextResponse.json({ error: 'Failed to create customer - no data returned' }, { status: 500 });
+       }
+
+       if (newCustomer) {
+         console.log('✅ Created new customer:', newCustomer.id);
+         customerId = newCustomer.id;
+       }
     }
 
     // Create calendar event
@@ -183,19 +216,23 @@ ${notes ? `\nNotes: ${notes}` : ''}
     const startTimeFormatted = startDateTime.split('T')[1].slice(0, 8);
     const endTimeFormatted = endDateTime.split('T')[1].slice(0, 8);
     
+    console.log('📅 Creating appointment with customer ID:', customerId);
+    const appointmentData = {
+      business_id: businessId,
+      customer_id: customerId || null,
+      service_id: serviceId,
+      appointment_date: appointmentDate,
+      start_time: startTimeFormatted,
+      end_time: endTimeFormatted,
+      status: 'confirmed',
+      notes,
+      google_calendar_event_id: calendarEventId
+    };
+    console.log('📅 Appointment data:', appointmentData);
+    
     const { data: appointment, error: appointmentError } = await supabase
       .from('appointments')
-      .insert({
-        business_id: businessId,
-        customer_id: customerId || null,
-        service_id: serviceId,
-        appointment_date: appointmentDate,
-        start_time: startTimeFormatted,
-        end_time: endTimeFormatted,
-        status: 'confirmed',
-        notes,
-        google_calendar_event_id: calendarEventId
-      })
+      .insert(appointmentData)
       .select('id')
       .single();
 
