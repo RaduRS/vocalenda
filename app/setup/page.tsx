@@ -31,6 +31,7 @@ import {
   validateService,
   validateStaffMember
 } from '@/lib/types'
+import { getCurrentUKDate, formatISODate } from '@/lib/date-utils'
 
 export default function SetupWizard() {
   const { user } = useUser();
@@ -511,7 +512,7 @@ export default function SetupWizard() {
                       const holidays = businessData.holidays || [];
                       const newHoliday: Holiday = { 
                         description: '', 
-                        date: new Date().toISOString().split('T')[0]
+                        date: formatISODate(getCurrentUKDate())
                       };
                       handleInputChange('holidays', [...holidays, newHoliday]);
                     }}

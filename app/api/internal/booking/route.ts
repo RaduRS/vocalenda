@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
+import {
+  parseISODate,
+  formatISODate,
+  formatISOTime,
+  createTimezoneAwareISO,
+  UK_TIMEZONE
+} from '@/lib/date-utils';
+import { parseISO } from 'date-fns';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -75,8 +83,8 @@ export async function POST(request: NextRequest) {
     // Check if slot is still available
     const isAvailable = await calendarService.isTimeSlotAvailable(
       business.google_calendar_id,
-      new Date(startTime),
-      new Date(endTime),
+      parseISO(startTime),
+      parseISO(endTime),
       business.timezone
     );
 
@@ -188,9 +196,10 @@ ${notes ? `\nNotes: ${notes}` : ''}
     const startDateTime = startTime.includes('T') ? startTime : `${startTime}T00:00:00`;
     const endDateTime = endTime.includes('T') ? endTime : `${endTime}T00:00:00`;
     
-    // Create timezone-aware datetime strings
-    const startTimeForCalendar = startDateTime.endsWith('Z') ? startDateTime : `${startDateTime}.000`;
-    const endTimeForCalendar = endDateTime.endsWith('Z') ? endDateTime : `${endDateTime}.000`;
+    // Create timezone-aware datetime strings using UK standards
+    const businessTimezone = business.timezone || UK_TIMEZONE;
+    const startTimeForCalendar = createTimezoneAwareISO(parseISO(startDateTime), businessTimezone);
+    const endTimeForCalendar = createTimezoneAwareISO(parseISO(endDateTime), businessTimezone);
 
     const calendarEventId = await calendarService.createEvent(
       business.google_calendar_id,
@@ -199,22 +208,23 @@ ${notes ? `\nNotes: ${notes}` : ''}
         description: eventDescription,
         start: {
           dateTime: startTimeForCalendar,
-          timeZone: business.timezone
+          timeZone: businessTimezone
         },
         end: {
           dateTime: endTimeForCalendar,
-          timeZone: business.timezone
+          timeZone: businessTimezone
         }
       }
     );
 
     // Create appointment record
-    // Extract date and time components from the datetime strings to avoid timezone conversion issues
-    const appointmentDate = startDateTime.split('T')[0];
+    // Extract date and time components using UK date utilities
+    const startDateObj = parseISO(startDateTime);
+    const endDateObj = parseISO(endDateTime);
     
-    // Extract time in HH:MM:SS format from the datetime string to preserve the intended time
-    const startTimeFormatted = startDateTime.split('T')[1].slice(0, 8);
-    const endTimeFormatted = endDateTime.split('T')[1].slice(0, 8);
+    const appointmentDate = formatISODate(startDateObj);
+    const startTimeFormatted = formatISOTime(startDateObj);
+    const endTimeFormatted = formatISOTime(endDateObj);
     
     console.log('📅 Creating appointment with customer ID:', customerId);
     const appointmentData = {

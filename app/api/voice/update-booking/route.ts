@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
 import { findBookingByFuzzyName } from '@/lib/fuzzy-matching';
+import { createUKDateTime, formatISOTime, getCurrentUKDateTime } from '@/lib/date-utils';
+import { parseISO, addMinutes } from 'date-fns';
 
 // Type for database appointment with joined tables
 type AppointmentWithRelations = {
@@ -199,18 +201,17 @@ export async function POST(request: NextRequest) {
       const finalTime = new_time || current_time;
       
       // Create datetime for calendar operations
-      const newStartDateTime = `${finalDate}T${finalTime}:00`;
-      const startDateTime = new Date(newStartDateTime);
-      const endDateTime = new Date(startDateTime.getTime() + serviceDuration * 60000);
+      const startDateTime = createUKDateTime(finalDate, finalTime);
+      const endDateTime = addMinutes(startDateTime, serviceDuration);
       
       // Store just the time part in start_time field (matching database schema)
       const finalTimeWithSeconds = finalTime.includes(':') && finalTime.split(':').length === 2 ? `${finalTime}:00` : finalTime;
-      newStartTime = newStartDateTime; // For calendar operations
-      newEndTime = endDateTime.toISOString().slice(0, 19); // For calendar operations
+      newStartTime = startDateTime.toISOString(); // For calendar operations
+      newEndTime = endDateTime.toISOString(); // For calendar operations
 
       updates.appointment_date = finalDate;
       updates.start_time = finalTimeWithSeconds; // Store just time, not datetime
-      updates.end_time = endDateTime.toTimeString().slice(0, 8); // Store just time, not datetime
+      updates.end_time = formatISOTime(endDateTime); // Store just time, not datetime
     }
 
     // Check availability for new time slot (if time is changing)
@@ -223,8 +224,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const startDateTime = new Date(newStartTime);
-      const endDateTime = new Date(newEndTime);
+      const startDateTime = parseISO(newStartTime);
+      const endDateTime = parseISO(newEndTime);
 
       const isAvailable = await calendarService.isTimeSlotAvailable(
         business.google_calendar_id,
@@ -251,8 +252,8 @@ export async function POST(request: NextRequest) {
       end_time: updates.end_time || existingBooking.end_time,
       status: 'confirmed',
       notes: existingBooking.notes,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      created_at: getCurrentUKDateTime().toISOString(),
+      updated_at: getCurrentUKDateTime().toISOString()
     };
 
     const { data: newBooking, error: createError } = await supabaseAdmin

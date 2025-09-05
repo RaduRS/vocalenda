@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { getCurrentUKDate, formatISODate } from '@/lib/date-utils';
 
 export async function GET() {
   try {
@@ -67,7 +68,7 @@ export async function GET() {
     ]);
 
     // Today's appointments
-    const today = new Date().toISOString().split('T')[0];
+    const today = formatISODate(getCurrentUKDate());
     const { count: todayAppointments } = await supabase
       .from('appointments')
       .select('id', { count: 'exact' })

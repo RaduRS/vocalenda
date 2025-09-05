@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
+import { parseISODate, getDayOfWeekName, formatUKTime, UK_TIMEZONE } from '@/lib/date-utils';
+import { parseISO } from 'date-fns';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -93,8 +95,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const requestDate = new Date(date + 'T00:00:00'); // Ensure proper date parsing
-    if (isNaN(requestDate.getTime())) {
+    let requestDate: Date;
+    try {
+      requestDate = parseISODate(date);
+    } catch (error) {
       console.error(`Invalid date: ${date}`);
       return NextResponse.json(
         { error: 'Invalid date provided' },
@@ -102,12 +106,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // UK format: Monday is first day of week (index 0)
-    const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const jsDay = requestDate.getDay(); // JavaScript: 0=Sunday, 1=Monday, ..., 6=Saturday
-    const ukDay = jsDay === 0 ? 6 : jsDay - 1; // Convert to UK format: 0=Monday, 1=Tuesday, ..., 6=Sunday
-    const dayOfWeek = dayNames[ukDay];
-    console.log(`Date: ${date}, Day of week: ${dayOfWeek}, JS getDay(): ${jsDay}, UK day index: ${ukDay}`);
+    const dayOfWeek = getDayOfWeekName(requestDate).toLowerCase();
+    console.log(`Date: ${date}, Day of week: ${dayOfWeek}`);
     
     const dayHours = businessHours[dayOfWeek];
     if (!dayHours || dayHours.closed === true || !dayHours.open || !dayHours.close) {
@@ -133,16 +133,8 @@ export async function GET(request: NextRequest) {
     const formattedSlots = availableSlots.map(slot => ({
       start: slot.start.toISOString(),
       end: slot.end.toISOString(),
-      startTime: slot.start.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: business.timezone
-      }),
-      endTime: slot.end.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: business.timezone
-      })
+      startTime: formatUKTime(slot.start),
+      endTime: formatUKTime(slot.end)
     }));
 
     return NextResponse.json({ slots: formattedSlots });
@@ -224,8 +216,8 @@ export async function POST(request: NextRequest) {
     // Check if slot is still available
     const isAvailable = await calendarService.isTimeSlotAvailable(
       business.google_calendar_id,
-      new Date(startTime),
-      new Date(endTime),
+      parseISO(startTime),
+      parseISO(endTime),
       business.timezone
     );
 

@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { ComprehensiveBusinessData, PaymentMethod, BusinessHours, Holiday } from '@/lib/types';
 import { Json } from '@/lib/database.types';
+import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 // GET - Fetch comprehensive business data
 export async function GET(request: NextRequest) {
@@ -167,7 +168,7 @@ export async function PUT(request: NextRequest) {
         key_information: businessData.ai_configuration.key_information,
         customer_notes_enabled: businessData.customer_notes_enabled,
         booking_policies: businessData.booking_policies as unknown as Json,
-        updated_at: new Date().toISOString()
+        updated_at: getCurrentUKDateTime().toISOString()
       })
       .eq('id', user.business_id);
 
@@ -186,7 +187,7 @@ export async function PUT(request: NextRequest) {
         restricted_ai_topics: businessData.ai_configuration.restricted_topics,
         ai_prompt: businessData.ai_configuration.custom_prompt,
         greeting_message: businessData.ai_configuration.greeting,
-        updated_at: new Date().toISOString()
+        updated_at: getCurrentUKDateTime().toISOString()
       }, {
         onConflict: 'business_id'
       });

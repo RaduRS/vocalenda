@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
 import { findBookingByFuzzyName } from '@/lib/fuzzy-matching';
+import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       .update({
         status: 'cancelled',
         notes: reason ? `Cancelled: ${reason}` : 'Cancelled by customer',
-        updated_at: new Date().toISOString()
+        updated_at: getCurrentUKDateTime().toISOString()
       })
       .eq('id', existingBooking.id)
       .eq('status', 'confirmed') // Only update if still confirmed

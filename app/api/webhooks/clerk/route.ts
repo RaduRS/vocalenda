@@ -3,6 +3,7 @@ import { WebhookEvent } from '@clerk/nextjs/server';
 import { UserJSON } from '@clerk/nextjs/server';
 import { Webhook } from 'svix';
 import { supabaseAdmin } from '@/lib/supabase';
+import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 export async function POST(req: Request) {
   const headerPayload = await headers();
@@ -107,7 +108,7 @@ async function handleUserUpdated(userData: WebhookEvent['data']) {
         email: primaryEmail.email_address,
         first_name: user.first_name,
         last_name: user.last_name,
-        updated_at: new Date().toISOString(),
+        updated_at: getCurrentUKDateTime().toISOString(),
       })
       .eq('clerk_user_id', user.id);
 
@@ -128,7 +129,7 @@ async function handleUserDeleted(userData: WebhookEvent['data']) {
       .from('users')
       .update({
         is_active: false,
-        updated_at: new Date().toISOString(),
+        updated_at: getCurrentUKDateTime().toISOString(),
       })
       .eq('clerk_user_id', deletedUser.id);
 

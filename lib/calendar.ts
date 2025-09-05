@@ -2,6 +2,13 @@ import { google } from 'googleapis';
 import type { calendar_v3 } from 'googleapis';
 import type { OAuth2Client } from 'google-auth-library';
 import { createClient } from '@supabase/supabase-js';
+import {
+  getCurrentUKDateTime,
+  formatISODate,
+  createTimezoneAwareISO,
+  UK_TIMEZONE,
+  createUKDateTime
+} from './date-utils';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -123,7 +130,7 @@ class CalendarService {
       const busyTimes = response.data.calendars?.[calendarId]?.busy || [];
       
       // Also check database for confirmed bookings (in case Google Calendar sync is delayed)
-      const startDate = startTime.toISOString().split('T')[0];
+      const startDate = formatISODate(startTime);
       const { data: dbBookings } = await supabase
         .from('appointments')
         .select('start_time, end_time, appointment_date')
@@ -196,7 +203,7 @@ class CalendarService {
 
       // Also get existing bookings from database to prevent double bookings
       // when Google Calendar sync is delayed
-      const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const dateString = formatISODate(date);
       const { data: existingBookings } = await supabase
         .from('appointments')
         .select('start_time, end_time')
@@ -206,8 +213,8 @@ class CalendarService {
 
       // Convert database bookings to busy time format
       const dbBusyTimes = (existingBookings || []).map(booking => {
-        const startDateTime = new Date(`${dateString}T${booking.start_time}`);
-        const endDateTime = new Date(`${dateString}T${booking.end_time}`);
+        const startDateTime = createUKDateTime(dateString, booking.start_time);
+        const endDateTime = createUKDateTime(dateString, booking.end_time);
         return {
           start: startDateTime.toISOString(),
           end: endDateTime.toISOString()

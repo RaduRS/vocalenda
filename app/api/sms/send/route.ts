@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 interface SMSRequest {
   businessId: string;
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
     if (appointmentId && type === 'confirmation') {
       await supabaseAdmin
         .from('appointments')
-        .update({ confirmation_sent_at: new Date().toISOString() })
+        .update({ confirmation_sent_at: getCurrentUKDateTime().toISOString() })
         .eq('id', appointmentId);
     }
 

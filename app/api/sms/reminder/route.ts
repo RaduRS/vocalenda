@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { generateReminderMessage } from '@/lib/sms-templates';
+import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
     // Update appointment to mark reminder as sent
     const { error: updateError } = await supabaseAdmin
       .from('appointments')
-      .update({ reminder_sent_at: new Date().toISOString() })
+      .update({ reminder_sent_at: getCurrentUKDateTime().toISOString() })
       .eq('id', appointmentId);
 
     if (updateError) {

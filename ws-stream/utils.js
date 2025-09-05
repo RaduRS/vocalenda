@@ -2,12 +2,14 @@
  * Utility functions and constants for the Vocalenda Stream Server
  */
 
+import { formatISODate, getCurrentUKDateTime } from './dateUtils.js';
+
 /**
  * Get today's date in YYYY-MM-DD format
  * @returns {string} Today's date in YYYY-MM-DD format
  */
 export function getTodayDate() {
-  return new Date().toISOString().split("T")[0];
+  return formatISODate(getCurrentUKDateTime());
 }
 
 /**

@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { getCalendarService } from '@/lib/calendar';
 import { generateConfirmationMessage } from '@/lib/sms-templates';
 import { Json } from '@/lib/database.types';
+import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime } from '@/lib/date-utils';
+import { addMinutes } from 'date-fns';
 
 interface DeepgramMessage {
   type: string;
@@ -611,18 +613,16 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
       return { error: 'Business hours not configured' };
     }
 
-    const requestDate = new Date(date + 'T00:00:00'); // Ensure proper date parsing
-    if (isNaN(requestDate.getTime())) {
+    let requestDate: Date;
+    try {
+      requestDate = parseISODate(date);
+    } catch (error) {
       console.error(`Invalid date: ${date}`);
       return { error: 'Invalid date provided' };
     }
 
-    // UK format: Monday is first day of week (index 0)
-    const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const jsDay = requestDate.getDay(); // JavaScript: 0=Sunday, 1=Monday, ..., 6=Saturday
-    const ukDay = jsDay === 0 ? 6 : jsDay - 1; // Convert to UK format: 0=Monday, 1=Tuesday, ..., 6=Sunday
-    const dayOfWeek = dayNames[ukDay];
-    console.log(`Voice API - Date: ${date}, Day of week: ${dayOfWeek}, JS getDay(): ${jsDay}, UK day index: ${ukDay}`);
+    const dayOfWeek = getDayOfWeekName(requestDate).toLowerCase();
+    console.log(`Voice API - Date: ${date}, Day of week: ${dayOfWeek}`);
     
     const dayHours = businessHours[dayOfWeek];
     if (!dayHours || dayHours.closed === true || !dayHours.open || !dayHours.close) {
@@ -641,11 +641,7 @@ async function getAvailableSlots(businessConfig: BusinessConfig, params: { date:
     );
 
     const formattedSlots = availableSlots.map(slot => 
-      slot.start.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: business.timezone
-      })
+      formatUKTime(slot.start)
     );
 
     return { available_slots: formattedSlots };
@@ -693,13 +689,12 @@ async function createBooking(businessConfig: BusinessConfig, params: {
     console.log(`Voice API - Booking - Using service: ${service.name} (Duration: ${service.duration_minutes} minutes)`);
 
     // Parse date and time in business timezone format
-    const appointmentDateTime = `${date}T${time}:00`;
-    const appointmentDate = new Date(`${appointmentDateTime}Z`); // For availability check
-    const endTime = new Date(appointmentDate.getTime() + service.duration_minutes * 60000);
+    const appointmentDate = createUKDateTime(date, time);
+    const endTime = addMinutes(appointmentDate, service.duration_minutes);
     
     // Create timezone-aware datetime strings for calendar
-    const startTimeForCalendar = `${appointmentDateTime}.000`;
-    const endTimeForCalendar = new Date(appointmentDate.getTime() + service.duration_minutes * 60000).toISOString().slice(0, 19) + '.000';
+    const startTimeForCalendar = appointmentDate.toISOString();
+    const endTimeForCalendar = endTime.toISOString();
 
     const calendarService = await getCalendarService(business.id);
     if (!calendarService) {
