@@ -184,7 +184,8 @@ export function createUKDateTime(isoDate: string, timeString: string): Date {
   if (!isValid(parsed)) {
     throw new Error(`Invalid date/time combination: ${isoDate} ${timeString}`);
   }
-  return toZonedTime(parsed, UK_TIMEZONE);
+  // Treat the input as UK local time and convert to UTC for storage
+  return fromZonedTime(parsed, UK_TIMEZONE);
 }
 
 /**

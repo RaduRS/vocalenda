@@ -1,6 +1,6 @@
 import { format, parse, isValid, startOfWeek, addDays, parseISO } from 'date-fns';
 import { toZonedTime, fromZonedTime, format as formatTz } from 'date-fns-tz';
-import { enGB } from 'date-fns/locale/index.js';
+import { enGB } from 'date-fns/locale';
 
 // UK timezone constant
 export const UK_TIMEZONE = 'Europe/London';
@@ -177,7 +177,8 @@ export function createUKDateTime(isoDate, timeString) {
   if (!isValid(parsed)) {
     throw new Error(`Invalid date/time combination: ${isoDate} ${timeString}`);
   }
-  return toZonedTime(parsed, UK_TIMEZONE);
+  // Treat the input as UK local time and convert to UTC for storage
+  return fromZonedTime(parsed, UK_TIMEZONE);
 }
 
 /**
