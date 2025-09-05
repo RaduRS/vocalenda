@@ -110,6 +110,7 @@ class CalendarService {
     timezone: string
   ): Promise<boolean> {
     try {
+      // Check Google Calendar busy times
       const response = await this.calendar.freebusy.query({
         requestBody: {
           timeMin: startTime.toISOString(),
@@ -120,7 +121,44 @@ class CalendarService {
       });
 
       const busyTimes = response.data.calendars?.[calendarId]?.busy || [];
-      return busyTimes.length === 0;
+      
+      // Also check database for confirmed bookings (in case Google Calendar sync is delayed)
+      const startDate = startTime.toISOString().split('T')[0];
+      const { data: dbBookings } = await supabase
+        .from('appointments')
+        .select('start_time, end_time, appointment_date')
+        .eq('business_id', this.businessId)
+        .eq('status', 'confirmed')
+        .eq('appointment_date', startDate);
+
+      // Convert database bookings to busy times format
+      const dbBusyTimes = (dbBookings || []).map(booking => ({
+        start: `${booking.appointment_date}T${booking.start_time}`,
+        end: `${booking.appointment_date}T${booking.end_time}`
+      }));
+
+      // Combine Google Calendar and database busy times
+      type BusyTime = { start: string; end: string };
+      const calendarBusyTimes: BusyTime[] = busyTimes
+        .filter((busy): busy is { start: string; end: string } => 
+          busy.start != null && busy.end != null
+        )
+        .map(busy => ({ start: busy.start!, end: busy.end! }));
+      const allBusyTimes: BusyTime[] = [...calendarBusyTimes, ...dbBusyTimes];
+
+      // Check if the requested time slot conflicts with any busy time
+      const hasConflict = allBusyTimes.some((busy: BusyTime) => {
+        const busyStart = new Date(busy.start!);
+        const busyEnd = new Date(busy.end!);
+        
+        return (
+          (startTime >= busyStart && startTime < busyEnd) ||
+          (endTime > busyStart && endTime <= busyEnd) ||
+          (startTime <= busyStart && endTime >= busyEnd)
+        );
+      });
+
+      return !hasConflict;
     } catch (error) {
       console.error('Error checking calendar availability:', error);
       throw new Error('Failed to check calendar availability');
@@ -144,7 +182,7 @@ class CalendarService {
       const [endHour, endMinute] = businessHours.end.split(':').map(Number);
       dayEnd.setHours(endHour, endMinute, 0, 0);
 
-      // Get busy times for the day
+      // Get busy times from Google Calendar
       const response = await this.calendar.freebusy.query({
         requestBody: {
           timeMin: dayStart.toISOString(),
@@ -155,6 +193,35 @@ class CalendarService {
       });
 
       const busyTimes = response.data.calendars?.[calendarId]?.busy || [];
+
+      // Also get existing bookings from database to prevent double bookings
+      // when Google Calendar sync is delayed
+      const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const { data: existingBookings } = await supabase
+        .from('appointments')
+        .select('start_time, end_time')
+        .eq('business_id', this.businessId)
+        .eq('appointment_date', dateString)
+        .eq('status', 'confirmed');
+
+      // Convert database bookings to busy time format
+      const dbBusyTimes = (existingBookings || []).map(booking => {
+        const startDateTime = new Date(`${dateString}T${booking.start_time}`);
+        const endDateTime = new Date(`${dateString}T${booking.end_time}`);
+        return {
+          start: startDateTime.toISOString(),
+          end: endDateTime.toISOString()
+        };
+      });
+
+      // Combine Google Calendar and database busy times
+      type BusyTime = { start: string; end: string };
+      const calendarBusyTimes: BusyTime[] = busyTimes
+        .filter((busy): busy is { start: string; end: string } => 
+          busy.start != null && busy.end != null
+        )
+        .map(busy => ({ start: busy.start!, end: busy.end! }));
+      const allBusyTimes: BusyTime[] = [...calendarBusyTimes, ...dbBusyTimes];
       const availableSlots: Array<{ start: Date; end: Date }> = [];
 
       // Generate potential slots every 30 minutes
@@ -165,8 +232,8 @@ class CalendarService {
         const slotEnd = new Date(currentTime.getTime() + serviceDuration * 60000);
         
         if (slotEnd <= dayEnd) {
-          // Check if this slot conflicts with any busy time
-          const isAvailable = !busyTimes.some((busy: calendar_v3.Schema$TimePeriod) => {
+          // Check if this slot conflicts with any busy time (Google Calendar + Database)
+          const isAvailable = !allBusyTimes.some((busy: BusyTime) => {
             const busyStart = new Date(busy.start!);
             const busyEnd = new Date(busy.end!);
             
