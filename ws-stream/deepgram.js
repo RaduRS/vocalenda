@@ -612,6 +612,7 @@ export async function handleDeepgramMessage(
       businessConfig,
       streamSid,
       callSid: state.callSid,
+      callerPhone: state.callerPhone,
       state: {
         expectingFunctionCall,
         functionCallTimeout,
