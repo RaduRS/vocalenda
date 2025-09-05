@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { getCalendarService } from '@/lib/calendar';
 import { generateConfirmationMessage } from '@/lib/sms-templates';
 import { Json } from '@/lib/database.types';
-import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime, getCurrentUKDateTime, formatISODate } from '@/lib/date-utils';
+import { parseISODate, parseUKDate, getDayOfWeekName, formatUKTime, createUKDateTime, getCurrentUKDateTime, formatISODate } from '@/lib/date-utils';
 import { addMinutes, addDays } from 'date-fns';
 
 interface DeepgramMessage {
@@ -293,7 +293,11 @@ General rules:
 IMPORTANT DATE AND TIME AWARENESS:
 - When customer says "Thursday", they mean the next Thursday from today (${todayDate})
 - When customer says "tomorrow", they mean ${formatISODate(addDays(getCurrentUKDateTime(), 1))}
+- CRITICAL: When mentioning appointment dates, ALWAYS use get_day_of_week function to verify the correct day
+- NEVER assume what day a date falls on - always call get_day_of_week first
 - Always verify the exact date using get_available_slots before confirming any booking
+- Use get_day_of_week to confirm the day name before stating appointment details
+- When confirming appointments, always state the correct day from get_day_of_week result
 - If unsure about which specific date the customer means, ask for clarification
 
 TIME FORMAT HANDLING:
@@ -364,6 +368,20 @@ function getAvailableFunctions() {
         properties: {},
         required: []
       }
+    },
+    {
+      name: 'get_day_of_week',
+      description: 'Calculate the day of the week for any given date to verify appointment day accuracy',
+      parameters: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            description: 'Date in UK format (DD/MM/YYYY)'
+          }
+        },
+        required: ['date']
+      }
     }
   ];
 }
@@ -404,7 +422,20 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
         result = await createBooking(businessConfig, bookingParams);
         break;
         
-
+      case 'get_day_of_week':
+        const dateParams = parameters as { date: string };
+        try {
+          const parsedDate = parseUKDate(dateParams.date);
+          const dayName = getDayOfWeekName(parsedDate);
+          result = {
+            date: dateParams.date,
+            day_of_week: dayName,
+            formatted: `${dayName}, ${parsedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+          };
+        } catch (error) {
+          result = { error: 'Invalid date format. Please use DD/MM/YYYY format.' };
+        }
+        break;
         
       default:
         result = { error: 'Unknown function' };

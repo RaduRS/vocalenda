@@ -26,7 +26,7 @@ export default function Home() {
         width: 512,
         height: 512,
       },
-      foundingDate: "2024",
+      foundingDate: "2025",
       sameAs: ["https://vocalenda.com"],
       contactPoint: {
         "@type": "ContactPoint",
