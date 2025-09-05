@@ -40,10 +40,14 @@ export default function Dashboard() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const response = await fetch('/api/dashboard', {
+      // Add timestamp to prevent any caching
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/dashboard?t=${timestamp}`, {
         cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
       if (response.ok) {
@@ -126,8 +130,12 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        console.log('Disconnect successful, refreshing dashboard data...');
+        // Small delay to ensure database changes are committed
+        await new Promise(resolve => setTimeout(resolve, 500));
         // Refetch dashboard data to get the updated connection status
         await fetchDashboardData();
+        console.log('Dashboard data refreshed after disconnect');
         alert('Google Calendar disconnected successfully!');
       } else {
         throw new Error(data.error || 'Failed to disconnect Google Calendar');

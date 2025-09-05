@@ -124,8 +124,11 @@ export async function POST(request: NextRequest) {
 
     if (updateBusinessError) {
       console.error('Failed to update business:', updateBusinessError);
+    } else {
+      console.log('Successfully cleared google_calendar_id from business');
     }
 
+    console.log('Google Calendar disconnect completed successfully');
     return NextResponse.json({
       success: true,
       message: 'Google Calendar disconnected successfully'
