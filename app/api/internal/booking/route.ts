@@ -87,43 +87,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create customer record if doesn't exist
-    let customerId;
-    if (customerPhone) {
-      const { data: existingCustomer } = await supabase
+    // Handle customer creation/retrieval
+    let customerId: string | undefined;
+    
+    // Split customer name into first and last name more flexibly
+    const nameParts = customerName.trim().split(' ');
+    const firstName = nameParts[0] || customerName;
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    
+    if (!customerPhone) {
+      return NextResponse.json(
+        { error: 'Phone number is required for voice bookings' },
+        { status: 400 }
+      );
+    }
+    
+    // Check if customer already exists
+    const { data: existingCustomer } = await supabase
+      .from('customers')
+      .select('id')
+      .eq('phone', customerPhone)
+      .eq('business_id', businessId)
+      .single();
+
+    if (existingCustomer) {
+      customerId = existingCustomer.id;
+    } else {
+      // Create new customer
+      const { data: newCustomer, error: customerError } = await supabase
         .from('customers')
+        .insert({
+          business_id: businessId,
+          first_name: firstName,
+          last_name: lastName,
+          phone: customerPhone
+        })
         .select('id')
-        .eq('phone', customerPhone)
-        .eq('business_id', businessId)
         .single();
 
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
-      } else {
-        // Split customer name into first and last name
-        const nameParts = customerName.trim().split(' ');
-        const firstName = nameParts[0] || customerName;
-        const lastName = nameParts.slice(1).join(' ') || null;
-        
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert({
-            business_id: businessId,
-            first_name: firstName,
-            last_name: lastName,
-            phone: customerPhone
-          })
-          .select('id')
-          .single();
-
-        if (customerError || !newCustomer) {
-          return NextResponse.json(
-            { error: 'Failed to create customer record' },
-            { status: 500 }
-          );
-        }
-        customerId = newCustomer.id;
+      if (customerError || !newCustomer) {
+        console.error('Error creating customer:', customerError);
+        return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
       }
+
+      customerId = newCustomer.id;
     }
 
     // Create calendar event

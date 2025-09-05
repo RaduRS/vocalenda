@@ -3,6 +3,30 @@ import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
 import { findBookingByFuzzyName } from '@/lib/fuzzy-matching';
 
+// Type for database appointment with joined tables
+type AppointmentWithRelations = {
+  id: string;
+  customer_id: string;
+  service_id: string | null;
+  appointment_date: string;
+  start_time: string;
+  end_time: string;
+  google_calendar_event_id: string | null;
+  notes: string | null;
+  status: string;
+  customers: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    phone: string;
+  } | null;
+  services: {
+    id: string;
+    name: string;
+    duration_minutes: number;
+  } | null;
+};
+
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -32,7 +56,8 @@ export async function POST(request: NextRequest) {
       current_time,
       new_date,
       new_time,
-      new_service_id
+      new_service_id,
+      caller_phone
     } = await request.json();
 
     console.log('📝 Update booking request:', {
@@ -42,13 +67,22 @@ export async function POST(request: NextRequest) {
       current_time,
       new_date,
       new_time,
-      new_service_id
+      new_service_id,
+      caller_phone
     });
 
     // Validate required parameters
     if (!business_id || !customer_name || !current_date || !current_time) {
       return NextResponse.json(
         { error: 'Missing required parameters: business_id, customer_name, current_date, current_time' },
+        { status: 400 }
+      );
+    }
+
+    // Validate caller phone for voice bookings security
+    if (!caller_phone) {
+      return NextResponse.json(
+        { error: 'Phone number verification required for updates' },
         { status: 400 }
       );
     }
@@ -101,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find booking using fuzzy name matching
-    const existingBooking = findBookingByFuzzyName(existingBookings || [], customer_name);
+    const existingBooking = findBookingByFuzzyName(existingBookings || [], customer_name) as AppointmentWithRelations;
 
     if (!existingBooking) {
       console.error('Booking not found for:', { customer_name, current_date, current_time });
@@ -112,6 +146,20 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Found existing booking:', existingBooking.id);
+
+    // Verify caller phone matches the customer's phone number
+    if (existingBooking.customers?.phone !== caller_phone) {
+      console.error('Phone verification failed:', {
+        customer_phone: existingBooking.customers?.phone,
+        caller_phone
+      });
+      return NextResponse.json(
+        { error: 'Phone number verification failed. You must call from the same number used to make the booking.' },
+        { status: 403 }
+      );
+    }
+
+    console.log('✅ Phone verification successful');
 
     // Prepare update data
     const updates: {
@@ -193,91 +241,127 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update the booking in database (only if still confirmed)
-    const { data: updatedBooking, error: updateError } = await supabaseAdmin
+    // Create new booking with updated details
+    const newBookingData = {
+      business_id: business_id,
+      customer_id: existingBooking.customer_id,
+      service_id: updates.service_id || existingBooking.service_id,
+      appointment_date: updates.appointment_date || existingBooking.appointment_date,
+      start_time: updates.start_time || existingBooking.start_time,
+      end_time: updates.end_time || existingBooking.end_time,
+      status: 'confirmed',
+      notes: existingBooking.notes,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const { data: newBooking, error: createError } = await supabaseAdmin
       .from('appointments')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', existingBooking.id)
-      .eq('status', 'confirmed') // Only update if still confirmed
+      .insert(newBookingData)
       .select(`
         *,
         customers(*),
         services(*)
       `)
-      .single();
+      .single() as { data: AppointmentWithRelations | null; error: Error | null };
 
-    if (updateError) {
-      console.error('Error updating booking:', updateError);
+    if (createError || !newBooking) {
+      console.error('Error creating new booking:', createError);
       return NextResponse.json(
-        { error: 'Failed to update booking in database' },
+        { error: 'Failed to create new booking in database' },
         { status: 500 }
       );
     }
 
-    // Check if the booking was actually updated (may have been cancelled)
-    if (!updatedBooking) {
-      console.log('⚠️ Booking cannot be updated - may have been cancelled');
-      return NextResponse.json(
-        { error: 'Booking cannot be updated - it may have been cancelled or no longer exists' },
-        { status: 409 }
-      );
+    console.log('✅ Created new booking:', newBooking.id);
+
+    // Create new Google Calendar event
+    let newCalendarEventId = null;
+    try {
+      const calendarService = await getCalendarService(business_id);
+      if (calendarService) {
+        const serviceName = newBooking.services?.name;
+        
+        // Format datetime for Google Calendar with proper timezone handling
+        const startTimeForCalendar = newStartTime.endsWith('Z') ? newStartTime : `${newStartTime}.000`;
+        const endTimeForCalendar = newEndTime.endsWith('Z') ? newEndTime : `${newEndTime}.000`;
+
+        const calendarEvent = await calendarService.createEvent(
+          business.google_calendar_id,
+          {
+            summary: `${serviceName} - ${customer_name}`,
+            description: `Service: ${serviceName}\nCustomer: ${customer_name}\nPhone: ${newBooking.customers?.phone || 'Not provided'}`,
+            start: {
+              dateTime: startTimeForCalendar,
+              timeZone: business.timezone
+            },
+            end: {
+              dateTime: endTimeForCalendar,
+              timeZone: business.timezone
+            }
+          }
+        );
+        
+        newCalendarEventId = calendarEvent || null;
+        console.log('✅ New Google Calendar event created:', newCalendarEventId);
+        
+        // Update the new booking with the calendar event ID
+        await supabaseAdmin
+          .from('appointments')
+          .update({ google_calendar_event_id: newCalendarEventId })
+          .eq('id', newBooking!.id);
+      }
+    } catch (calendarError) {
+      console.error('⚠️ Failed to create new Google Calendar event:', calendarError);
+      // Continue with deletion of old booking even if calendar creation fails
     }
 
-    // Update Google Calendar event
+    // Delete old Google Calendar event
     if (existingBooking.google_calendar_event_id) {
       try {
         const calendarService = await getCalendarService(business_id);
         if (calendarService) {
-          const serviceName = updates.service_id ? 
-            (await supabaseAdmin.from('services').select('name').eq('id', updates.service_id).single()).data?.name :
-            existingBooking.services?.name;
-
-          // Format datetime for Google Calendar with proper timezone handling
-          const startTimeForCalendar = newStartTime.endsWith('Z') ? newStartTime : `${newStartTime}.000`;
-          const endTimeForCalendar = newEndTime.endsWith('Z') ? newEndTime : `${newEndTime}.000`;
-
-          await calendarService.updateEvent(
+          await calendarService.deleteEvent(
             business.google_calendar_id,
-            existingBooking.google_calendar_event_id,
-            {
-              summary: `${serviceName} - ${customer_name}`,
-              description: `Service: ${serviceName}\nCustomer: ${customer_name}\nPhone: ${existingBooking.customers?.phone || 'Not provided'}`,
-              start: {
-                dateTime: startTimeForCalendar,
-                timeZone: business.timezone
-              },
-              end: {
-                dateTime: endTimeForCalendar,
-                timeZone: business.timezone
-              }
-            }
+            existingBooking.google_calendar_event_id
           );
-          console.log('✅ Google Calendar event updated');
+          console.log('✅ Old Google Calendar event deleted');
         }
       } catch (calendarError) {
-        console.error('⚠️ Failed to update Google Calendar event:', calendarError);
-        // Don't fail the entire operation if calendar update fails
+        console.error('⚠️ Failed to delete old Google Calendar event:', calendarError);
+        // Don't fail the entire operation if calendar deletion fails
       }
     }
 
-    console.log('✅ Booking updated successfully:', updatedBooking.id);
+    // Delete old booking from database
+    const { error: deleteError } = await supabaseAdmin
+      .from('appointments')
+      .delete()
+      .eq('id', existingBooking.id);
+
+    if (deleteError) {
+      console.error('⚠️ Failed to delete old booking:', deleteError);
+      // Don't fail the entire operation if old booking deletion fails
+      // The new booking is already created successfully
+    } else {
+      console.log('✅ Old booking deleted:', existingBooking.id);
+    }
+
+    console.log('✅ Booking updated successfully:', newBooking.id);
 
     return NextResponse.json({
       success: true,
       message: 'Booking updated successfully',
       booking: {
-        id: updatedBooking.id,
-        customer_name: updatedBooking.customers 
-          ? `${updatedBooking.customers.first_name} ${updatedBooking.customers.last_name}`.trim()
+        id: newBooking.id,
+        customer_name: newBooking.customers 
+          ? `${newBooking.customers.first_name} ${newBooking.customers.last_name}`.trim()
           : customer_name, // Use the provided customer name for voice bookings
-        service_name: updatedBooking.services?.name,
-        date: updatedBooking.appointment_date,
-        start_time: updatedBooking.start_time,
-        end_time: updatedBooking.end_time,
-        status: updatedBooking.status
+        service_name: newBooking.services?.name,
+        date: newBooking.appointment_date,
+        start_time: newBooking.start_time,
+        end_time: newBooking.end_time,
+        status: newBooking.status
       }
     });
 

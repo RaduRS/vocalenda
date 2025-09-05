@@ -345,7 +345,7 @@ function getAvailableFunctions() {
 }
 
 // Handle function calls from the AI agent
-async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: DeepgramMessage, businessConfig: BusinessConfig) {
+async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: DeepgramMessage, businessConfig: BusinessConfig, callContext?: CallContext) {
   try {
     const { function_name, parameters } = functionCallData;
     let result: unknown;
@@ -366,14 +366,21 @@ async function handleFunctionCall(deepgramWs: WebSocket, functionCallData: Deepg
         break;
         
       case 'create_booking':
-        result = await createBooking(businessConfig, parameters as {
+        const bookingParams = parameters as {
           customer_name: string;
           service_id: string;
           date: string;
           time: string;
           customer_phone?: string;
-        });
+        };
+        // Use callerPhone from callContext if customer_phone is not provided
+        if (!bookingParams.customer_phone && callContext?.callerPhone) {
+          bookingParams.customer_phone = callContext.callerPhone;
+        }
+        result = await createBooking(businessConfig, bookingParams);
         break;
+        
+
         
       default:
         result = { error: 'Unknown function' };
@@ -483,7 +490,14 @@ async function handleWebSocket(ws: WebSocket) {
             } else if (deepgramData.type === 'FunctionCall') {
               // Handle tool calls
               if (deepgramWs && businessConfig) {
-                handleFunctionCall(deepgramWs, deepgramData, businessConfig);
+                const callContext = {
+                  businessId: businessId!,
+                  callSid: callSid || '',
+                  callerPhone,
+                  businessPhone,
+                  timezone: businessConfig.business?.timezone || timezone || 'UTC'
+                };
+                handleFunctionCall(deepgramWs, deepgramData, businessConfig, callContext);
               }
             }
           });
@@ -704,14 +718,19 @@ async function createBooking(businessConfig: BusinessConfig, params: {
       return { error: 'Time slot is no longer available' };
     }
 
-    // Create customer record
+    // Create customer record - use caller's phone as primary source
+    const phoneToUse = customer_phone || 'Unknown';
+    const nameParts = customer_name.trim().split(' ');
+    const firstName = nameParts[0] || customer_name;
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    
     const { data: customer, error: customerError } = await supabaseAdmin
       .from('customers')
       .upsert({
         business_id: business.id,
-        first_name: customer_name.split(' ')[0] || customer_name,
-        last_name: customer_name.split(' ').slice(1).join(' ') || '',
-        phone: customer_phone || 'Not provided'
+        first_name: firstName,
+        last_name: lastName,
+        phone: phoneToUse
       }, {
         onConflict: 'business_id,phone'
       })
@@ -727,7 +746,7 @@ async function createBooking(businessConfig: BusinessConfig, params: {
       business.google_calendar_id,
       {
         summary: `${service.name} - ${customer_name}`,
-        description: `Service: ${service.name}\nCustomer: ${customer_name}\nPhone: ${customer_phone || 'Not provided'}`,
+        description: `Service: ${service.name}\nCustomer: ${customer_name}\nPhone: ${phoneToUse}`,
         start: {
           dateTime: startTimeForCalendar,
           timeZone: business.timezone
@@ -794,7 +813,7 @@ async function createBooking(businessConfig: BusinessConfig, params: {
         },
         body: JSON.stringify({
           businessId: business.id,
-          customerPhone: customer_phone || 'Not provided',
+          customerPhone: phoneToUse,
           message: confirmationMessage,
           type: 'confirmation',
           appointmentId: appointment.id

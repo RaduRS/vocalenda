@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
       customer_name,
       date,
       time,
-      reason
+      reason,
+      caller_phone
     } = await request.json();
 
     console.log('❌ Cancel booking request:', {
@@ -38,13 +39,22 @@ export async function POST(request: NextRequest) {
       customer_name,
       date,
       time,
-      reason
+      reason,
+      caller_phone
     });
 
     // Validate required parameters
     if (!business_id || !customer_name || !date || !time) {
       return NextResponse.json(
         { error: 'Missing required parameters: business_id, customer_name, date, time' },
+        { status: 400 }
+      );
+    }
+
+    // Validate caller phone for voice bookings security
+    if (!caller_phone) {
+      return NextResponse.json(
+        { error: 'Phone number verification required for cancellations' },
         { status: 400 }
       );
     }
@@ -100,6 +110,20 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Found existing booking to cancel:', existingBooking.id);
+
+    // Verify caller phone matches the customer's phone number
+    if (existingBooking.customers?.phone !== caller_phone) {
+      console.error('Phone verification failed:', {
+        customer_phone: existingBooking.customers?.phone,
+        caller_phone
+      });
+      return NextResponse.json(
+        { error: 'Phone number verification failed. You must call from the same number used to make the booking.' },
+        { status: 403 }
+      );
+    }
+
+    console.log('✅ Phone verification successful');
 
     // Atomic update: only cancel if status is still 'confirmed' to prevent race conditions
     const { data: cancelledBooking, error: updateError } = await supabaseAdmin
