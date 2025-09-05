@@ -150,7 +150,7 @@ export default function PrivacyPolicy() {
                   <li>Your Google user data is used exclusively for providing our appointment management services</li>
                   <li>We do not sell, transfer, or use your Google data for advertising or other commercial purposes</li>
                   <li>Data access is limited to what is necessary for core functionality</li>
-                  <li>You can revoke access at any time through your Google account settings</li>
+                  <li>You can revoke access at any time through your Google account settings or on your Vocalenda dashboard</li>
                 </ul>
               </div>
             </CardContent>
@@ -212,7 +212,7 @@ export default function PrivacyPolicy() {
                 <li>Request correction of inaccurate data</li>
                 <li>Request deletion of your personal information</li>
                 <li>Opt-out of certain data processing activities</li>
-                <li>Withdraw consent for Google Calendar integration</li>
+                <li>Withdraw consent for Google Calendar integration (through your Google account settings or on your Vocalenda dashboard)</li>
                 <li>Request a copy of your data in a portable format</li>
               </ul>
             </CardContent>
