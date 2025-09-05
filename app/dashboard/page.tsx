@@ -38,32 +38,38 @@ export default function Dashboard() {
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await fetch('/api/dashboard');
-        if (response.ok) {
-          const data = await response.json();
-          setBusiness(data.business);
-          setStats(data.stats);
-          
-          // If no business found, redirect to setup
-          if (!data.business) {
-            router.push('/setup');
-            return;
-          }
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard');
+      if (response.ok) {
+        const data = await response.json();
+        setBusiness(data.business);
+        setStats(data.stats);
+        
+        // If no business found, redirect to setup
+        if (!data.business) {
+          router.push('/setup');
+          return;
         }
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+      }
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        await fetchDashboardData();
       } finally {
         setLoading(false);
       }
     };
 
     if (user) {
-      fetchDashboardData();
+      loadDashboard();
     }
-  }, [user, router]);
+  }, [user, fetchDashboardData]);
 
   const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
@@ -72,8 +78,7 @@ export default function Dashboard() {
         alert('Business information not available. Please refresh the page.');
         return;
       }
-      
-      // First get the OAuth URL from the API
+
       const response = await fetch(`/api/auth/google?businessId=${business.id}`);
       const data = await response.json();
       
@@ -114,8 +119,8 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Update the business state to reflect disconnection
-        setBusiness(prev => prev ? { ...prev, google_calendar_connected: false } : null);
+        // Refetch dashboard data to get the updated connection status
+        await fetchDashboardData();
         alert('Google Calendar disconnected successfully!');
       } else {
         throw new Error(data.error || 'Failed to disconnect Google Calendar');
@@ -126,7 +131,7 @@ export default function Dashboard() {
     } finally {
       setDisconnectingCalendar(false);
     }
-  }, [business?.id]);
+  }, [business?.id, fetchDashboardData]);
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(() => [

@@ -33,55 +33,72 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
-    // Get current Google tokens
+    // Check if user has any Google Calendar connection (either tokens or calendar ID)
+    const { data: business, error: businessError } = await supabase
+      .from('businesses')
+      .select('google_calendar_id')
+      .eq('id', businessId)
+      .single();
+
     const { data: config, error: configError } = await supabase
       .from('business_config')
       .select('integration_settings')
       .eq('business_id', businessId)
       .single();
 
-    if (configError || !config?.integration_settings?.google) {
+    const hasGoogleCalendarId = business?.google_calendar_id;
+    const hasGoogleTokens = config?.integration_settings?.google;
+    
+    // If user has no Google Calendar connection at all, return error
+    if (!hasGoogleCalendarId && !hasGoogleTokens) {
       return NextResponse.json({ error: 'Google Calendar not connected' }, { status: 400 });
     }
 
-    const googleTokens = config.integration_settings.google;
+    // Attempt to revoke Google tokens if they exist
+    if (hasGoogleTokens) {
+      try {
+        const oauth2Client = new google.auth.OAuth2(
+          process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          process.env.GOOGLE_CLIENT_SECRET
+        );
+        
+        oauth2Client.setCredentials({
+          access_token: hasGoogleTokens.access_token,
+          refresh_token: hasGoogleTokens.refresh_token
+        });
 
-    // Revoke Google tokens
-    try {
-      const oauth2Client = new google.auth.OAuth2(
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET
-      );
-      
-      oauth2Client.setCredentials({
-        access_token: googleTokens.access_token,
-        refresh_token: googleTokens.refresh_token
-      });
-
-      // Revoke the tokens with Google
-      await oauth2Client.revokeCredentials();
-    } catch (revokeError) {
-      console.error('Failed to revoke Google tokens:', revokeError);
-      // Continue with cleanup even if revocation fails
+        // Revoke the tokens with Google
+        await oauth2Client.revokeCredentials();
+        console.log('Successfully revoked Google tokens');
+      } catch (revokeError) {
+        console.error('Failed to revoke Google tokens:', revokeError);
+        // Continue with cleanup even if revocation fails
+      }
+    } else {
+      console.log('No Google tokens found to revoke, proceeding with cleanup');
     }
 
-    // Remove Google integration from business config
-    const updatedSettings = { ...config.integration_settings };
-    delete updatedSettings.google;
+    // Remove Google integration from business config (if it exists)
+    if (config?.integration_settings) {
+      const updatedSettings = { ...config.integration_settings };
+      delete updatedSettings.google;
 
-    const { error: updateConfigError } = await supabase
-      .from('business_config')
-      .update({
-        integration_settings: Object.keys(updatedSettings).length > 0 ? updatedSettings : null
-      })
-      .eq('business_id', businessId);
+      const { error: updateConfigError } = await supabase
+        .from('business_config')
+        .update({
+          integration_settings: Object.keys(updatedSettings).length > 0 ? updatedSettings : null
+        })
+        .eq('business_id', businessId);
 
-    if (updateConfigError) {
-      console.error('Failed to update business config:', updateConfigError);
-      return NextResponse.json(
-        { error: 'Failed to disconnect Google Calendar' },
-        { status: 500 }
-      );
+      if (updateConfigError) {
+        console.error('Failed to update business config:', updateConfigError);
+        return NextResponse.json(
+          { error: 'Failed to disconnect Google Calendar' },
+          { status: 500 }
+        );
+      }
+    } else {
+      console.log('No business config found to clean up');
     }
 
     // Clear Google Calendar ID from business
