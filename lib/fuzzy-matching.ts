@@ -81,9 +81,27 @@ export const extractCustomerName = (booking: BookingRecord): string => {
     return `${booking.customers.first_name} ${booking.customers.last_name}`.trim();
   } else if (booking.notes) {
     // Voice booking - extract name from notes
-    const nameMatch = booking.notes.match(/Customer: ([^\n]+)/);
+    const nameMatch = booking.notes.match(/Customer: ([^\n-]+)/);
     if (nameMatch) {
       return nameMatch[1].trim();
+    }
+  }
+  return '';
+};
+
+/**
+ * Extracts customer phone from a booking record
+ * Handles both regular customer bookings and voice bookings stored in notes
+ */
+export const extractCustomerPhone = (booking: BookingRecord): string => {
+  if (booking.customers?.phone) {
+    // Regular booking with customer record
+    return booking.customers.phone;
+  } else if (booking.notes) {
+    // Voice booking - extract phone from notes
+    const phoneMatch = booking.notes.match(/Phone: ([^\n]+)/);
+    if (phoneMatch) {
+      return phoneMatch[1].trim();
     }
   }
   return '';
@@ -106,21 +124,27 @@ export const findBookingByFuzzyName = (
   maxLengthDiff: number = 2
 ): BookingRecord | null => {
   if (!bookings || bookings.length === 0) {
+    console.log('🔍 No bookings to search through');
     return null;
   }
+
+  console.log(`🔍 Searching for customer: "${searchName}" in ${bookings.length} bookings`);
 
   // First try exact match
   const exactMatch = bookings.find(booking => {
     const bookingName = extractCustomerName(booking);
+    console.log(`📝 Extracted name: "${bookingName}" from booking ${booking.id}`);
+    console.log(`📝 Notes: ${booking.notes}`);
     return bookingName.toLowerCase() === searchName.toLowerCase();
   });
 
   if (exactMatch) {
+    console.log('✅ Found exact match!');
     return exactMatch;
   }
 
   // If no exact match, try fuzzy matching
-  console.log('No exact match found, trying fuzzy matching...');
+  console.log('❌ No exact match found, trying fuzzy matching...');
   
   const normalizedSearchName = normalizeName(searchName);
   let bestMatch = null;
@@ -134,16 +158,23 @@ export const findBookingByFuzzyName = (
       const similarity = calculateSimilarity(normalizedSearchName, normalizedBookingName);
       const lengthDiff = Math.abs(normalizedSearchName.length - normalizedBookingName.length);
       
+      console.log(`🔍 Comparing "${searchName}" vs "${bookingName}" - similarity: ${Math.round(similarity * 100)}%, length diff: ${lengthDiff}`);
+      
       // Use fuzzy matching with configurable thresholds
       if (similarity > similarityThreshold && lengthDiff <= maxLengthDiff && similarity > bestSimilarity) {
         bestMatch = booking;
         bestSimilarity = similarity;
+        console.log(`✅ New best match found with ${Math.round(bestSimilarity * 100)}% similarity`);
       }
+    } else {
+      console.log(`❌ No name extracted from booking ${booking.id}`);
     }
   }
   
   if (bestMatch) {
-    console.log(`Found fuzzy match with ${Math.round(bestSimilarity * 100)}% similarity`);
+    console.log(`🎯 Final fuzzy match with ${Math.round(bestSimilarity * 100)}% similarity`);
+  } else {
+    console.log('❌ No fuzzy match found');
   }
   
   return bestMatch;

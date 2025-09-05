@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
-import { findBookingByFuzzyName } from '@/lib/fuzzy-matching';
+import { findBookingByFuzzyName, extractCustomerPhone } from '@/lib/fuzzy-matching';
 import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 const supabaseAdmin = createClient(
@@ -99,6 +99,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('📋 Found bookings for date/time:', existingBookings?.length || 0);
+    if (existingBookings && existingBookings.length > 0) {
+      existingBookings.forEach((booking, index) => {
+        console.log(`📝 Booking ${index + 1}:`, {
+          id: booking.id,
+          notes: booking.notes,
+          customer_name: booking.customers ? `${booking.customers.first_name} ${booking.customers.last_name}` : 'No customer record'
+        });
+      });
+    }
+
     // Find booking using fuzzy name matching
     const existingBooking = findBookingByFuzzyName(existingBookings || [], customer_name);
 
@@ -113,9 +124,10 @@ export async function POST(request: NextRequest) {
     console.log('✅ Found existing booking to cancel:', existingBooking.id);
 
     // Verify caller phone matches the customer's phone number
-    if (existingBooking.customers?.phone !== caller_phone) {
+    const customerPhone = extractCustomerPhone(existingBooking);
+    if (customerPhone !== caller_phone) {
       console.error('Phone verification failed:', {
-        customer_phone: existingBooking.customers?.phone,
+        customer_phone: customerPhone,
         caller_phone
       });
       return NextResponse.json(
