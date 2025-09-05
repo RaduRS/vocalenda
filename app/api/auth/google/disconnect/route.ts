@@ -47,7 +47,22 @@ export async function POST(request: NextRequest) {
       .single();
 
     const hasGoogleCalendarId = business?.google_calendar_id;
-    const hasGoogleTokens = config?.integration_settings?.google;
+    
+    // Parse integration_settings if it's a JSON string
+    let integrationSettings = null;
+    if (config?.integration_settings) {
+      if (typeof config.integration_settings === 'string') {
+        try {
+          integrationSettings = JSON.parse(config.integration_settings);
+        } catch (e) {
+          console.error('Failed to parse integration_settings JSON:', e);
+        }
+      } else {
+        integrationSettings = config.integration_settings;
+      }
+    }
+    
+    const hasGoogleTokens = integrationSettings?.google;
     
     // If user has no Google Calendar connection at all, return error
     if (!hasGoogleCalendarId && !hasGoogleTokens) {

@@ -93,13 +93,29 @@ export async function GET() {
         .eq('business_id', businessId)
         .single();
       
-      googleCalendarConnected = !!(config?.integration_settings && 
-         typeof config.integration_settings === 'object' && 
-         config.integration_settings !== null &&
-         'google' in config.integration_settings &&
-         typeof config.integration_settings.google === 'object' &&
-         config.integration_settings.google !== null &&
-         'access_token' in config.integration_settings.google);
+      if (config?.integration_settings) {
+        let integrationSettings;
+        
+        // Parse JSON string if needed
+        if (typeof config.integration_settings === 'string') {
+          try {
+            integrationSettings = JSON.parse(config.integration_settings);
+          } catch (e) {
+            console.error('Failed to parse integration_settings JSON:', e);
+            integrationSettings = null;
+          }
+        } else {
+          integrationSettings = config.integration_settings;
+        }
+        
+        googleCalendarConnected = !!(integrationSettings && 
+           typeof integrationSettings === 'object' && 
+           integrationSettings !== null &&
+           'google' in integrationSettings &&
+           typeof integrationSettings.google === 'object' &&
+           integrationSettings.google !== null &&
+           'access_token' in integrationSettings.google);
+      }
     }
     
     const businessWithCalendarStatus = {
