@@ -13,9 +13,12 @@ function GoogleCallbackContent() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      if (!isLoaded) return;
+      if (!isLoaded) {
+      return;
+    }
       
       if (!userId) {
+        console.error('❌ No userId found, user not authenticated');
         setError('You must be signed in to connect Google Calendar');
         setStatus('error');
         return;
@@ -38,6 +41,8 @@ function GoogleCallbackContent() {
       }
 
       try {
+
+        
         // Send the authorization code and state to our API
         const response = await fetch('/api/auth/google', {
           method: 'POST',
@@ -53,12 +58,14 @@ function GoogleCallbackContent() {
         const data = await response.json();
 
         if (response.ok && data.success) {
+
           setStatus('success');
           // Redirect to dashboard after a short delay
           setTimeout(() => {
-            router.push('/dashboard?calendar=connected');
-          }, 2000);
+             router.push('/dashboard?calendar=connected');
+           }, 1000);
         } else {
+          console.error('❌ OAuth API error:', data);
           setError(data.error || 'Failed to connect Google Calendar');
           setStatus('error');
         }
@@ -104,6 +111,12 @@ function GoogleCallbackContent() {
             <p className="text-slate-600 dark:text-slate-300 mb-4">
               Your Google Calendar has been successfully connected. Redirecting to dashboard...
             </p>
+            <button
+              onClick={() => router.push('/dashboard?calendar=connected')}
+              className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              Go to Dashboard
+            </button>
           </>
         )}
 

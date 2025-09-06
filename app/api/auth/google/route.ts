@@ -52,10 +52,12 @@ export async function GET(request: NextRequest) {
       'https://www.googleapis.com/auth/userinfo.email'
     ];
 
-    // Construct redirect URI dynamically based on the request
-    const protocol = request.headers.get('x-forwarded-proto') || 'http';
-    const host = request.headers.get('host') || 'localhost:3000';
-    const redirectUri = `${protocol}://${host}/auth/google/callback`;
+    // Use production redirect URI or fallback to dynamic construction for development
+    const redirectUri = process.env.NODE_ENV === 'production' 
+      ? 'https://www.vocalenda.com/auth/google/callback'
+      : `http://localhost:3000/auth/google/callback`;
+    
+
     
     const oauth2Client = getOAuth2Client(redirectUri);
 
@@ -79,6 +81,9 @@ export async function GET(request: NextRequest) {
 
 // Handle OAuth callback
 export async function POST(request: NextRequest) {
+  let businessId: string | undefined;
+  let code: string | undefined;
+  
   try {
     const { userId } = await auth();
     
@@ -86,8 +91,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { code, state } = await request.json();
-    const businessId = state;
+    const requestBody = await request.json();
+    code = requestBody.code;
+    businessId = requestBody.state;
 
     if (!code || !businessId) {
       return NextResponse.json(
@@ -107,10 +113,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
-    // Construct redirect URI dynamically based on the request
-    const protocol = request.headers.get('x-forwarded-proto') || 'http';
-    const host = request.headers.get('host') || 'localhost:3000';
-    const redirectUri = `${protocol}://${host}/auth/google/callback`;
+    // Use production redirect URI or fallback to dynamic construction for development
+    const redirectUri = process.env.NODE_ENV === 'production' 
+      ? 'https://www.vocalenda.com/auth/google/callback'
+      : `http://localhost:3000/auth/google/callback`;
+    
+
     
     const oauth2Client = getOAuth2Client(redirectUri);
 
@@ -176,6 +184,8 @@ export async function POST(request: NextRequest) {
       console.error('Failed to update business calendar ID:', updateError);
     }
 
+
+    
     return NextResponse.json({
       success: true,
       calendarId: primaryCalendar.id,
