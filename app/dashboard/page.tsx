@@ -52,8 +52,6 @@ export default function Dashboard() {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('Dashboard data received:', data);
-        console.log('Google Calendar connected status:', data.business?.google_calendar_connected);
         setBusiness(data.business);
         setStats(data.stats);
         
@@ -130,12 +128,10 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        console.log('Disconnect successful, refreshing dashboard data...');
         // Small delay to ensure database changes are committed
         await new Promise(resolve => setTimeout(resolve, 500));
         // Refetch dashboard data to get the updated connection status
         await fetchDashboardData();
-        console.log('Dashboard data refreshed after disconnect');
         alert('Google Calendar disconnected successfully!');
       } else {
         throw new Error(data.error || 'Failed to disconnect Google Calendar');

@@ -1,47 +1,48 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Script from 'next/script';
 
 export function GoogleAnalytics() {
+  const [cookiesAccepted, setCookiesAccepted] = useState(false);
+  const [nonce, setNonce] = useState('');
+
   useEffect(() => {
-    // Check if cookies are accepted before loading analytics
-    if (typeof window !== 'undefined' && localStorage.getItem('cookies-accepted') === 'true') {
-      // Get nonce from meta tag
-      const nonceMeta = document.querySelector('meta[name="csp-nonce"]');
-      const nonce = nonceMeta?.getAttribute('content') || '';
-      
-      // Load Google Analytics script
-      const script = document.createElement('script');
-      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK';
-      script.async = true;
-      if (nonce) {
-        script.nonce = nonce;
-      }
-      document.head.appendChild(script);
-      
-      // Initialize gtag
-      window.dataLayer = window.dataLayer || [];
-      function gtag(...args: unknown[]) {
-        window.dataLayer.push(args);
-      }
-      
-      // Create and execute gtag initialization script with nonce
-      const initScript = document.createElement('script');
-      if (nonce) {
-        initScript.nonce = nonce;
-      }
-      initScript.textContent = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-V5TDZDW6VK');
-      `;
-      document.head.appendChild(initScript);
-    }
+    // Check if cookies are accepted
+    const accepted = localStorage.getItem('cookies-accepted') === 'true';
+    setCookiesAccepted(accepted);
+    
+    // Get nonce from meta tag
+    const nonceMeta = document.querySelector('meta[name="csp-nonce"]');
+    const nonceValue = nonceMeta?.getAttribute('content') || '';
+    setNonce(nonceValue);
   }, []);
 
-  return null;
+  if (!cookiesAccepted) {
+    return null;
+  }
+
+  return (
+    <>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK"
+        strategy="afterInteractive"
+        nonce={nonce}
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        nonce={nonce}
+      >
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-V5TDZDW6VK');
+        `}
+      </Script>
+    </>
+  );
 }
 
 // Extend window type for TypeScript

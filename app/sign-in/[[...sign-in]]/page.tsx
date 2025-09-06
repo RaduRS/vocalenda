@@ -53,7 +53,7 @@ export default function SignInPage() {
               showOptionalFields: false,
             },
           }}
-          redirectUrl="/setup"
+          fallbackRedirectUrl="/setup"
           signUpUrl="/sign-up"
         />
 

@@ -100,14 +100,12 @@ export async function GET() {
         if (typeof config.integration_settings === 'string') {
           try {
             integrationSettings = JSON.parse(config.integration_settings);
-            console.log('Parsed integration_settings from string:', integrationSettings);
           } catch (e) {
             console.error('Failed to parse integration_settings JSON:', e);
             integrationSettings = null;
           }
         } else {
           integrationSettings = config.integration_settings;
-          console.log('Using integration_settings as object:', integrationSettings);
         }
         
         const hasGoogleTokens = !!(integrationSettings && 
@@ -119,13 +117,7 @@ export async function GET() {
             'access_token' in integrationSettings.google);
             
         // Both google_calendar_id AND valid tokens are required for connection
-        googleCalendarConnected = !!(user.businesses?.google_calendar_id && hasGoogleTokens);
-         
-         console.log('Google Calendar connection check:');
-         console.log('- hasGoogleCalendarId:', !!user.businesses?.google_calendar_id);
-         console.log('- integrationSettings:', integrationSettings);
-         console.log('- hasGoogleTokens:', hasGoogleTokens);
-         console.log('- Final googleCalendarConnected:', googleCalendarConnected);
+         googleCalendarConnected = !!(user.businesses?.google_calendar_id && hasGoogleTokens);
       }
     }
     
