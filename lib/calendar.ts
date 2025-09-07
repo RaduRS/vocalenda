@@ -3,10 +3,7 @@ import type { calendar_v3 } from 'googleapis';
 import type { OAuth2Client } from 'google-auth-library';
 import { createClient } from '@supabase/supabase-js';
 import {
-  getCurrentUKDateTime,
   formatISODate,
-  createTimezoneAwareISO,
-  UK_TIMEZONE,
   createUKDateTime
 } from './date-utils';
 
@@ -204,17 +201,21 @@ class CalendarService {
       // Also get existing bookings from database to prevent double bookings
       // when Google Calendar sync is delayed
       const dateString = formatISODate(date);
-      const { data: existingBookings } = await supabase
+      
+      const { data: existingBookings, error: dbError } = await supabase
         .from('appointments')
-        .select('start_time, end_time')
+        .select('start_time, end_time, status, appointment_date')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
         .eq('status', 'confirmed');
 
       // Convert database bookings to busy time format
       const dbBusyTimes = (existingBookings || []).map(booking => {
-        const startDateTime = createUKDateTime(dateString, booking.start_time);
-        const endDateTime = createUKDateTime(dateString, booking.end_time);
+        // Convert HH:mm:ss to HH:mm format for createUKDateTime
+        const startTime = booking.start_time.substring(0, 5); // "10:00:00" -> "10:00"
+        const endTime = booking.end_time.substring(0, 5); // "10:20:00" -> "10:20"
+        const startDateTime = createUKDateTime(dateString, startTime);
+        const endDateTime = createUKDateTime(dateString, endTime);
         return {
           start: startDateTime.toISOString(),
           end: endDateTime.toISOString()
