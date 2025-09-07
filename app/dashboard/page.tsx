@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { CallLogsSection } from '@/components/ui/call-logs-section';
 
 interface Business {
   id: string;
@@ -24,6 +25,17 @@ interface DashboardStats {
   totalCalls: number;
 }
 
+interface CallLog {
+  id: string;
+  caller_phone: string;
+  status: 'incoming' | 'in_progress' | 'completed' | 'failed';
+  started_at: string;
+  ended_at: string | null;
+  duration: number | null;
+  customer_name: string | null;
+  twilio_call_sid: string | null;
+}
+
 export default function Dashboard() {
   const { user } = useUser();
   const router = useRouter();
@@ -34,6 +46,7 @@ export default function Dashboard() {
     totalCustomers: 0,
     totalCalls: 0
   });
+  const [recentCalls, setRecentCalls] = useState<CallLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
@@ -54,6 +67,7 @@ export default function Dashboard() {
         const data = await response.json();
         setBusiness(data.business);
         setStats(data.stats);
+        setRecentCalls(data.recentCalls || []);
         
         // If no business found, redirect to setup
         if (!data.business) {
@@ -365,6 +379,11 @@ export default function Dashboard() {
               </div>
             </div>
           </Card>
+        </div>
+
+        {/* Recent Call Logs */}
+        <div className="mb-8">
+          <CallLogsSection recentCalls={recentCalls} />
         </div>
 
         {/* Business Info */}

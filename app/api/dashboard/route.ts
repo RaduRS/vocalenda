@@ -40,14 +40,15 @@ export async function GET() {
           todayAppointments: 0,
           totalCustomers: 0,
           totalCalls: 0
-        }
+        },
+        recentCalls: []
       });
     }
 
     const businessId = user.business_id;
 
-    // Get dashboard stats
-    const [appointmentsResult, customersResult, callsResult] = await Promise.all([
+    // Get dashboard stats and recent call logs
+    const [appointmentsResult, customersResult, callsResult, recentCallsResult] = await Promise.all([
       // Total appointments
       supabase
         .from('appointments')
@@ -64,7 +65,27 @@ export async function GET() {
       supabase
         .from('call_logs')
         .select('id', { count: 'exact' })
+        .eq('business_id', businessId),
+      
+      // Recent call logs with customer info
+      supabase
+        .from('call_logs')
+        .select(`
+          id,
+          caller_phone,
+          status,
+          started_at,
+          ended_at,
+          twilio_call_sid,
+          customers (
+            first_name,
+            last_name,
+            phone
+          )
+        `)
         .eq('business_id', businessId)
+        .order('started_at', { ascending: false })
+        .limit(10)
     ]);
 
     // Today's appointments
@@ -74,6 +95,22 @@ export async function GET() {
       .select('id', { count: 'exact' })
       .eq('business_id', businessId)
       .eq('appointment_date', today);
+
+    // Process recent calls data
+    const recentCalls = (recentCallsResult.data || []).map(call => ({
+      id: call.id,
+      caller_phone: call.caller_phone,
+      status: call.status,
+      started_at: call.started_at,
+      ended_at: call.ended_at,
+      duration: call.started_at && call.ended_at 
+        ? Math.round((new Date(call.ended_at).getTime() - new Date(call.started_at).getTime()) / 1000)
+        : null,
+      customer_name: call.customers 
+        ? `${call.customers.first_name || ''} ${call.customers.last_name || ''}`.trim() || null
+        : null,
+      twilio_call_sid: call.twilio_call_sid
+    }));
 
     const stats = {
       totalAppointments: appointmentsResult.count || 0,
@@ -128,7 +165,8 @@ export async function GET() {
 
     return NextResponse.json({
       business: businessWithCalendarStatus,
-      stats
+      stats,
+      recentCalls
     });
 
   } catch (error) {
