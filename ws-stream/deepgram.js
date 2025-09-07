@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { generateSystemPrompt, getAvailableFunctions } from "./utils.js";
 import { validateConfig } from "./config.js";
-import { handleFunctionCall } from "./functionHandlers.js";
+import { handleFunctionCall, endCall } from "./functionHandlers.js";
 
 // Get configuration
 const config = validateConfig();
@@ -370,6 +370,15 @@ export function closeDeepgramConnection(deepgramWs) {
   // Clean up persistent pacer
   cleanupPersistentPacer();
 
+  // Clear silence tracking
+  if (silenceTimeout) {
+    clearTimeout(silenceTimeout);
+    silenceTimeout = null;
+  }
+  silenceStartTime = null;
+  silencePromptCount = 0;
+  console.log("🔇 Silence tracking cleaned up");
+
   // Clear KeepAlive interval if it exists
   if (deepgramWs && deepgramWs.keepAliveInterval) {
     clearInterval(deepgramWs.keepAliveInterval);
@@ -407,6 +416,11 @@ let twilioWsRef = null; // Store Twilio WebSocket reference for pacer
 // Deepgram Voice Agent sends 960-byte chunks (120ms of 8kHz μ-law audio)
 const FRAME_SIZE = 960; // Match Deepgram's chunk size
 const SILENCE_PAYLOAD = Buffer.alloc(FRAME_SIZE, 0xff).toString("base64");
+
+// Silence tracking for auto-disconnect
+let silenceStartTime = null;
+let silencePromptCount = 0;
+let silenceTimeout = null;
 
 /**
  * Initialize the persistent pacer that sends audio packets every 20ms
@@ -713,13 +727,26 @@ async function handleDeepgramMessageType(deepgramData, timestamp, context) {
     if (transcript) {
       await handleTranscriptAnalysis(transcript, timestamp, state);
     }
+  } else if (deepgramData.type === "UserStartedSpeaking") {
+    console.log(`[${timestamp}] 🎤 USER_STARTED_SPEAKING: User began speaking`);
+    // Reset silence tracking when user starts speaking
+    if (silenceTimeout) {
+      clearTimeout(silenceTimeout);
+      silenceTimeout = null;
+    }
+    silenceStartTime = null;
+    silencePromptCount = 0;
+    console.log(`[${timestamp}] 🔄 SILENCE_RESET: User speaking, silence tracking reset`);
   } else if (deepgramData.type === "SpeechStarted") {
-    console.log(`[${timestamp}] 🎤 SPEECH_STARTED: User began speaking`);
-  } else if (deepgramData.type === "UtteranceEnd") {
-    console.log(`[${timestamp}] 🔇 UTTERANCE_END: User finished speaking`);
-    console.log(
-      `[${timestamp}] 🧠 EXPECTING: AgentThinking → FunctionCall or TtsStart`
-    );
+    console.log(`[${timestamp}] 🎤 SPEECH_STARTED: User began speaking (STT event)`);
+    // Reset silence tracking when user starts speaking
+    if (silenceTimeout) {
+      clearTimeout(silenceTimeout);
+      silenceTimeout = null;
+    }
+    silenceStartTime = null;
+    silencePromptCount = 0;
+    console.log(`[${timestamp}] 🔄 SILENCE_RESET: User speaking, silence tracking reset`);
   } else if (deepgramData.type === "TtsAudio") {
     console.log(
       `[${timestamp}] 🔊 TTS_AUDIO: AI sending audio response (${
@@ -814,6 +841,58 @@ async function handleDeepgramMessageType(deepgramData, timestamp, context) {
       clearTimeout(audioStreamTimeout);
       audioStreamTimeout = null;
     }
+
+    // Start silence tracking after AI finishes speaking
+    silenceStartTime = Date.now();
+    silencePromptCount = 0;
+    console.log(`[${timestamp}] ⏰ SILENCE_START: Beginning silence tracking after AI speech`);
+    
+    // Capture callSid for use in timeout closure
+    const currentCallSid = context.callSid;
+    
+    // Set up silence detection timeouts
+    const scheduleNextSilenceCheck = () => {
+      if (silenceTimeout) clearTimeout(silenceTimeout);
+      
+      silenceTimeout = setTimeout(() => {
+        if (!silenceStartTime) return; // User started speaking, abort
+        
+        const silenceDuration = Date.now() - silenceStartTime;
+        console.log(`[${timestamp}] 🔇 SILENCE_CHECK: ${silenceDuration}ms of silence`);
+        
+        if (silenceDuration >= 10000) {
+          // Auto-disconnect at 10 seconds - send InjectAgentMessage to trigger farewell
+          console.log(`[${timestamp}] 📞 SILENCE_DISCONNECT: Auto-disconnecting after 10s`);
+          deepgramWs.send(JSON.stringify({
+            type: "InjectAgentMessage",
+            content: "I notice you've been quiet for a while. Thank you for calling! Have a great day and goodbye!"
+          }));
+          
+          // Wait a moment for the agent to speak, then end the call
+          setTimeout(async () => {
+            console.log(`[${timestamp}] 📞 ENDING_CALL: Terminating call after silence timeout`);
+            if (currentCallSid) {
+              await endCall(currentCallSid, { reason: "silence timeout - auto disconnect" });
+            } else {
+              console.log(`[${timestamp}] ⚠️ No callSid available for endCall`);
+            }
+          }, 4000); // Wait 4 seconds for agent to finish speaking
+          
+          // Clear silence tracking since we're ending
+          silenceStartTime = null;
+          silencePromptCount = 0;
+          if (silenceTimeout) {
+            clearTimeout(silenceTimeout);
+            silenceTimeout = null;
+          }
+        } else if (silenceDuration < 15000) {
+          // Continue checking
+          scheduleNextSilenceCheck();
+        }
+      }, 1000); // Check every second
+    };
+    
+    scheduleNextSilenceCheck();
 
     // The pacer will automatically switch to sending silence once the buffer is empty.
     // No need to send extra silence here; the pacer's default state handles it.

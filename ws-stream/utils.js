@@ -2,7 +2,12 @@
  * Utility functions and constants for the Vocalenda Stream Server
  */
 
-import { formatISODate, getCurrentUKDateTime } from "./dateUtils.js";
+import {
+  formatISODate,
+  getCurrentUKDateTime,
+  getDayOfWeekName,
+  parseISODate,
+} from "./dateUtils.js";
 
 /**
  * Get today's date in YYYY-MM-DD format
@@ -55,6 +60,12 @@ export function generateSystemPrompt(businessConfig, callContext) {
 - ALWAYS convert customer's 12-hour time requests to 24-hour format before checking availability
 - If "13:30" is in available slots, then 1:30 PM IS available - never say it's not available
 
+⏰ TIME DISPLAY RULES:
+- NEVER say times like "seventeen hundred" or "seventeen o'clock" - always use 12-hour format when speaking
+- Say "5 PM" instead of "17:00" when talking to customers
+- Convert 24-hour format to natural 12-hour format for customer communication
+- Example: "17:00" becomes "5 PM", "13:30" becomes "1:30 PM"
+
 BUSINESS: ${business.name}`;
   if (business.address) prompt += ` | ${business.address}`;
   if (business.phone_number) prompt += ` | ${business.phone_number}`;
@@ -73,21 +84,44 @@ BUSINESS: ${business.name}`;
     staffMembers.forEach((staff) => {
       prompt += ` ${staff.name}`;
       if (staff.specialties && staff.specialties.length > 0) {
-        prompt += ` (${staff.specialties.join(', ')})`;
+        prompt += ` (${staff.specialties.join(", ")})`;
       }
       prompt += `,`;
     });
-    prompt += `\n\n📋 STAFF BOOKING NOTES:\n- Customers can request specific staff members by name\n- If no preference is mentioned, any available staff member can provide the service\n- Always mention available staff when discussing services if customers ask`;
+    prompt += `\n\n📋 STAFF BOOKING NOTES:\n- Customers can request specific staff members by name\n- If no preference is mentioned, any available staff member can provide the service\n- NEVER ask about staff preferences unless customer specifically mentions wanting a particular staff member\n- Only discuss staff options if customer asks about specific staff members`;
+  }
+
+  // Add business hours information if available
+  const businessHours = businessConfig.config?.business_hours;
+  if (businessHours) {
+    prompt += `\n\n🕐 BUSINESS HOURS:`;
+    if (businessHours.monday)
+      prompt += ` Mon: ${businessHours.monday.open}-${businessHours.monday.close}`;
+    if (businessHours.tuesday)
+      prompt += ` Tue: ${businessHours.tuesday.open}-${businessHours.tuesday.close}`;
+    if (businessHours.wednesday)
+      prompt += ` Wed: ${businessHours.wednesday.open}-${businessHours.wednesday.close}`;
+    if (businessHours.thursday)
+      prompt += ` Thu: ${businessHours.thursday.open}-${businessHours.thursday.close}`;
+    if (businessHours.friday)
+      prompt += ` Fri: ${businessHours.friday.open}-${businessHours.friday.close}`;
+    if (businessHours.saturday)
+      prompt += ` Sat: ${businessHours.saturday.open}-${businessHours.saturday.close}`;
+    if (businessHours.sunday)
+      prompt += ` Sun: ${businessHours.sunday.open}-${businessHours.sunday.close}`;
+    prompt += `\n\n⚠️ BUSINESS HOURS VALIDATION:\n- NEVER check availability for times outside business hours\n- If customer requests booking outside business hours, politely inform them of operating hours\n- Only call get_available_slots for times within business hours`;
   }
 
   prompt += `\n\n🚨 MANDATORY FUNCTION RULES:
 1. AFTER getting customer name + service interest → ASK for their preferred time
-2. Check if preferred time is available using get_available_slots
-3. If available, confirm and book directly. If not, suggest alternatives
-4. Use create_booking to confirm appointments
-5. NEVER output JSON code blocks or raw JSON - ALWAYS execute/invoke functions directly
-6. NEVER show JSON parameters or code - just execute the function immediately from the available functions list
-7. TIME FORMAT: get_available_slots returns 24-hour format (e.g., "15:00"), and create_booking also requires 24-hour format (e.g., "15:00"). When customers say "3:00 PM" or "3 PM", convert to "15:00" to match available slots. IMPORTANT: "03:00 PM" = "3:00 PM" = "3 PM" = "15:00" - these are ALL the same time!
+2. VALIDATE requested time is within business hours BEFORE checking availability
+3. Check if preferred time is available using get_available_slots (only if within business hours)
+4. If available, confirm and book directly. If not, suggest alternatives
+5. Use create_booking to confirm appointments
+6. NEVER output JSON code blocks or raw JSON - ALWAYS execute/invoke functions directly
+7. NEVER show JSON parameters or code - just execute the function immediately from the available functions list
+8. NEVER announce that you are calling a function or checking something - just do it silently and respond with the results
+9. TIME FORMAT: get_available_slots returns 24-hour format (e.g., "15:00"), and create_booking also requires 24-hour format (e.g., "15:00"). When customers say "3:00 PM" or "3 PM", convert to "15:00" to match available slots. IMPORTANT: "03:00 PM" = "3:00 PM" = "3 PM" = "15:00" - these are ALL the same time!
 
 ⚡ EXACT WORKFLOW:
 Customer: "I want a haircut tomorrow"
@@ -95,23 +129,29 @@ You: "Great! Your name?"
 Customer: "John"
 You: "Perfect John! What time would you prefer for your haircut tomorrow?"
 Customer: "10am"
-You: "Let me check if 10am is available for you" [IMMEDIATELY call get_available_slots for that date]
+[SILENTLY call get_available_slots - DO NOT say "let me check"]
 If available: "Perfect! I can book you for 10am. Shall I confirm that?"
 If not: "10am isn't available, but I have 11am or 2pm. Which works better?"
 
 🎯 BOOKING STRATEGY:
 - Always ask for preferred time first
-- IMMEDIATELY check availability when you say you will - never just say you'll check without actually doing it
+- SILENTLY check availability - never announce you're checking
 - Only show alternatives if preferred time unavailable
 - Never list all available slots unless customer asks
 - Book immediately if preferred time is free
 
 📝 BOOKING UPDATES & CANCELLATIONS:
 - For security, ALWAYS require EXACT customer name and current appointment details (date & time) to update or cancel
+- Phone number verification is automatic - if caller's phone doesn't match booking phone, inform them they need to call from the original number
 - Use update_booking to change appointment time, date, or service
 - Use cancel_booking to cancel appointments
+- If phone verification fails, explain: "For security, you'll need to call from the phone number used to make the original booking"
 - Never update/cancel without exact verification details🔒 SECURITY RULES:
 - NEVER ask customers for their phone number - phone verification is done automatically using the caller's number
+- NEVER announce function calls or mention JSON parameters to customers
+- NEVER say things like "Let me check availability" or "I'm calling the booking function"
+- Execute all functions silently in the background
+- Use get_day_of_week function silently to verify dates without announcing - just say the correct day naturally in conversation
 
 🔄 SAME-CALL OPERATIONS (CRITICAL):
 - If a customer JUST made a booking in this same call and immediately wants to update/cancel it, DO NOT ask for their name, date, or time again
@@ -126,10 +166,15 @@ If not: "10am isn't available, but I have 11am or 2pm. Which works better?"
 - This creates a seamless experience for immediate changes after booking
 
 🔚 CALL ENDING:
-- AFTER completing any booking, cancellation, or update, ALWAYS ask: "Is there anything else I can help you with today?"
-- Only end the call when customer clearly indicates they're done ("No", "That's it", "Nothing else", "Goodbye", etc.)
-- When ending, say a polite farewell like "Thank you for calling [business name]! Have a great day!" THEN use end_call function
-- Don't keep talking after calling end_call
+- ONLY end the call when the customer explicitly indicates they want to end the conversation (e.g., "goodbye", "that's all", "thank you, bye")
+- NEVER automatically end the call after completing a booking - always ask if there's anything else you can help with
+- After booking completion, say: "Your appointment is confirmed! Is there anything else I can help you with today?"
+- To end the call, you MUST first say a polite, concluding farewell phrase
+- Your absolute final action in the conversation MUST be to call/run/trigger the end_call function for ending the call
+- Example Farewell Sequence:
+  - Customer says: "That's all, thank you!"
+  - You say: "Thank you for calling [business name], have a great day!"
+  - You immediately run/trigger: end_call function without actually saying it
 
 Be friendly and use functions when needed. When you say you'll check availability, IMMEDIATELY do it - don't wait for the customer to prompt you again. Never guess availability. Never mention events being added to google calendar.
 
@@ -142,6 +187,63 @@ Be friendly and use functions when needed. When you say you'll check availabilit
  * Get available functions for the AI agent
  * @returns {Array} Array of function definitions
  */
+/**
+ * Check if a requested time is within business hours
+ * @param {Object} businessConfig - Business configuration object
+ * @param {string} date - Date in YYYY-MM-DD format
+ * @param {string} time - Time in HH:MM format (24-hour)
+ * @returns {Object} { isWithinHours: boolean, message?: string }
+ */
+export function isWithinBusinessHours(date, time, businessConfig) {
+  const businessHours = businessConfig.config?.business_hours;
+
+  if (!businessHours) {
+    // If no business hours configured, allow all times
+    return { isWithin: true };
+  }
+
+  try {
+    // Parse the date using UK date utilities to get day of week
+    const parsedDate = typeof date === "string" ? parseISODate(date) : date;
+    const dayName = getDayOfWeekName(parsedDate).toLowerCase();
+
+    const dayHours = businessHours[dayName];
+
+    if (!dayHours || !dayHours.open || !dayHours.close) {
+      return {
+        isWithin: false,
+        message: `We're closed on ${
+          dayName.charAt(0).toUpperCase() + dayName.slice(1)
+        }s`,
+      };
+    }
+
+    // Convert times to minutes for comparison
+    const [requestHour, requestMin] = time.split(":").map(Number);
+    const requestMinutes = requestHour * 60 + requestMin;
+
+    const [openHour, openMin] = dayHours.open.split(":").map(Number);
+    const openMinutes = openHour * 60 + openMin;
+
+    const [closeHour, closeMin] = dayHours.close.split(":").map(Number);
+    const closeMinutes = closeHour * 60 + closeMin;
+
+    if (requestMinutes < openMinutes || requestMinutes >= closeMinutes) {
+      return {
+        isWithin: false,
+        message: `We're open ${dayHours.open}-${dayHours.close} on ${
+          dayName.charAt(0).toUpperCase() + dayName.slice(1)
+        }s`,
+      };
+    }
+
+    return { isWithin: true };
+  } catch (error) {
+    console.error("Error checking business hours:", error);
+    return { isWithin: true }; // Default to allowing if error
+  }
+}
+
 export function getAvailableFunctions() {
   return [
     {
@@ -155,11 +257,27 @@ export function getAvailableFunctions() {
     },
     {
       name: "get_staff_members",
-      description: "Get list of available staff members who can provide services",
+      description:
+        "Get list of available staff members who can provide services",
       parameters: {
         type: "object",
         properties: {},
         required: [],
+      },
+    },
+    {
+      name: "get_day_of_week",
+      description:
+        "Get the day of the week for a given date. Use this to verify dates silently in the background without announcing to the customer.",
+      parameters: {
+        type: "object",
+        properties: {
+          date: {
+            type: "string",
+            description: "Date in DD/MM/YYYY format (e.g., 11/09/2025)",
+          },
+        },
+        required: ["date"],
       },
     },
     {
@@ -286,7 +404,7 @@ export function getAvailableFunctions() {
     {
       name: "end_call",
       description:
-        "End the phone call when the conversation has naturally concluded. Use this when the customer indicates they are finished (saying goodbye, thanking you, or expressing satisfaction with the service).",
+        "Say the farewell and then end the phone call. This function MUST be the absolute last action in the conversation after you said the farewell phrase. ",
       parameters: {
         type: "object",
         properties: {

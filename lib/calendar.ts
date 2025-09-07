@@ -135,14 +135,18 @@ class CalendarService {
         .from('appointments')
         .select('start_time, end_time, appointment_date')
         .eq('business_id', this.businessId)
-        .eq('status', 'confirmed')
+        .in('status', ['pending', 'confirmed', 'completed'])
         .eq('appointment_date', startDate);
 
       // Convert database bookings to busy times format
-      const dbBusyTimes = (dbBookings || []).map(booking => ({
-        start: `${booking.appointment_date}T${booking.start_time}`,
-        end: `${booking.appointment_date}T${booking.end_time}`
-      }));
+      const dbBusyTimes = (dbBookings || []).map(booking => {
+        const startDateTime = createUKDateTime(booking.appointment_date, booking.start_time);
+        const endDateTime = createUKDateTime(booking.appointment_date, booking.end_time);
+        return {
+          start: startDateTime.toISOString(),
+          end: endDateTime.toISOString()
+        };
+      });
 
       // Combine Google Calendar and database busy times
       type BusyTime = { start: string; end: string };
@@ -206,15 +210,15 @@ class CalendarService {
       const dateString = formatISODate(date);
       const { data: existingBookings } = await supabase
         .from('appointments')
-        .select('start_time, end_time')
+        .select('start_time, end_time, appointment_date')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
-        .eq('status', 'confirmed');
+        .in('status', ['pending', 'confirmed', 'completed']);
 
       // Convert database bookings to busy time format
       const dbBusyTimes = (existingBookings || []).map(booking => {
-        const startDateTime = createUKDateTime(dateString, booking.start_time);
-        const endDateTime = createUKDateTime(dateString, booking.end_time);
+        const startDateTime = createUKDateTime(booking.appointment_date, booking.start_time);
+        const endDateTime = createUKDateTime(booking.appointment_date, booking.end_time);
         return {
           start: startDateTime.toISOString(),
           end: endDateTime.toISOString()
