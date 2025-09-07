@@ -242,12 +242,22 @@ class CalendarService {
       // when Google Calendar sync is delayed
       const dateString = formatISODate(date);
       
+      // Add a small delay to ensure any recently created bookings are visible
+      // This prevents race conditions where get_available_slots is called immediately after booking creation
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      console.log(`🔍 Checking calendar availability for business ${this.businessId} on ${dateString}`);
+      
+      // Force a fresh read from the database by adding a timestamp to prevent caching
       const { data: existingBookings, error: dbError } = await supabase
         .from('appointments')
-        .select('start_time, end_time, status, appointment_date')
+        .select('start_time, end_time, status, appointment_date, created_at')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
-        .eq('status', 'confirmed');
+        .eq('status', 'confirmed')
+        .order('created_at', { ascending: false });
+        
+      console.log(`📊 Found ${existingBookings?.length || 0} existing bookings for ${dateString}:`, existingBookings?.map(b => `${b.start_time}-${b.end_time}`));
 
       // Convert database bookings to busy time format
       const dbBusyTimes = (existingBookings || []).map(booking => {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
-import { parseISODate, getDayOfWeekName, formatUKTime, UK_TIMEZONE } from '@/lib/date-utils';
+import { parseISODate, getDayOfWeekName, formatUKTime } from '@/lib/date-utils';
 import { parseISO } from 'date-fns';
 
 const supabase = createClient(
@@ -13,16 +13,24 @@ const supabase = createClient(
 // Get available time slots for a business
 export async function GET(request: NextRequest) {
   try {
+    console.log('🔐 Slots API called with headers:', Object.fromEntries(request.headers.entries()));
+    console.log('🔑 Expected secret exists:', !!process.env.INTERNAL_API_SECRET);
+    
     // Check for internal API call first
     const internalSecret = request.headers.get('x-internal-secret');
+    console.log('🔍 Received secret:', internalSecret ? 'Present' : 'Missing');
+    
     const isInternalCall = internalSecret === process.env.INTERNAL_API_SECRET;
     
     // If not internal call, require authentication
     if (!isInternalCall) {
+      console.log('❌ Authorization failed - secret mismatch');
       const { userId } = await auth();
       if (!userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
+    } else {
+      console.log('✅ Authorization successful');
     }
 
     const { searchParams } = new URL(request.url);

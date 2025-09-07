@@ -314,6 +314,10 @@ ${notes ? `\nNotes: ${notes}` : ""}
       );
     }
 
+    // Add a small delay to ensure the database transaction is fully committed
+    // This helps prevent race conditions with immediate availability checks
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     return NextResponse.json({
       success: true,
       appointmentId: appointment.id,
