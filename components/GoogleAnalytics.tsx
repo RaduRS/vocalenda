@@ -5,17 +5,11 @@ import Script from 'next/script';
 
 export function GoogleAnalytics() {
   const [cookiesAccepted, setCookiesAccepted] = useState(false);
-  const [nonce, setNonce] = useState('');
 
   useEffect(() => {
     // Check if cookies are accepted
     const accepted = localStorage.getItem('cookies-accepted') === 'true';
     setCookiesAccepted(accepted);
-    
-    // Get nonce from meta tag
-    const nonceMeta = document.querySelector('meta[name="csp-nonce"]');
-    const nonceValue = nonceMeta?.getAttribute('content') || '';
-    setNonce(nonceValue);
   }, []);
 
   if (!cookiesAccepted) {
@@ -27,12 +21,10 @@ export function GoogleAnalytics() {
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-V5TDZDW6VK"
         strategy="afterInteractive"
-        nonce={nonce}
       />
       <Script
         id="google-analytics"
         strategy="afterInteractive"
-        nonce={nonce}
       >
         {`
           window.dataLayer = window.dataLayer || [];

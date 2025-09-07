@@ -126,7 +126,6 @@ export default function RootLayout({
       <html lang="en">
         <head>
           <GoogleAnalytics />
-          <meta name="csp-nonce" content="" id="csp-nonce" />
         </head>
 
         <body className={`${inter.variable} ${poppins.variable} antialiased`}>
