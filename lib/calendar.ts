@@ -210,15 +210,15 @@ class CalendarService {
       const dateString = formatISODate(date);
       const { data: existingBookings } = await supabase
         .from('appointments')
-        .select('start_time, end_time, appointment_date')
+        .select('start_time, end_time')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
         .in('status', ['pending', 'confirmed', 'completed']);
 
       // Convert database bookings to busy time format
       const dbBusyTimes = (existingBookings || []).map(booking => {
-        const startDateTime = createUKDateTime(booking.appointment_date, booking.start_time);
-        const endDateTime = createUKDateTime(booking.appointment_date, booking.end_time);
+        const startDateTime = createUKDateTime(dateString, booking.start_time);
+        const endDateTime = createUKDateTime(dateString, booking.end_time);
         return {
           start: startDateTime.toISOString(),
           end: endDateTime.toISOString()
