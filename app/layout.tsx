@@ -1,18 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { Inter, Poppins } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import { CookieBanner } from "@/components/ui/cookie-banner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import WebVitals from "@/components/WebVitals";
-import Image from "next/image";
+import Navbar from "@/components/ui/navbar";
 
 import "./globals.css";
 
@@ -24,11 +16,12 @@ const inter = Inter({
   preload: true, // Preload for critical text
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
-  display: "swap", // Improve font loading performance
-  preload: false, // Don't preload since it's only used in typewriter component
+  variable: "--font-poppins",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -66,11 +59,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/vocalenda-logo.jpg", sizes: "512x512", type: "image/jpeg" },
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" }
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
     ],
     shortcut: "/vocalenda-logo.jpg",
     apple: [
-      { url: "/vocalenda-logo.jpg", sizes: "180x180", type: "image/jpeg" }
+      { url: "/vocalenda-logo.jpg", sizes: "180x180", type: "image/jpeg" },
     ],
   },
   manifest: "/manifest.json",
@@ -136,60 +129,8 @@ export default function RootLayout({
           <meta name="csp-nonce" content="" id="csp-nonce" />
         </head>
 
-        <body
-          className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
-        >
-          <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60">
-            <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center space-x-2">
-                <Image
-                  src="/vocalenda-logo.jpg"
-                  alt="Vocalenda Logo"
-                  width={32}
-                  height={32}
-                  className="rounded-md"
-                />
-                <div className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                  Vocalenda
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <SignedOut>
-                  <SignInButton>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
-                    >
-                      Sign In
-                    </Button>
-                  </SignInButton>
-                  <SignUpButton>
-                    <Button
-                      size="sm"
-                      className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white font-medium transition-colors duration-200"
-                    >
-                      Get Started
-                    </Button>
-                  </SignUpButton>
-                </SignedOut>
-                <SignedIn>
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-8 h-8",
-                        userButtonPopoverCard:
-                          "shadow-lg border border-slate-200 dark:border-slate-700",
-                        userButtonPopoverActionButton:
-                          "hover:bg-slate-50 dark:hover:bg-slate-800",
-                      },
-                    }}
-                  />
-                </SignedIn>
-              </div>
-            </div>
-          </header>
+        <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+          <Navbar />
           <WebVitals />
           {children}
           <CookieBanner />

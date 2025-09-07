@@ -76,7 +76,7 @@ export default function Home() {
       ))}
       <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
         {/* Hero Section */}
-        <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        <section className="relative min-h-screen flex items-center overflow-hidden">
           {/* Background Image */}
           <div className="absolute inset-0">
             <Image
@@ -90,7 +90,7 @@ export default function Home() {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 container mx-auto px-4 py-12 sm:py-20 lg:py-32">
+          <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-28 sm:pb-20 lg:pt-36 lg:pb-32">
             <div className="w-full max-w-4xl mx-auto text-center lg:text-left lg:max-w-2xl lg:mx-0">
               {/* Main Headline */}
               <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12">
