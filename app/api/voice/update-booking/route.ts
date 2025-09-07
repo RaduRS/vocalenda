@@ -231,7 +231,8 @@ export async function POST(request: NextRequest) {
         business.google_calendar_id,
         startDateTime,
         endDateTime,
-        business.timezone
+        business.timezone,
+        existingBooking.id // Exclude current booking from availability check
       );
 
       if (!isAvailable) {

@@ -111,7 +111,8 @@ class CalendarService {
     calendarId: string,
     startTime: Date,
     endTime: Date,
-    timezone: string
+    timezone: string,
+    excludeBookingId?: string
   ): Promise<boolean> {
     try {
       // Check Google Calendar busy times
@@ -124,22 +125,57 @@ class CalendarService {
         }
       });
 
-      const busyTimes = response.data.calendars?.[calendarId]?.busy || [];
+      let busyTimes = response.data.calendars?.[calendarId]?.busy || [];
+      
+      // If we're updating an existing booking, get its Google Calendar event ID and exclude it
+      if (excludeBookingId) {
+        const { data: existingBooking } = await supabase
+          .from('appointments')
+          .select('google_calendar_event_id')
+          .eq('id', excludeBookingId)
+          .single();
+          
+        if (existingBooking?.google_calendar_event_id) {
+
+          // Filter out busy times that match the existing booking's event
+          // Note: Google Calendar freebusy doesn't return event IDs, so we need to filter by time
+          const existingEventStart = startTime.toISOString();
+          const existingEventEnd = endTime.toISOString();
+          
+          busyTimes = busyTimes.filter(busy => {
+            const busyStart = new Date(busy.start!).toISOString();
+            const busyEnd = new Date(busy.end!).toISOString();
+            // Exclude if this busy time exactly matches our existing booking time
+            return !(busyStart === existingEventStart && busyEnd === existingEventEnd);
+          });
+          
+
+        }
+      }
       
       // Also check database for confirmed bookings (in case Google Calendar sync is delayed)
       const startDate = formatISODate(startTime);
-      const { data: dbBookings } = await supabase
+      let query = supabase
         .from('appointments')
-        .select('start_time, end_time, appointment_date')
+        .select('id, start_time, end_time, appointment_date')
         .eq('business_id', this.businessId)
         .eq('status', 'confirmed')
         .eq('appointment_date', startDate);
+      
+      // Exclude the current booking if updating
+      if (excludeBookingId) {
+        query = query.neq('id', excludeBookingId);
+      }
+      
+      const { data: dbBookings } = await query;
 
       // Convert database bookings to busy times format
       const dbBusyTimes = (dbBookings || []).map(booking => ({
         start: `${booking.appointment_date}T${booking.start_time}`,
         end: `${booking.appointment_date}T${booking.end_time}`
       }));
+
+
 
       // Combine Google Calendar and database busy times
       type BusyTime = { start: string; end: string };
@@ -149,11 +185,15 @@ class CalendarService {
         )
         .map(busy => ({ start: busy.start!, end: busy.end! }));
       const allBusyTimes: BusyTime[] = [...calendarBusyTimes, ...dbBusyTimes];
+      
+
 
       // Check if the requested time slot conflicts with any busy time
       const hasConflict = allBusyTimes.some((busy: BusyTime) => {
         const busyStart = new Date(busy.start!);
         const busyEnd = new Date(busy.end!);
+        
+
         
         return (
           (startTime >= busyStart && startTime < busyEnd) ||
