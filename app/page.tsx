@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +11,18 @@ import {
 import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [nonce, setNonce] = useState('');
+
+  useEffect(() => {
+    // Get nonce from meta tag
+    const nonceMeta = document.querySelector('meta[name="csp-nonce"]');
+    const nonceValue = nonceMeta?.getAttribute('content') || '';
+    setNonce(nonceValue);
+  }, []);
+
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -71,6 +83,7 @@ export default function Home() {
         <script
           key={index}
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
