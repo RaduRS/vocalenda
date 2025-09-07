@@ -135,18 +135,14 @@ class CalendarService {
         .from('appointments')
         .select('start_time, end_time, appointment_date')
         .eq('business_id', this.businessId)
-        .in('status', ['pending', 'confirmed', 'completed'])
+        .eq('status', 'confirmed')
         .eq('appointment_date', startDate);
 
       // Convert database bookings to busy times format
-      const dbBusyTimes = (dbBookings || []).map(booking => {
-        const startDateTime = createUKDateTime(booking.appointment_date, booking.start_time);
-        const endDateTime = createUKDateTime(booking.appointment_date, booking.end_time);
-        return {
-          start: startDateTime.toISOString(),
-          end: endDateTime.toISOString()
-        };
-      });
+      const dbBusyTimes = (dbBookings || []).map(booking => ({
+        start: `${booking.appointment_date}T${booking.start_time}`,
+        end: `${booking.appointment_date}T${booking.end_time}`
+      }));
 
       // Combine Google Calendar and database busy times
       type BusyTime = { start: string; end: string };
@@ -213,7 +209,7 @@ class CalendarService {
         .select('start_time, end_time')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
-        .in('status', ['pending', 'confirmed', 'completed']);
+        .eq('status', 'confirmed');
 
       // Convert database bookings to busy time format
       const dbBusyTimes = (existingBookings || []).map(booking => {
