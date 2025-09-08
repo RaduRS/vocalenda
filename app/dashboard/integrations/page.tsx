@@ -170,13 +170,15 @@ function Integrations() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="px-6 py-6">
-          <div>
-            <h1 className="text-2xl font-bold text-brand-primary-1">
-              Integrations
-            </h1>
-            <p className="text-brand-primary-2">
-              Connect and manage your third-party integrations
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-brand-primary-1">
+                Integrations
+              </h1>
+              <p className="text-brand-primary-2">
+                Connect and manage your third-party integrations
+              </p>
+            </div>
           </div>
         </div>
       </div>

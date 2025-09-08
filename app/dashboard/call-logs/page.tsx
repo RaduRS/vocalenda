@@ -196,11 +196,16 @@ export default function CallLogsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-6">
-            <div className="h-8 bg-brand-primary-2/20 rounded w-48 mb-4 animate-pulse"></div>
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="px-6 py-6">
+            <div className="h-8 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
             <div className="h-4 bg-brand-primary-2/20 rounded w-64 animate-pulse"></div>
           </div>
+        </div>
+        
+        {/* Main Content */}
+        <div className="p-6">
           <Card>
             <CardHeader>
               <div className="h-6 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
@@ -222,22 +227,11 @@ export default function CallLogsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push("/dashboard")}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-brand-primary-1">
                 AI Call History
@@ -249,8 +243,7 @@ export default function CallLogsPage() {
             {callLogs.length > 0 && (
               <Button
                 onClick={handleExport}
-                className="flex items-center gap-2"
-                variant="outline"
+                className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 flex items-center gap-2"
               >
                 <Download className="h-4 w-4" />
                 Export CSV
@@ -258,6 +251,10 @@ export default function CallLogsPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="p-6">
 
         {/* Call Logs */}
         <Card>

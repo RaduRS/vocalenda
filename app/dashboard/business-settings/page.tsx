@@ -238,40 +238,26 @@ export default function BusinessSettings() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 sm:py-6 gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => router.push('/dashboard')}
-                className="self-start"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Back to Dashboard</span>
-                <span className="sm:hidden">Back</span>
-              </Button>
-              <div className="w-full sm:w-auto">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Business Settings</h1>
-                <p className="text-sm sm:text-base text-gray-600">Manage your business information and preferences</p>
-              </div>
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-brand-primary-1">Business Settings</h1>
+              <p className="text-brand-primary-2">Manage your business information and preferences</p>
             </div>
             <Button 
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+              className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
             >
               {saving ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  <span className="hidden sm:inline">Saving...</span>
-                  <span className="sm:hidden">Save</span>
+                  Saving...
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Save Changes</span>
-                  <span className="sm:hidden">Save</span>
+                  Save Changes
                 </>
               )}
             </Button>
@@ -281,7 +267,7 @@ export default function BusinessSettings() {
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="px-6">
           {/* Mobile Tab Selector */}
           <div className="sm:hidden py-4">
             <select
@@ -330,7 +316,7 @@ export default function BusinessSettings() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="p-6">
         {/* Basic Information Tab */}
         {activeTab === 'basic' && (
           <Card className="p-6">
