@@ -16,15 +16,15 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(new URL('/sign-in', req.url));
   }
 
-  // If user is signed in and trying to access auth routes, redirect to setup
+  // If user is signed in and trying to access auth routes, redirect to dashboard
   // But allow homepage to pass through so Clerk can handle its own redirects
   if (isAuthRoute(req) && userId) {
-    return NextResponse.redirect(new URL('/setup', req.url));
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  // If user is signed in and on homepage, redirect to setup
+  // If user is signed in and on homepage, redirect to dashboard
   if (req.nextUrl.pathname === '/' && userId) {
-    return NextResponse.redirect(new URL('/setup', req.url));
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   return NextResponse.next();
