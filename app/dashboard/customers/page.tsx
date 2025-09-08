@@ -2,68 +2,26 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Plus, Phone, Mail, MapPin, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Users, Plus, Phone, Mail, MapPin, User, RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { format } from "date-fns";
+import { useCustomers, type Customer } from "@/hooks/useCustomers";
 
-interface Customer {
-  id: string;
-  name: string;
-  firstName: string | null;
-  lastName: string | null;
-  phone: string;
-  email: string | null;
-  notes: string | null;
-  appointmentCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface CustomerStats {
-  totalCustomers: number;
-  phoneContacts: number;
-  emailContacts: number;
-  localCustomers: number;
-}
+// Customer interface imported from useCustomers hook
 
 function Customers() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [stats, setStats] = useState<CustomerStats>({
+  const { data, isLoading, error, refetch, isFetching } = useCustomers();
+  const customers = data?.customers || [];
+  const stats = data?.stats || {
     totalCustomers: 0,
     phoneContacts: 0,
     emailContacts: 0,
     localCustomers: 0
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchCustomers = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/customers');
-      if (!response.ok) {
-        throw new Error('Failed to fetch customers');
-      }
-      const data = await response.json();
-      setCustomers(data.customers || []);
-      setStats(data.stats || {
-        totalCustomers: 0,
-        phoneContacts: 0,
-        emailContacts: 0,
-        localCustomers: 0
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
   };
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
 
-  if (loading) {
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white shadow-sm border-b">
@@ -109,11 +67,11 @@ function Customers() {
         </div>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-red-600">Error: {error}</p>
-            <Button onClick={fetchCustomers} className="mt-4">
-              Try Again
-            </Button>
-          </div>
+             <p className="text-red-600">Error: {error.message}</p>
+             <Button onClick={() => refetch()} className="mt-4">
+               Try Again
+             </Button>
+           </div>
         </div>
       </div>
     );
@@ -132,6 +90,16 @@ function Customers() {
                 Manage your customer contacts and information
               </p>
             </div>
+            <Button
+              onClick={() => refetch()}
+              variant="outline"
+              size="sm"
+              disabled={isFetching}
+              className="flex items-center space-x-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -223,9 +191,9 @@ function Customers() {
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900">
-                            {customer.firstName && customer.lastName 
-                              ? `${customer.firstName} ${customer.lastName}`
-                              : customer.name}
+                            {customer.first_name && customer.last_name 
+                              ? `${customer.first_name} ${customer.last_name}`
+                              : 'Unknown Customer'}
                           </h4>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
                             {customer.phone && (
@@ -244,8 +212,8 @@ function Customers() {
                         </div>
                       </div>
                       <div className="text-right text-sm text-gray-600">
-                        <p>{customer.appointmentCount} appointments</p>
-                        <p>Added {format(new Date(customer.createdAt), 'MMM d, yyyy')}</p>
+                        <p>{customer.appointment_count || 0} appointments</p>
+                        <p>Added {format(new Date(customer.created_at), 'MMM d, yyyy')}</p>
                       </div>
                     </div>
                     {customer.notes && (

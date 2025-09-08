@@ -60,35 +60,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch appointments' }, { status: 500 });
     }
 
-    // Get stats
-    const [todayAppointmentsResult, thisWeekAppointmentsResult, totalCustomersResult] = await Promise.all([
-      // Today's appointments
-      supabaseAdmin
-        .from('appointments')
-        .select('id', { count: 'exact' })
-        .eq('business_id', businessId)
-        .eq('appointment_date', today)
-        .neq('status', 'cancelled'),
-      
-      // This week's appointments (last 7 days)
-      supabaseAdmin
-        .from('appointments')
-        .select('id', { count: 'exact' })
-        .eq('business_id', businessId)
-        .gte('appointment_date', formatISODate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)))
-        .neq('status', 'cancelled'),
-      
-      // Total customers
-      supabaseAdmin
-        .from('customers')
-        .select('id', { count: 'exact' })
-        .eq('business_id', businessId)
-    ]);
+    // Calculate stats from the fetched appointments to reduce database queries
+    const todayAppointments = appointments?.filter(apt => 
+      apt.appointment_date === today && apt.status !== 'cancelled'
+    ).length || 0;
+    
+    const weekAgo = formatISODate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+    const thisWeekAppointments = appointments?.filter(apt => 
+      apt.appointment_date >= weekAgo && apt.status !== 'cancelled'
+    ).length || 0;
+    
+    // Only fetch total customers separately as it's not in appointments data
+    const { count: totalCustomers } = await supabaseAdmin
+      .from('customers')
+      .select('id', { count: 'exact' })
+      .eq('business_id', businessId);
 
     const stats = {
-      todayAppointments: todayAppointmentsResult.count || 0,
-      thisWeekAppointments: thisWeekAppointmentsResult.count || 0,
-      totalCustomers: totalCustomersResult.count || 0
+      todayAppointments,
+      thisWeekAppointments,
+      totalCustomers: totalCustomers || 0
     };
 
     // Process appointments data

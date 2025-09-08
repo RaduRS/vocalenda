@@ -6,6 +6,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import Navbar from "@/components/ui/navbar";
 import DashboardLayout from "@/components/ui/dashboard-layout";
 import { ClientOnlyComponents } from "@/components/ClientComponents";
+import QueryProvider from "@/components/providers/QueryProvider";
 
 import "./globals.css";
 
@@ -130,12 +131,14 @@ export default function RootLayout({
         </head>
 
         <body className={`${inter.variable} ${poppins.variable} antialiased`}>
-          <Navbar />
-          <ClientOnlyComponents />
-          <DashboardLayout>
-            {children}
-          </DashboardLayout>
-          <CookieBanner />
+          <QueryProvider>
+            <Navbar />
+            <ClientOnlyComponents />
+            <DashboardLayout>
+              {children}
+            </DashboardLayout>
+            <CookieBanner />
+          </QueryProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -371,7 +371,7 @@ export default function BusinessSettings() {
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <Settings className="w-5 h-5 text-blue-600" />
+                    <FileText className="w-5 h-5 text-blue-600" />
                   </div>
                   Basic Business Information
                 </h3>

@@ -2,74 +2,18 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Clock, Users, Phone, Mail, MapPin } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Calendar, Plus, Clock, Users, Phone, Mail, MapPin, RefreshCw } from "lucide-react";
 import { format, parseISO } from "date-fns";
-
-interface Customer {
-  id: string;
-  name: string;
-  phone: string;
-  email?: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  duration: number;
-  price: number;
-  currency: string;
-}
-
-interface Appointment {
-  id: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  status: string;
-  notes?: string;
-  createdAt: string;
-  customer: Customer | null;
-  service: Service | null;
-}
-
-interface AppointmentStats {
-  todayAppointments: number;
-  thisWeekAppointments: number;
-  totalCustomers: number;
-}
+import { useAppointments, type Appointment, type AppointmentStats } from "@/hooks/useAppointments";
 
 function Appointments() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [stats, setStats] = useState<AppointmentStats>({
+  const { data, isLoading, error, refetch, isFetching } = useAppointments();
+  
+  const appointments = data?.appointments || [];
+  const stats = data?.stats || {
     todayAppointments: 0,
     thisWeekAppointments: 0,
     totalCustomers: 0
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
-
-  const fetchAppointments = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/appointments');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch appointments');
-      }
-      
-      const data = await response.json();
-      setAppointments(data.appointments);
-      setStats(data.stats);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const getStatusColor = (status: string) => {
@@ -102,12 +46,13 @@ function Appointments() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-secondary-1 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading appointments...</p>
+          <p className="text-sm text-gray-500 mt-2">Fetching your latest data...</p>
         </div>
       </div>
     );
@@ -117,8 +62,8 @@ function Appointments() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Error: {error}</p>
-          <Button onClick={fetchAppointments} className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
+          <p className="text-red-600 mb-4">Error: {(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
             Try Again
           </Button>
         </div>
@@ -139,6 +84,22 @@ function Appointments() {
               <p className="text-brand-primary-2">
                 Manage your upcoming and past appointments
               </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                size="sm"
+                disabled={isFetching}
+                className="flex items-center space-x-2"
+              >
+                <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+                <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
+              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Plus className="w-4 h-4 mr-2" />
+                New Appointment
+              </Button>
             </div>
           </div>
         </div>

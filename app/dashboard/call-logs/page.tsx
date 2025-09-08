@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,19 +17,11 @@ import {
   ChevronUp,
   Bot,
   UserIcon,
+  RefreshCw,
 } from "lucide-react";
+import { useCallLogs, type CallLog } from "@/hooks/useCallLogs";
 
-interface CallLog {
-  id: string;
-  caller_phone: string;
-  status: "incoming" | "in_progress" | "completed" | "failed";
-  started_at: string;
-  ended_at: string | null;
-  duration: number | null;
-  customer_name: string | null;
-  twilio_call_sid: string | null;
-  transcript: string | null;
-}
+// CallLog interface is now imported from the hook
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -119,45 +111,13 @@ const toggleTranscript = (
 };
 
 export default function CallLogsPage() {
-  const { user, isLoaded } = useUser();
+  const { user } = useUser();
   const router = useRouter();
-  const [callLogs, setCallLogs] = useState<CallLog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error, refetch, isFetching } = useCallLogs();
+  const callLogs = data?.callLogs || [];
   const [expandedTranscript, setExpandedTranscript] = useState<string | null>(
     null
   );
-
-  useEffect(() => {
-    const fetchCallLogs = async () => {
-      try {
-        const response = await fetch("/api/call-logs", {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setCallLogs(data.callLogs || []);
-        } else {
-          throw new Error("Failed to fetch call logs");
-        }
-      } catch (error) {
-        console.error("Failed to fetch call logs:", error);
-        setError("Failed to load call logs. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      fetchCallLogs();
-    }
-  }, [user]);
 
   const handleExport = () => {
     // Create CSV content
@@ -193,7 +153,7 @@ export default function CallLogsPage() {
     window.URL.revokeObjectURL(url);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
@@ -232,24 +192,36 @@ export default function CallLogsPage() {
       <div className="bg-white shadow-sm border-b">
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-brand-primary-1">
-                AI Call History
-              </h1>
-              <p className="text-brand-primary-2">
-                Complete history of all AI-handled calls
-              </p>
+              <div>
+                <h1 className="text-2xl font-bold text-brand-primary-1">
+                  AI Call History
+                </h1>
+                <p className="text-brand-primary-2">
+                  Complete history of all AI-handled calls
+                </p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Button
+                  onClick={() => refetch()}
+                  variant="outline"
+                  size="sm"
+                  disabled={isFetching}
+                  className="flex items-center space-x-2"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+                  <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
+                </Button>
+                {callLogs.length > 0 && (
+                  <Button
+                    onClick={handleExport}
+                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </Button>
+                )}
+              </div>
             </div>
-            {callLogs.length > 0 && (
-              <Button
-                onClick={handleExport}
-                className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Export CSV
-              </Button>
-            )}
-          </div>
         </div>
       </div>
 
@@ -267,8 +239,8 @@ export default function CallLogsPage() {
           <CardContent>
             {error ? (
               <div className="text-center py-8">
-                <div className="text-red-600 mb-4">{error}</div>
-                <Button onClick={() => window.location.reload()}>
+                <div className="text-red-600 mb-4">{error.message}</div>
+                <Button onClick={() => refetch()}>
                   Try Again
                 </Button>
               </div>

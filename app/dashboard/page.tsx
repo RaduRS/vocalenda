@@ -1,8 +1,9 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState, useMemo, useCallback, memo } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,23 +27,7 @@ const LoadingSkeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 rounded-lg ${className}`} />
 );
 
-interface Business {
-  id: string;
-  name: string;
-  slug: string;
-  phone_number: string;
-  email: string;
-  address: string;
-  status: string;
-  google_calendar_connected?: boolean;
-}
-
-interface DashboardStats {
-  totalAppointments: number;
-  todayAppointments: number;
-  totalCustomers: number;
-  totalCalls: number;
-}
+import { useDashboard, type Business, type DashboardStats } from "@/hooks/useDashboard";
 
 // Memoized stats card component
 const StatsCard = memo(({ title, value, description }: { title: string; value: number; description: string }) => (
@@ -60,57 +45,16 @@ StatsCard.displayName = 'StatsCard';
 function Dashboard() {
   const { user } = useUser();
   const router = useRouter();
-  const [business, setBusiness] = useState<Business | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({
+  const { data, isLoading, error, refetch, isFetching } = useDashboard();
+  const business = data?.business;
+  const stats = data?.stats || {
     totalAppointments: 0,
     todayAppointments: 0,
     totalCustomers: 0,
     totalCalls: 0,
-  });
-
-  const [loading, setLoading] = useState(true);
+  };
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
-
-  const fetchDashboardData = useCallback(async () => {
-    try {
-      // Use stale-while-revalidate for better performance
-      const response = await fetch('/api/dashboard', {
-        next: { revalidate: 30 }, // Cache for 30 seconds
-        headers: {
-          'Cache-Control': 'max-age=30, stale-while-revalidate=60',
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setBusiness(data.business);
-        setStats(data.stats);
-
-        // If no business found, redirect to setup
-        if (!data.business) {
-          router.push("/setup");
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch dashboard data:", error);
-    }
-  }, [router]);
-
-  useEffect(() => {
-    const loadDashboard = async () => {
-      try {
-        await fetchDashboardData();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      loadDashboard();
-    }
-  }, [user, fetchDashboardData]);
 
   const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
@@ -169,7 +113,7 @@ function Dashboard() {
         // Small delay to ensure database changes are committed
         await new Promise((resolve) => setTimeout(resolve, 500));
         // Refetch dashboard data to get the updated connection status
-        await fetchDashboardData();
+        await refetch();
         alert("Google Calendar disconnected successfully!");
       } else {
         throw new Error(data.error || "Failed to disconnect Google Calendar");
@@ -180,7 +124,7 @@ function Dashboard() {
     } finally {
       setDisconnectingCalendar(false);
     }
-  }, [business?.id, fetchDashboardData]);
+  }, [business?.id, refetch]);
 
   // Memoize calendar connection status
   const isCalendarConnected = useMemo(() => {
@@ -231,7 +175,13 @@ function Dashboard() {
     );
   }, []);
 
-  if (loading) {
+  // Redirect to setup if no business found
+  if (data && !data.business) {
+    router.push("/setup");
+    return null;
+  }
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white pt-20">
         {/* Header Skeleton */}
@@ -330,13 +280,25 @@ function Dashboard() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="px-6 py-6">
-          <div>
-            <h1 className="text-2xl font-bold text-brand-primary-1">
-              {business.name}
-            </h1>
-            <p className="text-brand-primary-2">
-              Welcome back, {user?.firstName}!
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-brand-primary-1">
+                {business.name}
+              </h1>
+              <p className="text-brand-primary-2">
+                Welcome back, {user?.firstName}!
+              </p>
+            </div>
+            <Button
+              onClick={() => refetch()}
+              variant="outline"
+              size="sm"
+              disabled={isFetching}
+              className="flex items-center space-x-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
+            </Button>
           </div>
         </div>
       </div>
