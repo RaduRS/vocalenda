@@ -1007,10 +1007,17 @@ async function handleDeepgramMessageType(deepgramData, timestamp, context) {
   } else if (deepgramData.type === "Warning") {
     console.warn(`[${timestamp}] ⚠️ DEEPGRAM_WARNING:`, deepgramData);
   } else if (deepgramData.type === "ConversationText") {
+    const content = deepgramData.text || deepgramData.content;
     console.log(
       `[${timestamp}] 💭 CONVERSATION_TEXT:`,
-      deepgramData.text || deepgramData.content
+      content
     );
+    
+    // Add conversation text to transcript
+    if (content && content.trim()) {
+      const speaker = deepgramData.role === "user" ? "User" : "AI";
+      addTranscriptEntry(speaker, content, timestamp);
+    }
   } else if (deepgramData.type === "FunctionResponse") {
     console.log(`[${timestamp}] 📤 FUNCTION_RESPONSE: Sent back to agent`);
     console.log(
