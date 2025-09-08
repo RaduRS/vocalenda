@@ -140,10 +140,6 @@ function Appointments() {
                 Manage your upcoming and past appointments
               </p>
             </div>
-            <Button className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
-              <Plus className="w-4 h-4 mr-2" />
-              New Appointment
-            </Button>
           </div>
         </div>
       </div>
@@ -209,10 +205,7 @@ function Appointments() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">Recent Appointments</h2>
-                <Button className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Appointment
-                </Button>
+
               </div>
               
               <div className="space-y-4">

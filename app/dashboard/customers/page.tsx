@@ -132,10 +132,6 @@ function Customers() {
                 Manage your customer contacts and information
               </p>
             </div>
-            <Button className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Customer
-            </Button>
           </div>
         </div>
       </div>
@@ -215,10 +211,7 @@ function Customers() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Customer List ({customers.length})
                 </h3>
-                <Button className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Customer
-                </Button>
+
               </div>
               <div className="space-y-4">
                 {customers.map((customer) => (

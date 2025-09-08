@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { usePathname, useRouter } from 'next/navigation';
-import { UserButton, useUser } from '@clerk/nextjs';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  Users, 
-  Phone, 
+import { usePathname, useRouter } from "next/navigation";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import {
+  LayoutDashboard,
+  Calendar,
+  Users,
+  Phone,
   Settings,
   Puzzle,
   BarChart3,
   Menu,
-  X
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+  X,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   className?: string;
@@ -43,35 +43,40 @@ interface SidebarButtonProps {
   onMobileClick?: () => void;
 }
 
-function SidebarButton({ href, icon: Icon, label, isActive, onMobileClick }: SidebarButtonProps) {
+function SidebarButton({
+  href,
+  icon: Icon,
+  label,
+  isActive,
+  onMobileClick,
+}: SidebarButtonProps) {
   const router = useRouter();
-  
+
   const handleClick = () => {
     router.push(href);
     if (onMobileClick) {
       onMobileClick();
     }
   };
-  
+
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
+    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Button
         variant={isActive ? "default" : "ghost"}
         className={cn(
           "w-full justify-start h-12 px-4 text-left transition-all duration-200",
-          isActive 
-            ? "bg-brand-primary-1 text-white shadow-md" 
+          isActive
+            ? "bg-brand-primary-1 text-white shadow-md"
             : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
         )}
         onClick={handleClick}
       >
-        <Icon className={cn(
-          "mr-3 h-5 w-5",
-          isActive ? "text-white" : "text-gray-500"
-        )} />
+        <Icon
+          className={cn(
+            "mr-3 h-5 w-5",
+            isActive ? "text-white" : "text-gray-500"
+          )}
+        />
         <span className="font-medium text-sm">{label}</span>
       </Button>
     </motion.div>
@@ -80,44 +85,48 @@ function SidebarButton({ href, icon: Icon, label, isActive, onMobileClick }: Sid
 
 const navigationItems = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
+    name: "Dashboard",
+    href: "/dashboard",
     icon: LayoutDashboard,
-    description: '📊 Overview'
+    description: "📊 Overview",
   },
   {
-    name: 'Appointments',
-    href: '/dashboard/appointments',
+    name: "Appointments",
+    href: "/dashboard/appointments",
     icon: Calendar,
-    description: 'View All Appointments'
+    description: "View All Appointments",
   },
   {
-    name: 'Customers',
-    href: '/dashboard/customers',
+    name: "Customers",
+    href: "/dashboard/customers",
     icon: Users,
-    description: 'Customer Directory'
+    description: "Customer Directory",
   },
   {
-    name: 'Call History',
-    href: '/dashboard/call-logs',
+    name: "Call History",
+    href: "/dashboard/call-logs",
     icon: Phone,
-    description: 'AI Call History'
+    description: "AI Call History",
   },
   {
-    name: 'Settings',
-    href: '/dashboard/business-settings',
+    name: "Settings",
+    href: "/dashboard/business-settings",
     icon: Settings,
-    description: 'Business Settings'
+    description: "Business Settings",
   },
   {
-    name: 'Integrations',
-    href: '/dashboard/integrations',
+    name: "Integrations",
+    href: "/dashboard/integrations",
     icon: Puzzle,
-    description: 'Manage Integrations'
-  }
+    description: "Manage Integrations",
+  },
 ];
 
-export default function Sidebar({ className, isMobileOpen = false, onMobileToggle }: SidebarProps) {
+export default function Sidebar({
+  className,
+  isMobileOpen = false,
+  onMobileToggle,
+}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useUser();
@@ -126,13 +135,13 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
   useEffect(() => {
     const fetchBusinessData = async () => {
       try {
-        const response = await fetch('/api/dashboard');
+        const response = await fetch("/api/dashboard");
         if (response.ok) {
           const data = await response.json();
           setBusiness(data.business);
         }
       } catch (error) {
-        console.error('Failed to fetch business data:', error);
+        console.error("Failed to fetch business data:", error);
       }
     };
 
@@ -154,10 +163,12 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className={cn(
-        "hidden md:flex flex-col h-full bg-white border-r border-gray-200 w-64",
-        className
-      )}>
+      <div
+        className={cn(
+          "hidden md:flex flex-col h-full bg-white border-r border-gray-200 w-64",
+          className
+        )}
+      >
         {/* Logo Section */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -170,61 +181,56 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-xl font-bold text-brand-primary-1">Vocalenda</span>
+            <span className="text-xl font-bold text-brand-primary-1">
+              Vocalenda
+            </span>
           </div>
         </div>
 
         {/* Navigation Section */}
         <nav className="flex-1 px-4 py-6">
           <div className="space-y-2">
-            <div className="flex items-center mb-3">
-                <BarChart3 className="w-4 h-4 mr-2 text-gray-500" />
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Manage Your Business
-                </h3>
-              </div>
-            
             <SidebarButton
               href="/dashboard"
               icon={LayoutDashboard}
               label="Dashboard"
-              isActive={pathname === '/dashboard'}
+              isActive={pathname === "/dashboard"}
             />
-            
+
             <SidebarButton
               href="/dashboard/appointments"
               icon={Calendar}
               label="Appointments"
-              isActive={pathname === '/dashboard/appointments'}
+              isActive={pathname === "/dashboard/appointments"}
             />
-            
+
             <SidebarButton
               href="/dashboard/customers"
               icon={Users}
               label="Customers"
-              isActive={pathname === '/dashboard/customers'}
+              isActive={pathname === "/dashboard/customers"}
             />
-            
+
             <SidebarButton
-                href="/dashboard/call-logs"
-                icon={Phone}
-                label="Call History"
-                isActive={pathname === '/dashboard/call-logs'}
-              />
-            
+              href="/dashboard/call-logs"
+              icon={Phone}
+              label="Call History"
+              isActive={pathname === "/dashboard/call-logs"}
+            />
+
             <SidebarButton
               href="/dashboard/integrations"
               icon={Puzzle}
               label="Integrations"
-              isActive={pathname === '/dashboard/integrations'}
+              isActive={pathname === "/dashboard/integrations"}
             />
-            
+
             <SidebarButton
-                href="/dashboard/business-settings"
-                icon={Settings}
-                label="Settings"
-                isActive={pathname === '/dashboard/business-settings'}
-              />
+              href="/dashboard/business-settings"
+              icon={Settings}
+              label="Settings"
+              isActive={pathname === "/dashboard/business-settings"}
+            />
           </div>
         </nav>
 
@@ -234,20 +240,18 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: 'w-10 h-10',
-                  userButtonPopoverCard:
-                    'shadow-lg border border-slate-200',
-                  userButtonPopoverActionButton:
-                    'hover:bg-slate-50',
+                  avatarBox: "w-10 h-10",
+                  userButtonPopoverCard: "shadow-lg border border-slate-200",
+                  userButtonPopoverActionButton: "hover:bg-slate-50",
                 },
               }}
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.firstName || user?.username || 'User'}
+                {user?.firstName || user?.username || "User"}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                {business?.name || 'Loading business...'}
+                {business?.name || "Loading business..."}
               </p>
             </div>
           </div>
@@ -266,13 +270,13 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
               onClick={onMobileToggle}
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
             />
-            
+
             {/* Mobile Sidebar */}
             <motion.div
-              initial={{ x: '-100%' }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "tween", duration: 0.3 }}
               className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 md:hidden flex flex-col"
             >
               {/* Mobile Header with Close Button */}
@@ -287,7 +291,9 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-xl font-bold text-brand-primary-1">Vocalenda</span>
+                  <span className="text-xl font-bold text-brand-primary-1">
+                    Vocalenda
+                  </span>
                 </div>
                 <Button
                   variant="ghost"
@@ -302,60 +308,53 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
               {/* Mobile Navigation */}
               <nav className="flex-1 px-4 py-6">
                 <div className="space-y-2">
-                  <div className="flex items-center mb-3">
-                      <BarChart3 className="w-4 h-4 mr-2 text-gray-500" />
-                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Manage Your Business
-                      </h3>
-                    </div>
-                  
                   <SidebarButton
                     href="/dashboard"
                     icon={LayoutDashboard}
                     label="Dashboard"
-                    isActive={pathname === '/dashboard'}
+                    isActive={pathname === "/dashboard"}
                     onMobileClick={handleNavClick}
                   />
-                  
+
                   <SidebarButton
                     href="/dashboard/appointments"
                     icon={Calendar}
                     label="Appointments"
-                    isActive={pathname === '/dashboard/appointments'}
+                    isActive={pathname === "/dashboard/appointments"}
                     onMobileClick={handleNavClick}
                   />
-                  
+
                   <SidebarButton
                     href="/dashboard/customers"
                     icon={Users}
                     label="Customers"
-                    isActive={pathname === '/dashboard/customers'}
+                    isActive={pathname === "/dashboard/customers"}
                     onMobileClick={handleNavClick}
                   />
-                  
+
                   <SidebarButton
-                      href="/dashboard/call-logs"
-                      icon={Phone}
-                      label="Call History"
-                      isActive={pathname === '/dashboard/call-logs'}
-                      onMobileClick={handleNavClick}
-                    />
-                  
+                    href="/dashboard/call-logs"
+                    icon={Phone}
+                    label="Call History"
+                    isActive={pathname === "/dashboard/call-logs"}
+                    onMobileClick={handleNavClick}
+                  />
+
                   <SidebarButton
                     href="/dashboard/integrations"
                     icon={Puzzle}
                     label="Integrations"
-                    isActive={pathname === '/dashboard/integrations'}
+                    isActive={pathname === "/dashboard/integrations"}
                     onMobileClick={handleNavClick}
                   />
-                  
+
                   <SidebarButton
-                      href="/dashboard/business-settings"
-                      icon={Settings}
-                      label="Settings"
-                      isActive={pathname === '/dashboard/business-settings'}
-                      onMobileClick={handleNavClick}
-                    />
+                    href="/dashboard/business-settings"
+                    icon={Settings}
+                    label="Settings"
+                    isActive={pathname === "/dashboard/business-settings"}
+                    onMobileClick={handleNavClick}
+                  />
                 </div>
               </nav>
 
@@ -365,20 +364,19 @@ export default function Sidebar({ className, isMobileOpen = false, onMobileToggl
                   <UserButton
                     appearance={{
                       elements: {
-                        avatarBox: 'w-10 h-10',
+                        avatarBox: "w-10 h-10",
                         userButtonPopoverCard:
-                          'shadow-lg border border-slate-200',
-                        userButtonPopoverActionButton:
-                          'hover:bg-slate-50',
+                          "shadow-lg border border-slate-200",
+                        userButtonPopoverActionButton: "hover:bg-slate-50",
                       },
                     }}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {user?.firstName || user?.username || 'User'}
+                      {user?.firstName || user?.username || "User"}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
-                      {business?.name || 'Loading business...'}
+                      {business?.name || "Loading business..."}
                     </p>
                   </div>
                 </div>
