@@ -46,7 +46,7 @@ export default function AboutPage() {
               </p>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                 That&apos;s when the idea for Vocalenda was born. I wanted to create an AI-powered receptionist that could handle bookings, answer questions, 
-                and provide excellent customer service 24/7. The goal was simple: help businesses never miss an opportunity while reducing their workload.
+                and provide excellent customer service. The goal was simple: help businesses never miss an opportunity while reducing their workload.
               </p>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Today, Vocalenda serves businesses across the UK and beyond, from small local salons to growing wellness centers. 

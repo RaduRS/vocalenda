@@ -9,11 +9,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Footer } from "@/components/ui/footer";
+import { StatsSection } from "@/components/ui/stats-section";
+import { ServicesSection } from "@/components/ui/services-section";
+import { ProcessSection } from "@/components/ui/process-section";
+import { TeamSection } from "@/components/ui/team-section";
+import { DemoSection } from "@/components/ui/demo-section";
+import { FAQSection } from "@/components/ui/faq-section";
+import { RoadmapSection } from "@/components/ui/roadmap-section";
 import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 export default function Home() {
-
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -47,7 +53,7 @@ export default function Home() {
       operatingSystem: "Web",
       offers: {
         "@type": "Offer",
-        price: "0",
+        price: "109",
         priceCurrency: "GBP",
       },
       featureList: [
@@ -151,152 +157,93 @@ export default function Home() {
         </section>
 
         {/* Features Grid */}
-        <section className="container mx-auto px-4 pb-12 sm:pb-16 pt-32">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
-            <Card className="border-slate-200 dark:border-slate-800">
-              <CardHeader className="text-center">
-                <Phone className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
-                <CardTitle className="text-lg">Voice AI</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Natural conversations that feel human. Your customers book
-                  appointments as easily as talking to your staff.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="border-slate-200 dark:border-slate-800">
-              <CardHeader className="text-center">
-                <Calendar className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
-                <CardTitle className="text-lg">Google Calendar</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Real-time availability checking and automatic appointment
-                  scheduling
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="border-slate-200 dark:border-slate-800">
-              <CardHeader className="text-center">
-                <MessageSquare className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
-                <CardTitle className="text-lg">SMS Confirmations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Automatic SMS confirmations sent from the same number
-                  customers called
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="border-slate-200 dark:border-slate-800">
-              <CardHeader className="text-center">
-                <Zap className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
-                <CardTitle className="text-lg">Multi-Tenant</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Dedicated phone numbers and isolated data for each business
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* Benefits Section */}
-        <section className="bg-white dark:bg-slate-800/50 py-16 sm:py-24">
+        <section className="py-16 sm:py-24 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-brand-primary-1">
-                Why Businesses Choose Vocalenda
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-slate-900">
+                Everything You Need to Automate Bookings
               </h2>
-              <p className="text-lg text-brand-primary-2 max-w-2xl mx-auto">
-                Join thousands of businesses that have transformed their booking
-                process
+              <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+                Our comprehensive platform handles every aspect of appointment
+                scheduling, from initial contact to confirmation.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 max-w-5xl mx-auto">
-              <div className="text-center group">
-                <div className="bg-gradient-to-br from-brand-secondary-1 to-brand-secondary-1/80 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl font-bold text-white">24/7</span>
-                </div>
-                <h3 className="text-xl font-semibold text-brand-primary-1 mb-3">
-                  Always Available
-                </h3>
-                <p className="text-brand-primary-2 leading-relaxed">
-                  Never miss a booking opportunity, even after hours. Your AI
-                  agent works around the clock.
-                </p>
-              </div>
-              <div className="text-center group">
-                <div className="bg-gradient-to-br from-brand-secondary-1 to-brand-secondary-1/80 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-3xl font-bold text-white">90%</span>
-                </div>
-                <h3 className="text-xl font-semibold text-brand-primary-1 mb-3">
-                  Time Saved
-                </h3>
-                <p className="text-brand-primary-2 leading-relaxed">
-                  Massive reduction in time spent on phone bookings. Focus on
-                  what matters most.
-                </p>
-              </div>
-              <div className="text-center group">
-                <div className="bg-gradient-to-br from-brand-secondary-1 to-brand-secondary-1/80 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-2xl font-bold text-white">Zero</span>
-                </div>
-                <h3 className="text-xl font-semibold text-brand-primary-1 mb-3">
-                  Double Bookings
-                </h3>
-                <p className="text-brand-primary-2 leading-relaxed">
-                  Eliminate conflicts with real-time calendar sync and
-                  intelligent scheduling.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
+              <Card className="border-blue-200 dark:border-slate-800 hover:border-blue-300 transition-colors">
+                <CardHeader className="text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <Phone className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-lg">Voice AI</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Natural conversations that feel human. Your customers book
+                    appointments as easily as talking to your staff.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="border-emerald-200 dark:border-slate-800 hover:border-emerald-300 transition-colors">
+                <CardHeader className="text-center">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <CardTitle className="text-lg">Google Calendar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Real-time availability checking and automatic appointment
+                    scheduling
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="border-purple-200 dark:border-slate-800 hover:border-purple-300 transition-colors">
+                <CardHeader className="text-center">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <MessageSquare className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <CardTitle className="text-lg">SMS Confirmations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Automatic SMS confirmations sent from the same number
+                    customers called
+                  </CardDescription>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-200 dark:border-slate-800 hover:border-orange-300 transition-colors">
+                <CardHeader className="text-center">
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <Zap className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <CardTitle className="text-lg">Multi-Tenant</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
+                    Dedicated phone numbers and isolated data for each business
+                  </CardDescription>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* Call to Action Section */}
-        <section className="bg-gradient-to-r from-brand-secondary-1 to-brand-accent py-16 sm:py-20">
-          <div className="container mx-auto px-4 text-center">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6">
-                Ready to Transform Your Business?
-              </h2>
-              <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
-                Join the AI revolution and never miss another booking. Get
-                started in minutes.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <SignUpButton>
-                  <Button
-                    size="lg"
-                    className="bg-white text-brand-secondary-1 hover:bg-slate-50 px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto cursor-pointer"
-                  >
-                    Get Started
-                  </Button>
-                </SignUpButton>
-                <a
-                  href="https://www.tiktok.com/@vocalenda.app/video/7545573537944276246"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto"
-                >
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="border-white bg-transparent text-white hover:bg-white hover:text-black px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 w-full cursor-pointer"
-                  >
-                    Watch Demo
-                  </Button>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        <StatsSection />
+
+        <ServicesSection />
+
+        <ProcessSection />
+
+        <TeamSection />
+
+        <DemoSection />
+
+        <FAQSection />
+
+        <RoadmapSection />
 
         <Footer />
       </main>

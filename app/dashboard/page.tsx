@@ -410,7 +410,7 @@ export default function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-brand-primary-2">Your AI Booking Number</p>
                 <p className="text-brand-primary-1 font-mono text-lg">{business.phone_number}</p>
-                <p className="text-sm text-brand-primary-2 mt-1">Customers call this number to book appointments 24/7</p>
+                <p className="text-sm text-brand-primary-2 mt-1">Customers call this number to book appointments with AI assistance</p>
               </div>
             </div>
           </Card>
