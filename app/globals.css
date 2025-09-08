@@ -48,6 +48,13 @@ nav > h1 {
   --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
+  
+  /* Custom Brand Colors */
+  --color-brand-accent: #37fbe4;
+  --color-brand-secondary-1: #8727ff;
+  --color-brand-secondary-2: #474dff;
+  --color-brand-primary-1: #2B303E;
+  --color-brand-primary-2: #4a5056;
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);

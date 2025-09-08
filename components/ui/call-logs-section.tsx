@@ -22,15 +22,15 @@ interface CallLogsSectionProps {
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'completed':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      return 'bg-brand-secondary-1/10 text-brand-secondary-1';
     case 'in_progress':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      return 'bg-brand-primary-1/10 text-brand-primary-1';
     case 'failed':
       return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
     case 'incoming':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      return 'bg-brand-primary-2/10 text-brand-primary-2';
     default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      return 'bg-brand-primary-2/10 text-brand-primary-2';
   }
 };
 
@@ -94,7 +94,7 @@ export function CallLogsSection({ recentCalls }: CallLogsSectionProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-brand-primary-2">
             <Phone className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No calls yet</p>
             <p className="text-sm">Call logs will appear here once customers start calling</p>
@@ -117,18 +117,18 @@ export function CallLogsSection({ recentCalls }: CallLogsSectionProps) {
           {recentCalls.map((call) => (
             <div
               key={call.id}
-              className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-brand-primary-2/5 transition-colors"
             >
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                    <Phone className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 bg-brand-secondary-1/10 rounded-full flex items-center justify-center">
+                    <Phone className="h-5 w-5 text-brand-secondary-1" />
                   </div>
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-gray-900 dark:text-white">
+                    <span className="font-medium text-brand-primary-1">
                       {call.customer_name || 'Unknown Caller'}
                     </span>
                     <Badge className={getStatusColor(call.status)}>
@@ -136,7 +136,7 @@ export function CallLogsSection({ recentCalls }: CallLogsSectionProps) {
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-4 text-sm text-brand-primary-2">
                     <span className="flex items-center gap-1">
                       <User className="h-3 w-3" />
                       {formatPhoneNumber(call.caller_phone)}
@@ -153,7 +153,7 @@ export function CallLogsSection({ recentCalls }: CallLogsSectionProps) {
               </div>
               
               <div className="flex-shrink-0 text-right">
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-brand-primary-2">
                   {formatTimestamp(call.started_at)}
                 </div>
               </div>
@@ -163,7 +163,7 @@ export function CallLogsSection({ recentCalls }: CallLogsSectionProps) {
         
         {recentCalls.length >= 10 && (
           <div className="mt-4 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-brand-primary-2">
               Showing last 10 calls
             </p>
           </div>

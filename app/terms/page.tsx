@@ -7,21 +7,21 @@ export default function TermsOfService() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Terms of Service
-          </h1>
-          <p className="text-lg text-gray-600">Last updated: 02-Sept-2025</p>
+          <h1 className="text-4xl font-bold text-brand-primary-1 mb-4">
+              Terms of Service
+            </h1>
+            <p className="text-lg text-brand-primary-2">Last updated: 02-Sept-2025</p>
         </div>
 
         <div className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Agreement to Terms
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 By accessing and using Vocalenda (&quot;the Service&quot;), you
                 accept and agree to be bound by the terms and provision of this
                 agreement. If you do not agree to abide by the above, please do
@@ -32,15 +32,15 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Service Description
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 Vocalenda provides an AI-powered phone agent service that:
               </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>
                   Handles incoming phone calls using artificial intelligence
                 </li>
@@ -59,17 +59,17 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 User Responsibilities
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  <h3 className="text-lg font-semibold text-brand-primary-1 mb-2">
                     Account Security
                   </h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <ul className="list-disc list-inside text-brand-primary-2 space-y-1">
                     <li>
                       Maintain the confidentiality of your account credentials
                     </li>
@@ -78,10 +78,10 @@ export default function TermsOfService() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  <h3 className="text-lg font-semibold text-brand-primary-1 mb-2">
                     Proper Use
                   </h3>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <ul className="list-disc list-inside text-brand-primary-2 space-y-1">
                     <li>
                       Use the service only for legitimate business purposes
                     </li>
@@ -98,16 +98,16 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 AI Service Limitations
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 While our AI agent is designed to handle most common scenarios,
                 you acknowledge that:
               </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>AI responses may not always be perfect or complete</li>
                 <li>Complex requests may require human intervention</li>
                 <li>
@@ -128,15 +128,15 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Google Calendar Integration
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-brand-primary-2 leading-relaxed mb-4">
                 By using our Google Calendar integration, you:
               </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>
                   Grant Vocalenda permission to access and modify your Google
                   Calendar
@@ -157,15 +157,15 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Privacy and Data Protection
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-brand-primary-2 leading-relaxed mb-4">
                 Your privacy is important to us. By using our service:
               </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>
                   You consent to the collection and processing of voice data as
                   described in our Privacy Policy
@@ -188,15 +188,15 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Prohibited Uses
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-brand-primary-2 leading-relaxed mb-4">
                 You may not use our service to:
               </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>Engage in illegal, fraudulent, or harmful activities</li>
                 <li>Violate any applicable laws or regulations</li>
                 <li>Infringe on intellectual property rights</li>
@@ -213,12 +213,12 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Service Availability
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 We strive to provide reliable service but cannot guarantee 100%
                 uptime. We reserve the right to modify, suspend, or discontinue
                 the service at any time with reasonable notice. Scheduled
@@ -229,12 +229,12 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Billing and Payment
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>Fees are charged according to your selected plan</li>
                 <li>Payment is due in advance for subscription services</li>
                 <li>
@@ -249,12 +249,12 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Limitation of Liability
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 Vocalenda shall not be liable for any indirect, incidental,
                 special, consequential, or punitive damages, including but not
                 limited to loss of profits, data, or business opportunities. Our
@@ -266,12 +266,12 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Intellectual Property
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 All content, features, and functionality of Vocalenda, including
                 but not limited to AI models, software, text, graphics, and
                 logos, are owned by Vocalenda and are protected by copyright,
@@ -282,20 +282,20 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Termination
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-brand-primary-2 leading-relaxed mb-4">
                 Either party may terminate this agreement:
               </p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <ul className="list-disc list-inside text-brand-primary-2 space-y-2">
                 <li>At any time with 30 days written notice</li>
                 <li>Immediately for material breach of these terms</li>
                 <li>Immediately if required by law or regulation</li>
               </ul>
-              <p className="text-gray-700 leading-relaxed mt-4">
+              <p className="text-brand-primary-2 leading-relaxed mt-4">
                 Upon termination, your access to the service will cease, and we
                 will delete your data according to our data retention policy.
               </p>
@@ -304,12 +304,12 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Governing Law
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 These terms shall be governed by and construed in accordance
                 with the laws of the jurisdiction where Vocalenda is
                 incorporated, without regard to conflict of law principles.
@@ -319,20 +319,20 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Contact Information
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 leading-relaxed mb-4">
+              <p className="text-brand-primary-2 leading-relaxed mb-4">
                 If you have any questions about these Terms of Service, please
                 contact us:
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">
+                <p className="text-brand-primary-2">
                   <strong>Email:</strong> support@vocalenda.com
                 </p>
-                <p className="text-gray-700">
+                <p className="text-brand-primary-2">
                   <strong>General Inquiries:</strong> socials@vocalenda.com
                 </p>
               </div>
@@ -341,12 +341,12 @@ export default function TermsOfService() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-green-600">
+              <CardTitle className="text-2xl text-brand-secondary-1">
                 Changes to Terms
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-brand-primary-2 leading-relaxed">
                 We reserve the right to modify these terms at any time. Material
                 changes will be communicated via email or through the service.
                 Your continued use of Vocalenda after such modifications

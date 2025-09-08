@@ -188,28 +188,28 @@ export default function Dashboard() {
 
   const getColorClasses = useCallback((color: string) => {
     const colorMap = {
-      blue: 'bg-blue-100 text-blue-600',
-      green: 'bg-green-100 text-green-600',
-      purple: 'bg-purple-100 text-purple-600',
-      orange: 'bg-orange-100 text-orange-600'
+      blue: 'bg-brand-secondary-1/10 text-brand-secondary-1',
+      green: 'bg-brand-secondary-1/10 text-brand-secondary-1',
+      purple: 'bg-brand-primary-1/10 text-brand-primary-1',
+      orange: 'bg-brand-primary-2/10 text-brand-primary-2'
     };
-    return colorMap[color as keyof typeof colorMap] || 'bg-gray-100 text-gray-600';
+    return colorMap[color as keyof typeof colorMap] || 'bg-brand-primary-2/10 text-brand-primary-2';
   }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Header Skeleton */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
               <div>
-                <div className="h-8 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
-                <div className="h-5 bg-gray-200 rounded w-32 animate-pulse"></div>
+                <div className="h-8 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
+                <div className="h-5 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
               </div>
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                <div className="h-10 bg-gray-200 rounded w-24 animate-pulse"></div>
-                <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+                <div className="h-10 bg-brand-primary-2/20 rounded w-24 animate-pulse"></div>
+                <div className="h-10 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -222,10 +222,10 @@ export default function Dashboard() {
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="p-6">
                 <div className="flex items-center">
-                  <div className="p-2 bg-gray-200 rounded-lg w-12 h-12 animate-pulse"></div>
+                  <div className="p-2 bg-brand-primary-2/20 rounded-lg w-12 h-12 animate-pulse"></div>
                   <div className="ml-4 flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
-                    <div className="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
+                    <div className="h-4 bg-brand-primary-2/20 rounded w-24 mb-2 animate-pulse"></div>
+                    <div className="h-8 bg-brand-primary-2/20 rounded w-16 animate-pulse"></div>
                   </div>
                 </div>
               </Card>
@@ -236,32 +236,32 @@ export default function Dashboard() {
           <Card className="p-6 mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="mb-4 sm:mb-0 flex-1">
-                <div className="h-6 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded w-full max-w-md animate-pulse"></div>
+                <div className="h-6 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
+                <div className="h-4 bg-brand-primary-2/20 rounded w-full max-w-md animate-pulse"></div>
               </div>
-              <div className="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+              <div className="h-10 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
             </div>
           </Card>
           
           {/* Business Info Cards Skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="p-6">
-              <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
+              <div className="h-6 bg-brand-primary-2/20 rounded w-40 mb-4 animate-pulse"></div>
               <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div key={i}>
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div>
-                    <div className="h-5 bg-gray-200 rounded w-full animate-pulse"></div>
+                    <div className="h-4 bg-brand-primary-2/20 rounded w-24 mb-1 animate-pulse"></div>
+                    <div className="h-5 bg-brand-primary-2/20 rounded w-full animate-pulse"></div>
                   </div>
                 ))}
               </div>
             </Card>
             
             <Card className="p-6">
-              <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
+              <div className="h-6 bg-brand-primary-2/20 rounded w-32 mb-4 animate-pulse"></div>
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
+                  <div key={i} className="h-10 bg-brand-primary-2/20 rounded w-full animate-pulse"></div>
                 ))}
               </div>
             </Card>
@@ -273,10 +273,10 @@ export default function Dashboard() {
 
   if (!business) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Card className="p-8 text-center">
-          <h2 className="text-xl font-semibold mb-4">No Business Found</h2>
-          <p className="text-gray-600 mb-6">It looks like you haven&apos;t set up your business yet.</p>
+          <h2 className="text-xl font-semibold mb-4 text-brand-primary-1">No Business Found</h2>
+          <p className="text-brand-primary-2 mb-6">It looks like you haven&apos;t set up your business yet.</p>
           <Button onClick={() => router.push('/setup')}>
             Set Up Business
           </Button>
@@ -286,14 +286,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{business.name}</h1>
-              <p className="text-gray-600">Welcome back, {user?.firstName}!</p>
+              <h1 className="text-2xl font-bold text-brand-primary-1">{business.name}</h1>
+              <p className="text-brand-primary-2">Welcome back, {user?.firstName}!</p>
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
               <Button variant="outline" className="w-full sm:w-auto">Settings</Button>
@@ -316,8 +316,8 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">{card.title}</p>
-                  <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                  <p className="text-sm font-medium text-brand-primary-2">{card.title}</p>
+                  <p className="text-2xl font-bold text-brand-primary-1">{card.value}</p>
                 </div>
               </div>
             </Card>
@@ -329,8 +329,8 @@ export default function Dashboard() {
           <Card className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="mb-4 sm:mb-0">
-                <h3 className="text-lg font-semibold mb-2">Calendar Sync</h3>
-                <p className="text-gray-600">
+                <h3 className="text-lg font-semibold mb-2 text-brand-primary-1">Calendar Sync</h3>
+                <p className="text-brand-primary-2">
                   {business.google_calendar_connected 
                     ? '✅ Your calendar is synced! Customers can only book when you\'re available, and new appointments automatically appear in your Google Calendar.'
                     : '🔗 Connect your Google Calendar so customers can only book when you\'re free. All appointments will automatically sync to your calendar.'
@@ -340,7 +340,7 @@ export default function Dashboard() {
               <div className="flex-shrink-0">
                 {business.google_calendar_connected ? (
                   <div className="flex items-center space-x-3">
-                    <div className="flex items-center text-green-600">
+                    <div className="flex items-center text-brand-secondary-1">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -359,7 +359,7 @@ export default function Dashboard() {
                   <Button 
                     onClick={handleConnectCalendar}
                     disabled={connectingCalendar}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
                   >
                     {connectingCalendar ? (
                       <>
@@ -389,34 +389,34 @@ export default function Dashboard() {
         {/* Business Info */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Business Information</h3>
+            <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">Business Information</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-gray-600">Business Name</p>
-                <p className="text-gray-900">{business.name}</p>
+                <p className="text-sm font-medium text-brand-primary-2">Business Name</p>
+                <p className="text-brand-primary-1">{business.name}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">Phone Number</p>
-                <p className="text-gray-900">{business.phone_number}</p>
+                <p className="text-sm font-medium text-brand-primary-2">Phone Number</p>
+                <p className="text-brand-primary-1">{business.phone_number}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">Email</p>
-                <p className="text-gray-900">{business.email}</p>
+                <p className="text-sm font-medium text-brand-primary-2">Email</p>
+                <p className="text-brand-primary-1">{business.email}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">Address</p>
-                <p className="text-gray-900">{business.address}</p>
+                <p className="text-sm font-medium text-brand-primary-2">Address</p>
+                <p className="text-brand-primary-1">{business.address}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">Your AI Booking Number</p>
-                <p className="text-gray-900 font-mono text-lg">{business.phone_number}</p>
-                <p className="text-sm text-gray-500 mt-1">Customers call this number to book appointments 24/7</p>
+                <p className="text-sm font-medium text-brand-primary-2">Your AI Booking Number</p>
+                <p className="text-brand-primary-1 font-mono text-lg">{business.phone_number}</p>
+                <p className="text-sm text-brand-primary-2 mt-1">Customers call this number to book appointments 24/7</p>
               </div>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">📊 Manage Your Business</h3>
+            <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">📊 Manage Your Business</h3>
             <div className="space-y-3">
               <Button className="w-full justify-start" variant="outline">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

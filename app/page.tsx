@@ -112,15 +112,15 @@ export default function Home() {
                 {/* Key Benefits */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 text-sm sm:text-base lg:text-lg text-slate-300">
                   <div className="flex items-center gap-3 justify-center lg:justify-start">
-                    <Phone className="w-5 h-5 text-[#8b7aff] flex-shrink-0" />
+                    <Phone className="w-5 h-5 text-brand-accent flex-shrink-0" />
                     <span>24/7 Availability</span>
                   </div>
                   <div className="flex items-center gap-3 justify-center lg:justify-start">
-                    <Calendar className="w-5 h-5 text-[#8b7aff] flex-shrink-0" />
+                    <Calendar className="w-5 h-5 text-brand-accent flex-shrink-0" />
                     <span>Real-time Booking</span>
                   </div>
                   <div className="flex items-center gap-3 justify-center lg:justify-start">
-                    <Zap className="w-5 h-5 text-[#8b7aff] flex-shrink-0" />
+                    <Zap className="w-5 h-5 text-brand-accent flex-shrink-0" />
                     <span>Instant Setup</span>
                   </div>
                 </div>
@@ -131,7 +131,7 @@ export default function Home() {
                 <SignUpButton>
                   <Button
                     size="lg"
-                    className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
+                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto cursor-pointer"
                   >
                     Get Started
                   </Button>
@@ -140,7 +140,7 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white bg-transparent text-white hover:bg-white hover:text-black px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg transition-all duration-200 w-full sm:w-auto"
+                    className="border-white bg-transparent text-white hover:bg-white hover:text-black px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg transition-all duration-200 w-full sm:w-auto cursor-pointer"
                   >
                     Sign In
                   </Button>
@@ -155,7 +155,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
             <Card className="border-slate-200 dark:border-slate-800">
               <CardHeader className="text-center">
-                <Phone className="h-8 w-8 mx-auto text-blue-600 dark:text-blue-400 mb-2" />
+                <Phone className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
                 <CardTitle className="text-lg">Voice AI</CardTitle>
               </CardHeader>
               <CardContent>
@@ -168,7 +168,7 @@ export default function Home() {
 
             <Card className="border-slate-200 dark:border-slate-800">
               <CardHeader className="text-center">
-                <Calendar className="h-8 w-8 mx-auto text-green-600 dark:text-green-400 mb-2" />
+                <Calendar className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
                 <CardTitle className="text-lg">Google Calendar</CardTitle>
               </CardHeader>
               <CardContent>
@@ -181,7 +181,7 @@ export default function Home() {
 
             <Card className="border-slate-200 dark:border-slate-800">
               <CardHeader className="text-center">
-                <MessageSquare className="h-8 w-8 mx-auto text-purple-600 dark:text-purple-400 mb-2" />
+                <MessageSquare className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
                 <CardTitle className="text-lg">SMS Confirmations</CardTitle>
               </CardHeader>
               <CardContent>
@@ -194,7 +194,7 @@ export default function Home() {
 
             <Card className="border-slate-200 dark:border-slate-800">
               <CardHeader className="text-center">
-                <Zap className="h-8 w-8 mx-auto text-orange-600 dark:text-orange-400 mb-2" />
+                <Zap className="h-8 w-8 mx-auto text-brand-secondary-1 mb-2" />
                 <CardTitle className="text-lg">Multi-Tenant</CardTitle>
               </CardHeader>
               <CardContent>
@@ -210,47 +210,47 @@ export default function Home() {
         <section className="bg-white dark:bg-slate-800/50 py-16 sm:py-24">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 sm:mb-16">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-slate-900 dark:text-slate-100">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-brand-primary-1">
                 Why Businesses Choose Vocalenda
               </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              <p className="text-lg text-brand-primary-2 max-w-2xl mx-auto">
                 Join thousands of businesses that have transformed their booking
                 process
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 max-w-5xl mx-auto">
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-to-br from-brand-secondary-1 to-brand-secondary-1/80 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="text-3xl font-bold text-white">24/7</span>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                <h3 className="text-xl font-semibold text-brand-primary-1 mb-3">
                   Always Available
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-brand-primary-2 leading-relaxed">
                   Never miss a booking opportunity, even after hours. Your AI
                   agent works around the clock.
                 </p>
               </div>
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-to-br from-brand-secondary-1 to-brand-secondary-1/80 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="text-3xl font-bold text-white">90%</span>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                <h3 className="text-xl font-semibold text-brand-primary-1 mb-3">
                   Time Saved
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-brand-primary-2 leading-relaxed">
                   Massive reduction in time spent on phone bookings. Focus on
                   what matters most.
                 </p>
               </div>
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-to-br from-brand-secondary-1 to-brand-secondary-1/80 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="text-2xl font-bold text-white">Zero</span>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                <h3 className="text-xl font-semibold text-brand-primary-1 mb-3">
                   Double Bookings
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p className="text-brand-primary-2 leading-relaxed">
                   Eliminate conflicts with real-time calendar sync and
                   intelligent scheduling.
                 </p>
@@ -260,7 +260,7 @@ export default function Home() {
         </section>
 
         {/* Call to Action Section */}
-        <section className="bg-gradient-to-r from-[#6c47ff] to-[#8b7aff] py-16 sm:py-20">
+        <section className="bg-gradient-to-r from-brand-secondary-1 to-brand-accent py-16 sm:py-20">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6">
@@ -274,7 +274,7 @@ export default function Home() {
                 <SignUpButton>
                   <Button
                     size="lg"
-                    className="bg-white text-[#6c47ff] hover:bg-slate-50 px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
+                    className="bg-white text-brand-secondary-1 hover:bg-slate-50 px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto cursor-pointer"
                   >
                     Get Started
                   </Button>
@@ -288,7 +288,7 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white bg-transparent text-white hover:bg-white hover:text-black px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 w-full"
+                    className="border-white bg-transparent text-white hover:bg-white hover:text-black px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 w-full cursor-pointer"
                   >
                     Watch Demo
                   </Button>

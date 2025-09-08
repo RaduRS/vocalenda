@@ -87,7 +87,7 @@ export default function Navbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="transition-colors duration-300 hover:bg-white/10"
+                    className="transition-colors duration-300 hover:bg-white/10 cursor-pointer"
                   >
                     Sign In
                   </Button>
@@ -100,7 +100,7 @@ export default function Navbar() {
                 >
                   <Button
                     size="sm"
-                    className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white font-medium transition-colors duration-200"
+                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 text-white font-medium transition-colors duration-200 cursor-pointer"
                   >
                     Get Started
                   </Button>
@@ -134,7 +134,7 @@ export default function Navbar() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-md"
+                  className="p-2 rounded-md cursor-pointer"
                   style={{ color: textColor }}
                 >
                   <User className="h-6 w-6" />
