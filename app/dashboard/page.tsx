@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CallLogsSection } from '@/components/ui/call-logs-section';
+
 
 interface Business {
   id: string;
@@ -25,16 +25,7 @@ interface DashboardStats {
   totalCalls: number;
 }
 
-interface CallLog {
-  id: string;
-  caller_phone: string;
-  status: 'incoming' | 'in_progress' | 'completed' | 'failed';
-  started_at: string;
-  ended_at: string | null;
-  duration: number | null;
-  customer_name: string | null;
-  twilio_call_sid: string | null;
-}
+
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -46,7 +37,7 @@ export default function Dashboard() {
     totalCustomers: 0,
     totalCalls: 0
   });
-  const [recentCalls, setRecentCalls] = useState<CallLog[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
@@ -67,7 +58,7 @@ export default function Dashboard() {
         const data = await response.json();
         setBusiness(data.business);
         setStats(data.stats);
-        setRecentCalls(data.recentCalls || []);
+
         
         // If no business found, redirect to setup
         if (!data.business) {
@@ -381,10 +372,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Recent Call Logs */}
-        <div className="mb-8">
-          <CallLogsSection recentCalls={recentCalls} />
-        </div>
+
 
         {/* Business Info */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -430,7 +418,11 @@ export default function Dashboard() {
                 </svg>
                 Customer Directory
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => router.push('/call-logs')}
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
