@@ -20,6 +20,8 @@ import {
   X,
   Save,
   Edit3,
+  Bot,
+  FileText,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -465,12 +467,12 @@ export default function BusinessSettings() {
 
         {/* Operating Hours Tab */}
         {activeTab === "hours" && (
-          <div className="space-y-8">
-            <Card className="p-8 shadow-sm border-0 bg-white">
-              <div className="mb-8">
+          <div className="space-y-6">
+            <Card className="p-6 shadow-sm border-0 bg-white">
+              <div className="mb-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <Clock className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <Clock className="w-5 h-5 text-blue-600" />
                   </div>
                   Operating Hours
                 </h3>
@@ -479,7 +481,7 @@ export default function BusinessSettings() {
                 </p>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-3">
                 {(
                   [
                     "monday",
@@ -496,87 +498,69 @@ export default function BusinessSettings() {
                   return (
                     <div
                       key={day}
-                      className={`p-6 rounded-xl border transition-all duration-200 hover:shadow-md ${
+                      className={`p-4 rounded-lg border transition-all duration-200 ${
                         !hours.closed
-                          ? "bg-green-50 border-green-200"
+                          ? "bg-blue-50 border-blue-200"
                           : "bg-gray-50 border-gray-200"
                       }`}
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-28">
-                            <Label className="capitalize text-base font-medium text-gray-900 flex items-center">
-                              {isWeekend && (
-                                <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                              )}
-                              {day}
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="checkbox"
-                              checked={!hours.closed}
-                              onChange={(e) =>
-                                handleBusinessHoursChange(
-                                  day,
-                                  "closed",
-                                  !e.target.checked
-                                )
-                              }
-                              className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                            />
-                            <span
-                              className={`text-sm font-medium ${
-                                !hours.closed
-                                  ? "text-green-700"
-                                  : "text-gray-500"
-                              }`}
-                            >
-                              {!hours.closed ? "Open" : "Closed"}
-                            </span>
-                          </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="checkbox"
+                            checked={!hours.closed}
+                            onChange={(e) =>
+                              handleBusinessHoursChange(
+                                day,
+                                "closed",
+                                !e.target.checked
+                              )
+                            }
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                          <Label className="capitalize text-sm font-medium text-gray-900 min-w-[80px] flex items-center">
+                            {isWeekend && (
+                              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                            )}
+                            {day}
+                          </Label>
                         </div>
 
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3">
                           {!hours.closed ? (
                             <>
-                              <div className="flex items-center space-x-2">
-                                <Input
-                                  type="time"
-                                  value={hours.open}
-                                  onChange={(e) =>
-                                    handleBusinessHoursChange(
-                                      day,
-                                      "open",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-36 h-10 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                                />
-                                <span className="text-gray-400 font-medium">
-                                  to
-                                </span>
-                                <Input
-                                  type="time"
-                                  value={hours.close}
-                                  onChange={(e) =>
-                                    handleBusinessHoursChange(
-                                      day,
-                                      "close",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-36 h-10 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                                />
-                              </div>
+                              <Input
+                                type="time"
+                                value={hours.open}
+                                onChange={(e) =>
+                                  handleBusinessHoursChange(
+                                    day,
+                                    "open",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-24 h-9 text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                              <span className="text-gray-500 text-sm">
+                                to
+                              </span>
+                              <Input
+                                type="time"
+                                value={hours.close}
+                                onChange={(e) =>
+                                  handleBusinessHoursChange(
+                                    day,
+                                    "close",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-24 h-9 text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                              />
                             </>
                           ) : (
-                            <div className="flex items-center space-x-2 text-gray-500">
-                              <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                              <span className="italic font-medium">
-                                Closed all day
-                              </span>
-                            </div>
+                            <span className="text-sm text-gray-500 font-medium">
+                              Closed
+                            </span>
                           )}
                         </div>
                       </div>
@@ -842,118 +826,185 @@ export default function BusinessSettings() {
 
         {/* Holidays Tab */}
         {activeTab === "holidays" && (
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
-                Holidays & Closures
-              </h3>
-              <Button onClick={addHoliday} size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Holiday
-              </Button>
-            </div>
-            <div className="space-y-4">
-              {businessData.holidays.map((holiday, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-4 p-4 border rounded-lg"
-                >
-                  <div className="w-48">
-                    <Input
-                      type="date"
-                      value={holiday.date}
-                      onChange={(e) =>
-                        updateHoliday(index, "date", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <Input
-                      value={holiday.description}
-                      onChange={(e) =>
-                        updateHoliday(index, "description", e.target.value)
-                      }
-                      placeholder="Holiday description"
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => removeHoliday(index)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+          <div className="space-y-8">
+            <Card className="p-8 shadow-sm border-0 bg-white">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 space-y-4 sm:space-y-0">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                      <Calendar className="w-5 h-5 text-orange-600" />
+                    </div>
+                    Holidays & Closures
+                  </h3>
+                  <p className="text-gray-600">Manage special dates when your business is closed</p>
                 </div>
-              ))}
-              {businessData.holidays.length === 0 && (
-                <p className="text-gray-500 text-center py-8">
-                  No holidays added yet. Click &quot;Add Holiday&quot; to get
-                  started.
-                </p>
-              )}
-            </div>
-          </Card>
+                <Button onClick={addHoliday} className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 h-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Holiday
+                </Button>
+              </div>
+              
+              <div className="space-y-6">
+                {businessData.holidays.map((holiday, index) => (
+                  <div
+                    key={index}
+                    className="group p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-white to-gray-50"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                      <div className="lg:col-span-4">
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block flex items-center">
+                          <Calendar className="w-4 h-4 mr-1 text-gray-500" />
+                          Date
+                        </Label>
+                        <Input
+                          type="date"
+                          value={holiday.date}
+                          onChange={(e) =>
+                            updateHoliday(index, "date", e.target.value)
+                          }
+                          className="h-12 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                        />
+                      </div>
+                      
+                      <div className="lg:col-span-7">
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Description</Label>
+                        <Input
+                          value={holiday.description}
+                          onChange={(e) =>
+                            updateHoliday(index, "description", e.target.value)
+                          }
+                          placeholder="e.g., Christmas Day, New Year's Day"
+                          className="h-12 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                        />
+                      </div>
+                      
+                      <div className="lg:col-span-1 flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeHoliday(index)}
+                          className="h-10 w-10 p-0 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 group-hover:opacity-100 opacity-70 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {businessData.holidays.length === 0 && (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Calendar className="w-8 h-8 text-orange-600" />
+                    </div>
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">No holidays added yet</h4>
+                    <p className="text-gray-500 mb-6">Add special dates when your business will be closed</p>
+                    <Button onClick={addHoliday} className="bg-orange-600 hover:bg-orange-700 text-white">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Your First Holiday
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         )}
 
         {/* AI & Policies Tab */}
         {activeTab === "ai" && (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-6 flex items-center">
-                <Settings className="w-5 h-5 mr-2" />
-                Payment Methods
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {Object.entries(paymentMethodLabels).map(([method, label]) => (
-                  <label
-                    key={method}
-                    className="flex items-center space-x-2 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={businessData.payment_methods.includes(
-                        method as PaymentMethod
-                      )}
-                      onChange={() =>
-                        togglePaymentMethod(method as PaymentMethod)
-                      }
-                      className="rounded"
-                    />
-                    <span className="text-sm">{label}</span>
-                  </label>
-                ))}
+          <div className="space-y-8">
+            <Card className="p-8 shadow-sm border-0 bg-white">
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                    <Settings className="w-5 h-5 text-purple-600" />
+                  </div>
+                  AI & Policies
+                </h3>
+                <p className="text-gray-600">Configure payment methods, AI behavior, and booking policies</p>
               </div>
-            </Card>
+              
+              <div className="space-y-8">
+                {/* Payment Methods Section */}
+                <div className="p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-2">
+                      <Settings className="w-4 h-4 text-green-600" />
+                    </div>
+                    Payment Methods
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(paymentMethodLabels).map(([method, label]) => (
+                      <label
+                        key={method}
+                        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer group"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={businessData.payment_methods.includes(
+                            method as PaymentMethod
+                          )}
+                          onChange={() =>
+                            togglePaymentMethod(method as PaymentMethod)
+                          }
+                          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                        />
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-6">AI Instructions</h3>
-              <Textarea
-                value={businessData.ai_configuration.greeting}
-                onChange={(e) =>
-                  handleInputChange("ai_configuration", {
-                    ...businessData.ai_configuration,
-                    greeting: e.target.value,
-                  })
-                }
-                placeholder="Provide specific instructions for the AI assistant when handling customer calls..."
-                rows={6}
-              />
-            </Card>
+                {/* AI Instructions Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Settings className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <Label className="text-lg font-semibold text-gray-900">
+                      AI Instructions
+                    </Label>
+                  </div>
+                  <p className="text-sm text-gray-600 ml-10">Provide specific instructions for how the AI assistant should behave when handling customer calls</p>
+                  <Textarea
+                    value={businessData.ai_configuration.greeting}
+                    onChange={(e) =>
+                      handleInputChange("ai_configuration", {
+                        ...businessData.ai_configuration,
+                        greeting: e.target.value,
+                      })
+                    }
+                    placeholder="e.g., Always be polite and professional, ask for customer preferences, suggest popular services..."
+                    className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 ml-10 resize-none"
+                    rows={5}
+                  />
+                </div>
 
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Booking Policies</h3>
-              <Textarea
-                value={businessData.booking_policies.cancellation_policy || ""}
-                onChange={(e) =>
-                  handleInputChange("booking_policies", {
-                    ...businessData.booking_policies,
-                    cancellation_policy: e.target.value,
-                  })
-                }
-                placeholder="Enter your booking policies, cancellation terms, and other important information..."
-                rows={6}
-              />
+                {/* Booking Policies Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <Settings className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <Label className="text-lg font-semibold text-gray-900">
+                      Booking Policies
+                    </Label>
+                  </div>
+                  <p className="text-sm text-gray-600 ml-10">Define your booking rules, cancellation terms, and customer policies</p>
+                  <Textarea
+                    value={businessData.booking_policies.cancellation_policy || ""}
+                    onChange={(e) =>
+                      handleInputChange("booking_policies", {
+                        ...businessData.booking_policies,
+                        cancellation_policy: e.target.value,
+                      })
+                    }
+                    placeholder="e.g., 24-hour cancellation policy, 50% deposit required, no-show policy..."
+                    className="min-h-[120px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 ml-10 resize-none"
+                    rows={5}
+                  />
+                </div>
+              </div>
             </Card>
           </div>
         )}
