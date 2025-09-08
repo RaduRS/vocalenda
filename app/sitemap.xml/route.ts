@@ -35,6 +35,12 @@ export async function GET() {
       changeFrequency: 'yearly',
       priority: 0.5,
     },
+    {
+      url: '/about',
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

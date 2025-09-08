@@ -25,7 +25,7 @@ export default function Navbar() {
     ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.95)']
   );
   // Check if we're on privacy or terms pages
-  const isPrivacyOrTermsPage = pathname === '/privacy' || pathname === '/terms';
+  const isPrivacyOrTermsPage = pathname === '/privacy' || pathname === '/terms' || pathname === '/about';
   
   const textColor = useTransform(
     scrollY,
