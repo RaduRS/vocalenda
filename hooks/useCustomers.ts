@@ -2,14 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 
 export interface Customer {
   id: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email: string | null;
   notes: string | null;
-  created_at: string;
-  updated_at: string;
-  appointment_count?: number;
+  createdAt: string;
+  updatedAt: string;
+  appointmentCount?: number;
 }
 
 export interface CustomerStats {

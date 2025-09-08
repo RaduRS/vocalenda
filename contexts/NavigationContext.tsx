@@ -41,13 +41,13 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     // Navigate immediately
     router.push(href);
     
-    // Reset navigation state after a short delay
-    // This gives time for the new page to start loading
+    // Reset navigation state after a longer delay to allow skeleton to show
+    // This gives time for the skeleton to be visible and new page to load
     setTimeout(() => {
       setIsNavigating(false);
       setTargetRoute(null);
       setCurrentSkeleton(null);
-    }, 100);
+    }, 1500);
   };
 
   return (

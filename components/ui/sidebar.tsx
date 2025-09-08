@@ -67,22 +67,16 @@ function SidebarButton({
           "w-full justify-start h-12 px-4 text-left transition-all duration-200",
           isActive
             ? "bg-brand-primary-1 text-white shadow-md"
-            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1",
-          isCurrentlyNavigating && "opacity-75"
+            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
         )}
         onClick={handleClick}
-        disabled={isCurrentlyNavigating}
       >
-        {isCurrentlyNavigating ? (
-          <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent mr-3" />
-        ) : (
-          <Icon
-            className={cn(
-              "mr-3 h-5 w-5",
-              isActive ? "text-white" : "text-gray-500"
-            )}
-          />
-        )}
+        <Icon
+          className={cn(
+            "mr-3 h-5 w-5",
+            isActive ? "text-white" : "text-gray-500"
+          )}
+        />
         <span className="font-medium text-sm">{label}</span>
       </Button>
     </motion.div>

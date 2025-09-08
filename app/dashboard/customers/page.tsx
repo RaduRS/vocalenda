@@ -182,8 +182,8 @@ function Customers() {
                         <div>
                           <h4 className="font-medium text-gray-900">
                             {(() => {
-                              const firstName = customer.first_name?.trim();
-                              const lastName = customer.last_name?.trim();
+                              const firstName = customer.firstName?.trim();
+                              const lastName = customer.lastName?.trim();
                               
                               if (firstName && lastName) {
                                 return `${firstName} ${lastName}`;
@@ -214,8 +214,8 @@ function Customers() {
                         </div>
                       </div>
                       <div className="text-right text-sm text-gray-600">
-                        <p>{customer.appointment_count || 0} appointments</p>
-                        <p>Added {customer.created_at ? format(new Date(customer.created_at), 'MMM d, yyyy') : 'N/A'}</p>
+                        <p>{customer.appointmentCount || 0} appointments</p>
+                        <p>Added {customer.createdAt ? format(new Date(customer.createdAt), 'MMM d, yyyy') : 'N/A'}</p>
                       </div>
                     </div>
                     {customer.notes && (
