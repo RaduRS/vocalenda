@@ -6,14 +6,13 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { Loader2, CheckCircle, AlertCircle, Plus, Trash2, Clock, MapPin, Users, Settings, Phone, Calendar, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Loader2, CheckCircle, Plus, Trash2, Clock, MapPin, Users, Settings, Phone, Calendar, X } from 'lucide-react'
 import { 
   ComprehensiveBusinessData, 
   setupWizardSteps, 

@@ -34,13 +34,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has any Google Calendar connection (either tokens or calendar ID)
-    const { data: business, error: businessError } = await supabase
+    const { data: business } = await supabase
       .from('businesses')
       .select('google_calendar_id')
       .eq('id', businessId)
       .single();
 
-    const { data: config, error: configError } = await supabase
+    const { data: config } = await supabase
       .from('business_config')
       .select('integration_settings')
       .eq('business_id', businessId)

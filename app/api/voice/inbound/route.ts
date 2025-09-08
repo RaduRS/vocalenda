@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 // Handle GET requests for Twilio webhook verification
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Twilio sometimes sends GET requests to verify the webhook URL
   return new NextResponse('Webhook endpoint is active', {
     status: 200,

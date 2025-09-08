@@ -1,8 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,16 +8,15 @@ import {
   Phone,
   Clock,
   User,
-  ArrowLeft,
   Download,
   MessageSquare,
   ChevronDown,
   ChevronUp,
   Bot,
   UserIcon,
-  RefreshCw,
 } from "lucide-react";
-import { useCallLogs, type CallLog } from "@/hooks/useCallLogs";
+// RefreshCw import removed as it's no longer used
+import { useCallLogs } from "@/hooks/useCallLogs";
 
 // CallLog interface is now imported from the hook
 
@@ -111,9 +108,7 @@ const toggleTranscript = (
 };
 
 export default function CallLogsPage() {
-  const { user } = useUser();
-  const router = useRouter();
-  const { data, isLoading, error, refetch, isFetching } = useCallLogs();
+  const { data, isLoading, error, refetch } = useCallLogs();
   const callLogs = data?.callLogs || [];
   const [expandedTranscript, setExpandedTranscript] = useState<string | null>(
     null
@@ -201,16 +196,7 @@ export default function CallLogsPage() {
                 </p>
               </div>
               <div className="flex items-center space-x-3">
-                <Button
-                  onClick={() => refetch()}
-                  variant="outline"
-                  size="sm"
-                  disabled={isFetching}
-                  className="flex items-center space-x-2"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-                  <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
-                </Button>
+                {/* Refresh button removed as requested */}
                 {callLogs.length > 0 && (
                   <Button
                     onClick={handleExport}

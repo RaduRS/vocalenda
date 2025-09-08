@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useNavigation } from "@/contexts/NavigationContext";
 
 interface SidebarProps {
   className?: string;
@@ -48,17 +49,14 @@ function SidebarButton({
   isActive,
   onMobileClick,
 }: SidebarButtonProps) {
-  const router = useRouter();
-  const [isNavigating, setIsNavigating] = useState(false);
+  const { navigateWithSkeleton, isNavigating, targetRoute } = useNavigation();
+  const isCurrentlyNavigating = isNavigating && targetRoute === href;
 
   const handleClick = () => {
-    setIsNavigating(true);
-    router.push(href);
     if (onMobileClick) {
       onMobileClick();
     }
-    // Reset loading state after a short delay
-    setTimeout(() => setIsNavigating(false), 1000);
+    navigateWithSkeleton(href);
   };
 
   return (
@@ -70,12 +68,12 @@ function SidebarButton({
           isActive
             ? "bg-brand-primary-1 text-white shadow-md"
             : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1",
-          isNavigating && "opacity-75"
+          isCurrentlyNavigating && "opacity-75"
         )}
         onClick={handleClick}
-        disabled={isNavigating}
+        disabled={isCurrentlyNavigating}
       >
-        {isNavigating ? (
+        {isCurrentlyNavigating ? (
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent mr-3" />
         ) : (
           <Icon
@@ -91,44 +89,7 @@ function SidebarButton({
   );
 }
 
-const navigationItems = [
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    description: "📊 Overview",
-  },
-  {
-    name: "Appointments",
-    href: "/dashboard/appointments",
-    icon: Calendar,
-    description: "View All Appointments",
-  },
-  {
-    name: "Customers",
-    href: "/dashboard/customers",
-    icon: Users,
-    description: "Customer Directory",
-  },
-  {
-    name: "Call History",
-    href: "/dashboard/call-logs",
-    icon: Phone,
-    description: "AI Call History",
-  },
-  {
-    name: "Settings",
-    href: "/dashboard/business-settings",
-    icon: Settings,
-    description: "Business Settings",
-  },
-  {
-    name: "Integrations",
-    href: "/dashboard/integrations",
-    icon: Puzzle,
-    description: "Manage Integrations",
-  },
-];
+
 
 export default function Sidebar({
   className,
@@ -136,7 +97,6 @@ export default function Sidebar({
   onMobileToggle,
 }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const { user } = useUser();
   const [business, setBusiness] = useState<Business | null>(null);
 
@@ -158,9 +118,7 @@ export default function Sidebar({
     }
   }, [user]);
 
-  const handleNavigation = (href: string) => {
-    router.push(href);
-  };
+  // handleNavigation function removed - using navigation context instead
 
   const handleNavClick = () => {
     if (onMobileToggle && window.innerWidth < 768) {

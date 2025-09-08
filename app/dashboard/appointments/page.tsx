@@ -2,12 +2,12 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Clock, Users, Phone, Mail, MapPin, RefreshCw } from "lucide-react";
+import { Calendar, Clock, Users, Phone, Mail } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { useAppointments, type Appointment, type AppointmentStats } from "@/hooks/useAppointments";
+import { useAppointments } from "@/hooks/useAppointments";
 
 function Appointments() {
-  const { data, isLoading, error, refetch, isFetching } = useAppointments();
+  const { data, isLoading, error, refetch } = useAppointments();
   
   const appointments = data?.appointments || [];
   const stats = data?.stats || {
@@ -86,20 +86,7 @@ function Appointments() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <Button
-                onClick={() => refetch()}
-                variant="outline"
-                size="sm"
-                disabled={isFetching}
-                className="flex items-center space-x-2"
-              >
-                <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-                <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                New Appointment
-              </Button>
+              {/* Buttons removed as requested */}
             </div>
           </div>
         </div>
@@ -158,7 +145,6 @@ function Appointments() {
                 Your appointments will appear here once customers start booking.
               </p>
               <Button className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90">
-                <Plus className="w-4 h-4 mr-2" />
                 Create Your First Appointment
               </Button>
             </div>

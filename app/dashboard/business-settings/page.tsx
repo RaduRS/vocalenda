@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,10 +16,8 @@ import {
   Plus,
   Trash2,
   Calendar,
-  X,
   Save,
   Edit3,
-  Bot,
   FileText,
 } from "lucide-react";
 import {
@@ -34,7 +31,6 @@ import {
 } from "@/lib/types";
 
 export default function BusinessSettings() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [businessData, setBusinessData] = useState<ComprehensiveBusinessData>({
@@ -88,7 +84,7 @@ export default function BusinessSettings() {
         const data = await response.json();
         setBusinessData(data);
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to load business data");
     } finally {
       setLoading(false);
@@ -111,7 +107,7 @@ export default function BusinessSettings() {
       } else {
         throw new Error("Failed to update business settings");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to save business settings");
     } finally {
       setSaving(false);

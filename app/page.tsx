@@ -13,7 +13,6 @@ import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
 
 // Lazy load non-critical sections
 const StatsSection = dynamic(() => import("@/components/ui/stats-section").then(mod => ({ default: mod.StatsSection })), {

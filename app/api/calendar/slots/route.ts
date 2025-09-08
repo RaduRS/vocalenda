@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     let requestDate: Date;
     try {
       requestDate = parseISODate(date);
-    } catch (error) {
+    } catch {
       console.error(`Invalid date: ${date}`);
       return NextResponse.json(
         { error: 'Invalid date provided' },

@@ -1,5 +1,4 @@
 import { SignUp } from "@clerk/nextjs";
-import Link from "next/link";
 import { Metadata } from "next";
 import { PatternBackground } from "../../../components/ui/pattern-background";
 import { Suspense } from "react";

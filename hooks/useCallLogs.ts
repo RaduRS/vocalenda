@@ -35,10 +35,7 @@ export const useCallLogs = () => {
   return useQuery({
     queryKey: ['call-logs'],
     queryFn: fetchCallLogs,
-    staleTime: 30 * 1000, // 30 seconds
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 2 * 60 * 1000, // 2 minutes - call logs update less frequently than real-time data
+    // Use global defaults for better performance and consistency
   });
 };

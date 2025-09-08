@@ -2,15 +2,14 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Plus, Phone, Mail, MapPin, User, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { Users, Plus, Phone, Mail, MapPin, User } from "lucide-react";
 import { format } from "date-fns";
-import { useCustomers, type Customer } from "@/hooks/useCustomers";
+import { useCustomers } from "@/hooks/useCustomers";
 
 // Customer interface imported from useCustomers hook
 
 function Customers() {
-  const { data, isLoading, error, refetch, isFetching } = useCustomers();
+  const { data, isLoading, error, refetch } = useCustomers();
   const customers = data?.customers || [];
   const stats = data?.stats || {
     totalCustomers: 0,
@@ -90,16 +89,7 @@ function Customers() {
                 Manage your customer contacts and information
               </p>
             </div>
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              size="sm"
-              disabled={isFetching}
-              className="flex items-center space-x-2"
-            >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-              <span>{isFetching ? 'Refreshing...' : 'Refresh'}</span>
-            </Button>
+            {/* Refresh button removed as requested */}
           </div>
         </div>
       </div>
@@ -213,7 +203,7 @@ function Customers() {
                       </div>
                       <div className="text-right text-sm text-gray-600">
                         <p>{customer.appointment_count || 0} appointments</p>
-                        <p>Added {format(new Date(customer.created_at), 'MMM d, yyyy')}</p>
+                        <p>Added {customer.created_at ? format(new Date(customer.created_at), 'MMM d, yyyy') : 'N/A'}</p>
                       </div>
                     </div>
                     {customer.notes && (

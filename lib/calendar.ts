@@ -249,7 +249,7 @@ class CalendarService {
       console.log(`🔍 Checking calendar availability for business ${this.businessId} on ${dateString}`);
       
       // Force a fresh read from the database by adding a timestamp to prevent caching
-      const { data: existingBookings, error: dbError } = await supabase
+      const { data: existingBookings } = await supabase
         .from('appointments')
         .select('start_time, end_time, status, appointment_date, created_at')
         .eq('business_id', this.businessId)

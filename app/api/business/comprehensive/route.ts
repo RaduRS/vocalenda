@@ -6,7 +6,7 @@ import { Json } from '@/lib/database.types';
 import { getCurrentUKDateTime } from '@/lib/date-utils';
 
 // GET - Fetch comprehensive business data
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth();
     

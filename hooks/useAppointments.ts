@@ -52,17 +52,8 @@ export const useAppointments = () => {
   return useQuery({
     queryKey: ['appointments'],
     queryFn: fetchAppointments,
-    staleTime: 2 * 60 * 1000, // 2 minutes - appointments change frequently
-    gcTime: 5 * 60 * 1000, // 5 minutes cache time
-    refetchOnWindowFocus: true, // Refetch when user returns to tab
-    retry: (failureCount, error) => {
-      // Don't retry on 4xx errors (client errors)
-      const errorWithStatus = error as { message?: string };
-      if (errorWithStatus?.message?.includes('4')) {
-        return false;
-      }
-      return failureCount < 2; // Retry up to 2 times for other errors
-    },
+    staleTime: 5 * 60 * 1000, // 5 minutes - balance between freshness and performance
+    // Use global defaults for gcTime, retry, and refetch settings for consistency
   });
 };
 

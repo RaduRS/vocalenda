@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       'svix-timestamp': svix_timestamp,
       'svix-signature': svix_signature,
     }) as WebhookEvent;
-  } catch (err) {
+  } catch {
     return new Response('Invalid webhook signature', { status: 400 });
   }
 
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       default:
         // Unhandled webhook type
     }
-  } catch (error) {
+  } catch {
     return new Response('Webhook processing failed', { status: 500 });
   }
 
