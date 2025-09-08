@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get the user's business by finding the user record first
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabaseAdmin
       .from('users')
       .select('business_id')
       .eq('clerk_user_id', userId)
@@ -29,7 +24,7 @@ export async function GET(request: NextRequest) {
     const businessId = user.business_id;
 
     // Fetch all call logs for this business, ordered by most recent first
-    const { data: callLogs, error: callLogsError } = await supabase
+    const { data: callLogs, error: callLogsError } = await supabaseAdmin
       .from('call_logs')
       .select(`
         id,
@@ -37,10 +32,14 @@ export async function GET(request: NextRequest) {
         status,
         started_at,
         ended_at,
-        duration,
-        customer_name,
+        duration_seconds,
         twilio_call_sid,
-        transcript
+        transcript,
+        customers (
+          first_name,
+          last_name,
+          phone
+        )
       `)
       .eq('business_id', businessId)
       .order('started_at', { ascending: false });
@@ -50,8 +49,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch call logs' }, { status: 500 });
     }
 
+    // Process call logs data to match expected format
+    const processedCallLogs = (callLogs || []).map(call => ({
+      id: call.id,
+      caller_phone: call.caller_phone,
+      status: call.status,
+      started_at: call.started_at,
+      ended_at: call.ended_at,
+      duration: call.started_at && call.ended_at 
+        ? Math.round((new Date(call.ended_at).getTime() - new Date(call.started_at).getTime()) / 1000)
+        : call.duration_seconds,
+      customer_name: call.customers 
+        ? `${call.customers.first_name || ''} ${call.customers.last_name || ''}`.trim() || null
+        : null,
+      twilio_call_sid: call.twilio_call_sid,
+      transcript: call.transcript
+    }));
+
     return NextResponse.json({
-      callLogs: callLogs || []
+      callLogs: processedCallLogs
     });
 
   } catch (error) {
