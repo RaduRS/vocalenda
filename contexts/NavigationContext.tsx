@@ -2,6 +2,14 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import {
+  DashboardSkeleton,
+  AppointmentsSkeleton,
+  CustomersSkeleton,
+  CallLogsSkeleton,
+  BusinessSettingsSkeleton,
+  IntegrationsSkeleton
+} from '@/components/ui/skeleton-loading';
 
 interface NavigationContextType {
   isNavigating: boolean;
@@ -63,12 +71,12 @@ export function useNavigation() {
 }
 
 // Helper function to determine which skeleton to show based on route
-export function getSkeletonForRoute(route: string) {
-  if (route === '/dashboard') return 'dashboard';
-  if (route === '/dashboard/appointments') return 'appointments';
-  if (route === '/dashboard/customers') return 'customers';
-  if (route === '/dashboard/call-logs') return 'call-logs';
-  if (route === '/dashboard/business-settings') return 'business-settings';
-  if (route === '/dashboard/integrations') return 'integrations';
-  return 'dashboard'; // default
+export function getSkeletonForRoute(route: string): ReactNode {
+  if (route === '/dashboard') return <DashboardSkeleton />;
+  if (route === '/dashboard/appointments') return <AppointmentsSkeleton />;
+  if (route === '/dashboard/customers') return <CustomersSkeleton />;
+  if (route === '/dashboard/call-logs') return <CallLogsSkeleton />;
+  if (route === '/dashboard/business-settings') return <BusinessSettingsSkeleton />;
+  if (route === '/dashboard/integrations') return <IntegrationsSkeleton />;
+  return <DashboardSkeleton />; // default
 }

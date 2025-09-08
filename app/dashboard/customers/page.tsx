@@ -191,10 +191,6 @@ function Customers() {
                                 return firstName;
                               } else if (lastName) {
                                 return lastName;
-                              } else if (customer.phone) {
-                                return customer.phone;
-                              } else if (customer.email) {
-                                return customer.email;
                               } else {
                                 return 'Unknown Customer';
                               }
