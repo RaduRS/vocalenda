@@ -49,7 +49,7 @@ const faqItems: FAQItem[] = [
   },
   {
     id: "customization",
-    question: "Can I customize how the AI speaks and what it says?",
+    question: "Can I customize how the AI speaks and also what it says?",
     answer:
       "Yes! You can customize the AI's personality, tone, speaking style, and specific responses. Set business rules and the AI learns your preferences to maintain consistency with your brand voice. Voice options are coming soon.",
   },
