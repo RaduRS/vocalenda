@@ -15,16 +15,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get the user's business
-    const { data: business, error: businessError } = await supabase
-      .from('businesses')
-      .select('id')
-      .eq('user_id', userId)
+    // Get the user's business by finding the user record first
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('business_id')
+      .eq('clerk_user_id', userId)
       .single();
 
-    if (businessError || !business) {
+    if (userError || !user || !user.business_id) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
+
+    const businessId = user.business_id;
 
     // Fetch all call logs for this business, ordered by most recent first
     const { data: callLogs, error: callLogsError } = await supabase
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
         twilio_call_sid,
         transcript
       `)
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .order('started_at', { ascending: false });
 
     if (callLogsError) {

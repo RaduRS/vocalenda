@@ -100,7 +100,7 @@ const toggleTranscript = (callId: string, setExpandedTranscript: (id: string | n
 };
 
 export default function CallLogsPage() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,6 +188,8 @@ export default function CallLogsPage() {
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen bg-white">
