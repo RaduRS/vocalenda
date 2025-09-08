@@ -40,8 +40,8 @@ export default function Navbar() {
     ['0 0 0 rgba(0,0,0,0)', '0 4px 6px -1px rgba(0,0,0,0.1)']
   );
 
-  // Hide navbar on sign-in and sign-up pages
-  if (pathname === '/sign-in' || pathname === '/sign-up' || pathname?.startsWith('/sign-in/') || pathname?.startsWith('/sign-up/')) {
+  // Hide navbar on sign-in, sign-up, and dashboard pages
+  if (pathname === '/sign-in' || pathname === '/sign-up' || pathname?.startsWith('/sign-in/') || pathname?.startsWith('/sign-up/') || pathname?.startsWith('/dashboard')) {
     return null;
   }
 

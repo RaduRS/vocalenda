@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { CookieBanner } from "@/components/ui/cookie-banner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import Navbar from "@/components/ui/navbar";
+import DashboardLayout from "@/components/ui/dashboard-layout";
 import { ClientOnlyComponents } from "@/components/ClientComponents";
 
 import "./globals.css";
@@ -131,7 +132,9 @@ export default function RootLayout({
         <body className={`${inter.variable} ${poppins.variable} antialiased`}>
           <Navbar />
           <ClientOnlyComponents />
-          {children}
+          <DashboardLayout>
+            {children}
+          </DashboardLayout>
           <CookieBanner />
         </body>
       </html>
