@@ -1,6 +1,7 @@
 import { SignIn } from "@clerk/nextjs";
-import Link from "next/link";
 import { Metadata } from "next";
+import { PatternBackground } from "../../../components/ui/pattern-background";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Sign In - Vocalenda",
@@ -17,74 +18,30 @@ export default function SignInPage() {
     <div className="min-h-screen flex overflow-hidden">
       {/* Mobile Layout - Pattern Background */}
       <div className="lg:hidden min-h-screen w-full bg-gradient-to-br from-[#6c47ff] via-[#8b7aff] to-[#a855f7] relative flex items-center justify-center p-4">
-        {/* Mobile Pattern Background */}
-        <svg
-          className="absolute inset-0 w-full h-full opacity-20"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <pattern
-              id="mobileGrid"
-              width="10"
-              height="10"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M 10 0 L 0 0 0 10"
-                fill="none"
-                stroke="white"
-                strokeWidth="0.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100" height="100" fill="url(#mobileGrid)" />
-          <circle cx="20" cy="20" r="15" fill="white" opacity="0.1" />
-          <circle cx="80" cy="30" r="10" fill="white" opacity="0.15" />
-          <circle cx="60" cy="70" r="20" fill="white" opacity="0.08" />
-          <polygon
-            points="10,80 30,60 50,80 30,100"
-            fill="white"
-            opacity="0.1"
-          />
-          <polygon
-            points="70,10 90,30 70,50 50,30"
-            fill="white"
-            opacity="0.12"
-          />
-        </svg>
+        {/* Mobile Pattern Background - Lazy Loaded */}
+        <Suspense fallback={<div className="absolute inset-0 bg-gradient-to-br from-[#6c47ff] via-[#8b7aff] to-[#a855f7]" />}>
+          <PatternBackground />
+        </Suspense>
 
         {/* Mobile Modal */}
         <div className="relative z-10 max-w-sm w-full">
           <SignIn
             appearance={{
               elements: {
-                formButtonPrimary:
-                  "bg-white text-[#6c47ff] hover:bg-slate-50 font-medium rounded-md transition-colors duration-200",
+                formButtonPrimary: "bg-white text-[#6c47ff] hover:bg-slate-50",
                 card: "shadow-none border-0 bg-transparent",
                 headerTitle: "text-white",
                 headerSubtitle: "text-slate-200",
-                socialButtonsBlockButton:
-                  "border border-white/30 bg-white/10 hover:bg-white/20 text-white transition-colors duration-200",
-                socialButtonsBlockButtonText: "font-medium text-white",
-                formFieldLabel: "text-white font-medium",
-                formFieldInput:
-                  "border-white/30 bg-white/10 focus:border-white focus:ring-white text-white placeholder-slate-300",
-                footerActionLink: "text-white hover:text-slate-200 font-medium",
-                dividerLine: "bg-white/30",
-                dividerText: "text-slate-200",
-                formResendCodeLink: "text-white hover:text-slate-200",
-                identityPreviewText: "text-slate-200",
-                formFieldSuccessText: "text-green-300",
-                formFieldErrorText: "text-red-300",
-                alertText: "text-red-300",
+                formFieldLabel: "text-white",
+                formFieldInput: "border-white/30 bg-white/10 text-white",
+                footerActionLink: "text-white hover:text-slate-200",
               },
               layout: {
                 socialButtonsPlacement: "top",
                 showOptionalFields: false,
               },
             }}
-            fallbackRedirectUrl="/setup"
+            fallbackRedirectUrl="/dashboard"
             signUpUrl="/sign-up"
           />
         </div>
@@ -124,7 +81,7 @@ export default function SignInPage() {
                   showOptionalFields: false,
                 },
               }}
-              fallbackRedirectUrl="/setup"
+              fallbackRedirectUrl="/dashboard"
               signUpUrl="/sign-up"
             />
           </div>

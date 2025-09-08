@@ -9,16 +9,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Footer } from "@/components/ui/footer";
-import { StatsSection } from "@/components/ui/stats-section";
-import { ServicesSection } from "@/components/ui/services-section";
-import { ProcessSection } from "@/components/ui/process-section";
-import { TeamSection } from "@/components/ui/team-section";
-import { DemoSection } from "@/components/ui/demo-section";
-import { FAQSection } from "@/components/ui/faq-section";
-import { RoadmapSection } from "@/components/ui/roadmap-section";
 import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
+// Lazy load non-critical sections
+const StatsSection = dynamic(() => import("@/components/ui/stats-section").then(mod => ({ default: mod.StatsSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
+const ServicesSection = dynamic(() => import("@/components/ui/services-section").then(mod => ({ default: mod.ServicesSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
+const ProcessSection = dynamic(() => import("@/components/ui/process-section").then(mod => ({ default: mod.ProcessSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
+const TeamSection = dynamic(() => import("@/components/ui/team-section").then(mod => ({ default: mod.TeamSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
+const DemoSection = dynamic(() => import("@/components/ui/demo-section").then(mod => ({ default: mod.DemoSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
+const FAQSection = dynamic(() => import("@/components/ui/faq-section").then(mod => ({ default: mod.FAQSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
+const RoadmapSection = dynamic(() => import("@/components/ui/roadmap-section").then(mod => ({ default: mod.RoadmapSection })), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+  ssr: false
+});
 export default function Home() {
   const structuredData = [
     {
@@ -103,8 +128,8 @@ export default function Home() {
             <div className="w-full max-w-4xl mx-auto text-center lg:text-left lg:max-w-2xl lg:mx-0">
               {/* Main Headline */}
               <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12">
-                {/* The Hook: Your new, powerful H1 */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-white leading-tight">
+                {/* The Hook: Your new, powerful H1 - Optimized for LCP */}
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-white leading-tight">
                   Stop losing customers to your voicemail
                 </h1>
                 {/* The Solution: Your new, clear H2 */}

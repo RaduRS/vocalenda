@@ -3,9 +3,8 @@ import { Inter, Poppins } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CookieBanner } from "@/components/ui/cookie-banner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import WebVitals from "@/components/WebVitals";
 import Navbar from "@/components/ui/navbar";
-import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import { ClientOnlyComponents } from "@/components/ClientComponents";
 
 import "./globals.css";
 
@@ -131,8 +130,7 @@ export default function RootLayout({
 
         <body className={`${inter.variable} ${poppins.variable} antialiased`}>
           <Navbar />
-          <WebVitals />
-          <ServiceWorkerRegistration />
+          <ClientOnlyComponents />
           {children}
           <CookieBanner />
         </body>

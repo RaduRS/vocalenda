@@ -24,12 +24,14 @@ const nextConfig: NextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['@clerk/nextjs', 'lucide-react', '@supabase/supabase-js', 'date-fns'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  // Turbopack configuration (replaces deprecated experimental.turbo)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
@@ -154,8 +156,8 @@ const nextConfig: NextConfig = {
               `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://clerk.vocalenda.com https://*.clerk.accounts.dev`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https://www.google-analytics.com https://ssl.google-analytics.com https://img.clerk.com blob:",
-              "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://clerk.vocalenda.com https://api.clerk.com https://*.clerk.accounts.dev",
+              "img-src 'self' data: https://www.google-analytics.com https://ssl.google-analytics.com https://img.clerk.com https://images.clerk.dev blob:",
+              "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://clerk.vocalenda.com https://api.clerk.com https://*.clerk.accounts.dev https://img.clerk.com https://images.clerk.dev",
               "frame-src 'self' https://*.clerk.accounts.dev",
               "worker-src 'self' blob:",
               "object-src 'none'",

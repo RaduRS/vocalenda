@@ -39,6 +39,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Only handle same-origin requests to avoid CSP violations
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
   // Handle API requests with stale-while-revalidate strategy
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
@@ -50,6 +55,9 @@ self.addEventListener('fetch', (event) => {
               cache.put(request, networkResponse.clone());
             }
             return networkResponse;
+          }).catch(() => {
+            // Return cached response on network error
+            return cachedResponse;
           });
 
           // Return cached response immediately if available, otherwise wait for network
@@ -67,7 +75,8 @@ self.addEventListener('fetch', (event) => {
       url.pathname.endsWith('.css') ||
       url.pathname.endsWith('.png') ||
       url.pathname.endsWith('.jpg') ||
-      url.pathname.endsWith('.svg')) {
+      url.pathname.endsWith('.svg') ||
+      url.pathname.endsWith('.ico')) {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
         return cachedResponse || fetch(request).then((networkResponse) => {
@@ -78,13 +87,16 @@ self.addEventListener('fetch', (event) => {
             });
           }
           return networkResponse;
+        }).catch(() => {
+          // Return cached response on network error
+          return cachedResponse;
         });
       })
     );
     return;
   }
 
-  // For all other requests, use network-first strategy
+  // For all other same-origin requests, use network-first strategy
   event.respondWith(
     fetch(request).catch(() => {
       return caches.match(request);
