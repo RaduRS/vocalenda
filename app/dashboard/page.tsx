@@ -1,10 +1,30 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+// Dynamically import heavy icon components
+const CalendarDays = dynamic(() => import("lucide-react").then(mod => ({ default: mod.CalendarDays })), { ssr: false });
+const Phone = dynamic(() => import("lucide-react").then(mod => ({ default: mod.Phone })), { ssr: false });
+const Clock = dynamic(() => import("lucide-react").then(mod => ({ default: mod.Clock })), { ssr: false });
+const Users = dynamic(() => import("lucide-react").then(mod => ({ default: mod.Users })), { ssr: false });
+const TrendingUp = dynamic(() => import("lucide-react").then(mod => ({ default: mod.TrendingUp })), { ssr: false });
+const AlertCircle = dynamic(() => import("lucide-react").then(mod => ({ default: mod.AlertCircle })), { ssr: false });
+
+// Dynamic imports for heavy components with loading states
+const DynamicCard = dynamic(() => import("@/components/ui/card").then(mod => ({ default: mod.Card })), {
+  loading: () => <div className="animate-pulse bg-gray-200 rounded-lg h-32" />
+});
+
+// Loading skeleton components
+const LoadingSkeleton = ({ className }: { className?: string }) => (
+  <div className={`animate-pulse bg-gray-200 rounded-lg ${className}`} />
+);
 
 interface Business {
   id: string;
@@ -24,7 +44,20 @@ interface DashboardStats {
   totalCalls: number;
 }
 
-export default function Dashboard() {
+// Memoized stats card component
+const StatsCard = memo(({ title, value, description }: { title: string; value: number; description: string }) => (
+  <Card className="p-6">
+    <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <h3 className="text-sm font-medium">{title}</h3>
+    </div>
+    <div className="text-2xl font-bold">{value}</div>
+    <p className="text-xs text-muted-foreground">{description}</p>
+  </Card>
+));
+
+StatsCard.displayName = 'StatsCard';
+
+function Dashboard() {
   const { user } = useUser();
   const router = useRouter();
   const [business, setBusiness] = useState<Business | null>(null);
@@ -41,16 +74,14 @@ export default function Dashboard() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      // Add timestamp to prevent any caching
-      const timestamp = new Date().getTime();
-      const response = await fetch(`/api/dashboard?t=${timestamp}`, {
-        cache: "no-store",
+      // Use stale-while-revalidate for better performance
+      const response = await fetch('/api/dashboard', {
+        next: { revalidate: 30 }, // Cache for 30 seconds
         headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
+          'Cache-Control': 'max-age=30, stale-while-revalidate=60',
         },
       });
+      
       if (response.ok) {
         const data = await response.json();
         setBusiness(data.business);
@@ -150,6 +181,11 @@ export default function Dashboard() {
       setDisconnectingCalendar(false);
     }
   }, [business?.id, fetchDashboardData]);
+
+  // Memoize calendar connection status
+  const isCalendarConnected = useMemo(() => {
+    return business?.google_calendar_connected || false;
+  }, [business?.google_calendar_connected]);
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(
@@ -551,3 +587,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default memo(Dashboard);

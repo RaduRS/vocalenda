@@ -5,6 +5,7 @@ import { CookieBanner } from "@/components/ui/cookie-banner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import WebVitals from "@/components/WebVitals";
 import Navbar from "@/components/ui/navbar";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 import "./globals.css";
 
@@ -131,6 +132,7 @@ export default function RootLayout({
         <body className={`${inter.variable} ${poppins.variable} antialiased`}>
           <Navbar />
           <WebVitals />
+          <ServiceWorkerRegistration />
           {children}
           <CookieBanner />
         </body>

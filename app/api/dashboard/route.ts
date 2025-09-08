@@ -47,27 +47,19 @@ export async function GET() {
 
     const businessId = user.business_id;
 
-    // Get dashboard stats and recent call logs
-    const [appointmentsResult, customersResult, callsResult, recentCallsResult] = await Promise.all([
+    // Optimize database queries with fewer parallel requests
+    const today = formatISODate(getCurrentUKDate());
+    
+    const [appointmentsResult, customersResult, callsResult, todayAppointmentsResult, recentCallsResult] = await Promise.all([
       // Total appointments
-      supabase
-        .from('appointments')
-        .select('id', { count: 'exact' })
-        .eq('business_id', businessId),
-      
-      // Total customers
-      supabase
-        .from('customers')
-        .select('id', { count: 'exact' })
-        .eq('business_id', businessId),
-      
+      supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId),
+      // Total customers  
+      supabase.from('customers').select('id', { count: 'exact' }).eq('business_id', businessId),
       // Total calls
-      supabase
-        .from('call_logs')
-        .select('id', { count: 'exact' })
-        .eq('business_id', businessId),
-      
-      // Recent call logs with customer info
+      supabase.from('call_logs').select('id', { count: 'exact' }).eq('business_id', businessId),
+      // Today's appointments
+      supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId).eq('appointment_date', today),
+      // Recent call logs with customer info (reduced to 5 for performance)
       supabase
         .from('call_logs')
         .select(`
@@ -85,16 +77,8 @@ export async function GET() {
         `)
         .eq('business_id', businessId)
         .order('started_at', { ascending: false })
-        .limit(10)
+        .limit(5)
     ]);
-
-    // Today's appointments
-    const today = formatISODate(getCurrentUKDate());
-    const { count: todayAppointments } = await supabase
-      .from('appointments')
-      .select('id', { count: 'exact' })
-      .eq('business_id', businessId)
-      .eq('appointment_date', today);
 
     // Process recent calls data
     const recentCalls = (recentCallsResult.data || []).map(call => ({
@@ -114,7 +98,7 @@ export async function GET() {
 
     const stats = {
       totalAppointments: appointmentsResult.count || 0,
-      todayAppointments: todayAppointments || 0,
+      todayAppointments: todayAppointmentsResult.count || 0,
       totalCustomers: customersResult.count || 0,
       totalCalls: callsResult.count || 0
     };

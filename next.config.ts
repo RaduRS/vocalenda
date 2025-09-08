@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from '@next/bundle-analyzer';
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig: NextConfig = {
   // Performance optimizations
@@ -18,7 +23,95 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['@clerk/nextjs', 'lucide-react'],
+    optimizePackageImports: ['@clerk/nextjs', 'lucide-react', '@supabase/supabase-js', 'date-fns'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
+
+  // Webpack optimizations
+  webpack: (config, { dev, isServer }) => {
+    // Optimize bundle splitting
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        maxSize: 200000, // 200KB max chunk size
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          // React and React DOM
+          react: {
+            test: /[\/]node_modules[\/](react|react-dom)[\/]/,
+            name: 'react',
+            chunks: 'all',
+            priority: 20,
+          },
+          // Clerk authentication
+          clerk: {
+            test: /[\/]node_modules[\/]@clerk[\/]/,
+            name: 'clerk',
+            chunks: 'all',
+            priority: 15,
+          },
+          // Supabase
+          supabase: {
+            test: /[\/]node_modules[\/]@supabase[\/]/,
+            name: 'supabase',
+            chunks: 'all',
+            priority: 15,
+          },
+          // Radix UI components
+          radix: {
+            test: /[\/]node_modules[\/]@radix-ui[\/]/,
+            name: 'radix',
+            chunks: 'all',
+            priority: 12,
+          },
+          // Date utilities
+          dates: {
+            test: /[\/]node_modules[\/](date-fns|date-fns-tz)[\/]/,
+            name: 'dates',
+            chunks: 'all',
+            priority: 10,
+          },
+          // Animation libraries
+          animations: {
+            test: /[\/]node_modules[\/](framer-motion)[\/]/,
+            name: 'animations',
+            chunks: 'all',
+            priority: 10,
+          },
+          // Google APIs
+          google: {
+            test: /[\/]node_modules[\/](googleapis)[\/]/,
+            name: 'google',
+            chunks: 'all',
+            priority: 10,
+          },
+          // Other vendor libraries
+          vendor: {
+            test: /[\/]node_modules[\/]/,
+            name: 'vendor',
+            chunks: 'all',
+            priority: 5,
+            minChunks: 2,
+          },
+          // UI components
+          ui: {
+            test: /[\/]components[\/]ui[\/]/,
+            name: 'ui',
+            chunks: 'all',
+            priority: 8,
+          },
+        },
+      };
+    }
+    return config;
   },
   
   // Headers for static asset caching
@@ -94,4 +187,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);
