@@ -204,8 +204,8 @@ function Integrations() {
                 </div>
                 <p className="text-brand-primary-2">
                   {business.google_calendar_connected
-                    ? "✅ Your calendar is synced! Customers can only book when you're available, and new appointments automatically appear in your Google Calendar."
-                    : "🔗 Connect your Google Calendar so customers can only book when you're free. All appointments will automatically sync to your calendar."}
+                    ? "Your calendar is synced! Customers can only book when you're available, and new appointments automatically appear in your Google Calendar."
+                    : "Connect your Google Calendar so customers can only book when you're free. All appointments will automatically sync to your calendar."}
                 </p>
               </div>
               <div className="flex-shrink-0">
@@ -285,8 +285,8 @@ function Integrations() {
             <Card className="p-6 opacity-60">
               <div className="flex items-center mb-3">
                 <div className="w-8 h-8 bg-gray-400 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-600">
@@ -301,8 +301,8 @@ function Integrations() {
             <Card className="p-6 opacity-60">
               <div className="flex items-center mb-3">
                 <div className="w-8 h-8 bg-gray-400 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-600">
@@ -317,8 +317,8 @@ function Integrations() {
             <Card className="p-6 opacity-60">
               <div className="flex items-center mb-3">
                 <div className="w-8 h-8 bg-gray-400 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"/>
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-600">
