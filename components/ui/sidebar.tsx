@@ -12,8 +12,6 @@ import {
   Phone,
   Settings,
   Puzzle,
-  BarChart3,
-  Menu,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,12 +49,16 @@ function SidebarButton({
   onMobileClick,
 }: SidebarButtonProps) {
   const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = () => {
+    setIsNavigating(true);
     router.push(href);
     if (onMobileClick) {
       onMobileClick();
     }
+    // Reset loading state after a short delay
+    setTimeout(() => setIsNavigating(false), 1000);
   };
 
   return (
@@ -67,16 +69,22 @@ function SidebarButton({
           "w-full justify-start h-12 px-4 text-left transition-all duration-200",
           isActive
             ? "bg-brand-primary-1 text-white shadow-md"
-            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
+            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1",
+          isNavigating && "opacity-75"
         )}
         onClick={handleClick}
+        disabled={isNavigating}
       >
-        <Icon
-          className={cn(
-            "mr-3 h-5 w-5",
-            isActive ? "text-white" : "text-gray-500"
-          )}
-        />
+        {isNavigating ? (
+          <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent mr-3" />
+        ) : (
+          <Icon
+            className={cn(
+              "mr-3 h-5 w-5",
+              isActive ? "text-white" : "text-gray-500"
+            )}
+          />
+        )}
         <span className="font-medium text-sm">{label}</span>
       </Button>
     </motion.div>
