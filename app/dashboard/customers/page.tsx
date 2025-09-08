@@ -181,9 +181,25 @@ function Customers() {
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900">
-                            {customer.first_name && customer.last_name 
-                              ? `${customer.first_name} ${customer.last_name}`
-                              : 'Unknown Customer'}
+                            {(() => {
+                              const firstName = customer.first_name?.trim();
+                              const lastName = customer.last_name?.trim();
+                              
+                              if (firstName && lastName) {
+                                return `${firstName} ${lastName}`;
+                              } else if (firstName) {
+                                return firstName;
+                              } else if (lastName) {
+                                return lastName;
+                              } else if (customer.phone) {
+                                return customer.phone;
+                              } else if (customer.email) {
+                                return customer.email;
+                              } else {
+                                return 'Unknown Customer';
+                              }
+                            })()
+                            }
                           </h4>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
                             {customer.phone && (

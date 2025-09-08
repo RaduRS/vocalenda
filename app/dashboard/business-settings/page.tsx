@@ -19,6 +19,7 @@ import {
   Save,
   Edit3,
   FileText,
+  Bot,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -325,7 +326,7 @@ export default function BusinessSettings() {
               { id: "services", label: "Services", icon: Edit3 },
               { id: "staff", label: "Staff", icon: Users },
               { id: "holidays", label: "Holidays", icon: Calendar },
-              { id: "ai", label: "AI & Policies", icon: Settings },
+              { id: "ai", label: "AI & Policies", icon: Bot },
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -912,11 +913,11 @@ export default function BusinessSettings() {
             <Card className="p-8 shadow-sm border-0 bg-white">
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                    <Settings className="w-5 h-5 text-purple-600" />
-                  </div>
-                  AI & Policies
-                </h3>
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                      <Bot className="w-5 h-5 text-purple-600" />
+                    </div>
+                    AI & Policies
+                  </h3>
                 <p className="text-gray-600">Configure payment methods, AI behavior, and booking policies</p>
               </div>
               

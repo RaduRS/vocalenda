@@ -128,7 +128,7 @@ export default function CallLogsPage() {
       ...callLogs.map((call) =>
         [
           formatTimestamp(call.started_at),
-          call.customer_name || "Unknown Caller",
+          call.customer_name?.trim() || formatPhoneNumber(call.caller_phone) || "Unknown Caller",
           call.caller_phone,
           call.status,
           formatDuration(call.duration),
@@ -256,9 +256,17 @@ export default function CallLogsPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium text-brand-primary-1">
-                              {call.customer_name
-                                ? call.customer_name.split(" ")[0]
-                                : "Unknown Caller"}
+                              {(() => {
+                                const customerName = call.customer_name?.trim();
+                                if (customerName) {
+                                  return customerName.split(" ")[0];
+                                } else if (call.caller_phone) {
+                                  return formatPhoneNumber(call.caller_phone);
+                                } else {
+                                  return "Unknown Caller";
+                                }
+                              })()
+                              }
                             </span>
                             <Badge className={getStatusColor(call.status)}>
                               {call.status.replace("_", " ")}
@@ -321,7 +329,7 @@ export default function CallLogsPage() {
                           Conversation with{" "}
                           {call.customer_name
                             ? call.customer_name.split(" ")[0]
-                            : "Unknown Caller"}
+                            : call.caller_phone ? formatPhoneNumber(call.caller_phone) : "Unknown Caller"}
                         </h4>
                         <div className="max-h-96 overflow-y-auto space-y-4">
                           {formatTranscript(call.transcript).length > 0 ? (
