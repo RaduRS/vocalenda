@@ -22,9 +22,9 @@ export function ServicesSection() {
               </div>
               <CardTitle className="text-lg font-semibold text-slate-900">AI Voice Technology</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="text-center">
               <CardDescription className="text-slate-600 leading-relaxed text-sm">
-                Advanced conversational AI that handles appointment booking naturally. Understands context, manages scheduling conflicts, and provides professional customer service.
+                Natural conversations that feel human. Your customers book appointments as easily as talking to your staff.
               </CardDescription>
               <ul className="mt-4 space-y-2 text-sm text-slate-600">
                 <li className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export function ServicesSection() {
               </div>
               <CardTitle className="text-lg font-semibold text-slate-900">Smart Scheduling</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="text-center">
               <CardDescription className="text-slate-600 leading-relaxed text-sm">
                 Seamless integration with Google Calendar for real-time availability checking and automatic appointment booking. Handles scheduling conflicts intelligently.
               </CardDescription>
@@ -78,7 +78,7 @@ export function ServicesSection() {
               </div>
               <CardTitle className="text-lg font-semibold text-slate-900">Business Automation</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="text-center">
               <CardDescription className="text-slate-600 leading-relaxed text-sm">
                 Streamline your workflow with automated appointment confirmations, reminders, and follow-ups. Reduce no-shows and improve customer satisfaction.
               </CardDescription>
@@ -106,7 +106,7 @@ export function ServicesSection() {
               </div>
               <CardTitle className="text-lg font-semibold text-slate-900">Analytics & Insights</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="text-center">
               <CardDescription className="text-slate-600 leading-relaxed text-sm">
                 Comprehensive dashboard with call analytics, booking patterns, and performance metrics. Make data-driven decisions to optimize your business.
               </CardDescription>

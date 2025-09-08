@@ -53,7 +53,7 @@ export default function Home() {
       operatingSystem: "Web",
       offers: {
         "@type": "Offer",
-        price: "109",
+        price: "139",
         priceCurrency: "GBP",
       },
       featureList: [

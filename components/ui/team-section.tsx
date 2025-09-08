@@ -6,10 +6,10 @@ export function TeamSection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-slate-900">
-            Built by AI & Voice Technology Experts
+            Built with Modern AI Technology
           </h2>
           <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-            Our team combines deep expertise in artificial intelligence, voice technology, and business automation to deliver enterprise-grade solutions.
+            Leveraging cutting-edge AI and automation technologies to deliver reliable appointment booking solutions for your business.
           </p>
         </div>
         
@@ -19,9 +19,9 @@ export function TeamSection() {
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Zap className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-3">AI & Machine Learning</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-3">Natural Language Processing</h3>
             <p className="text-slate-600 leading-relaxed text-sm">
-              Advanced natural language processing that uses your business information to deliver contextual, human-like interactions.
+              Advanced AI that uses your business information to deliver contextual, human-like interactions with your customers.
             </p>
           </div>
           
@@ -29,9 +29,9 @@ export function TeamSection() {
             <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Shield className="w-6 h-6 text-emerald-600" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-3">Voice Technology</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-3">Voice Integration</h3>
             <p className="text-slate-600 leading-relaxed text-sm">
-              Cutting-edge speech recognition and synthesis technology optimized for business communications and appointment scheduling.
+              Reliable speech recognition and synthesis technology integrated with Twilio for seamless business communications.
             </p>
           </div>
           

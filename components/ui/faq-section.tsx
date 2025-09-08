@@ -45,7 +45,7 @@ const faqItems: FAQItem[] = [
     id: "pricing",
     question: "How much does Vocalenda cost and what's included?",
     answer:
-      "£109/month includes everything: 500 minutes of AI calls + unlimited SMS confirmations + dedicated phone number. No hidden fees, no surprises. Plus a £399 setup fee for initial configuration and phone number setup. You can optionally redirect your existing business calls to the new AI number.",
+      "£139/month includes everything: 500 minutes of AI calls + unlimited SMS confirmations + dedicated phone number. No hidden fees, no surprises. Plus a £399 setup fee for initial configuration and phone number setup. You can optionally redirect your existing business calls to the new AI number.",
   },
   {
     id: "customization",
