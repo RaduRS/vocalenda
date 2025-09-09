@@ -139,7 +139,7 @@ export async function GET() {
       }
     });
 
-    // Get weekly activity data (last 7 days)
+    // Get weekly activity data (current week: Monday to Sunday)
     const weeklyActivityData = [];
     const currentDate = new Date();
     const businessHours = user.businesses?.business_hours as Record<string, { closed?: boolean; open?: string; close?: string }> | null;
@@ -147,9 +147,15 @@ export async function GET() {
     // Day name mapping
     const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     
-    for (let i = 6; i >= 0; i--) {
-       const date = new Date(currentDate);
-       date.setDate(date.getDate() - i);
+    // Get start of current week (Monday)
+    const startOfWeek = new Date(currentDate);
+    const dayOfWeek = currentDate.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday = 0, so 6 days back to Monday
+    startOfWeek.setDate(currentDate.getDate() - daysToMonday);
+    
+    for (let i = 0; i < 7; i++) {
+       const date = new Date(startOfWeek);
+       date.setDate(startOfWeek.getDate() + i);
       const dateStr = formatISODate(date);
       const dayName = dayNames[date.getDay()];
       

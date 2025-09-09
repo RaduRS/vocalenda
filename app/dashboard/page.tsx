@@ -55,6 +55,9 @@ function Dashboard() {
   const router = useRouter();
   const { data, isLoading, error } = useDashboard();
   const business = data?.business;
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const maxItems = 10;
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(
@@ -296,21 +299,20 @@ function Dashboard() {
               <div className="h-48 sm:h-56 md:h-64">
                 <Doughnut
                    data={{
-                     labels: ['Completed', 'Failed', 'In Progress', 'Incoming'],
+                     labels: ['Completed', 'Failed'],
                      datasets: [
                        {
-                         data: callStatusValues,
+                         data: [
+                           callStatusValues[0] || 0, // Completed
+                           callStatusValues[1] || 0  // Failed
+                         ],
                          backgroundColor: [
                            'rgba(34, 197, 94, 0.8)',
                            'rgba(239, 68, 68, 0.8)',
-                           'rgba(251, 191, 36, 0.8)',
-                           'rgba(59, 130, 246, 0.8)',
                          ],
                          borderColor: [
                            'rgba(34, 197, 94, 1)',
                            'rgba(239, 68, 68, 1)',
-                           'rgba(251, 191, 36, 1)',
-                           'rgba(59, 130, 246, 1)',
                          ],
                          borderWidth: 2,
                        },
@@ -339,29 +341,20 @@ function Dashboard() {
                <div className="h-48 sm:h-56 md:h-64">
                  <Doughnut
                    data={{
-                     labels: ['Confirmed', 'Pending', 'Completed', 'Cancelled', 'No Show'],
+                     labels: ['Confirmed', 'Cancelled'],
                      datasets: [
                        {
                          data: [
                            data.stats?.appointmentStatusCounts?.confirmed || 0,
-                           data.stats?.appointmentStatusCounts?.pending || 0,
-                           data.stats?.appointmentStatusCounts?.completed || 0,
-                           data.stats?.appointmentStatusCounts?.cancelled || 0,
-                           data.stats?.appointmentStatusCounts?.no_show || 0
+                           data.stats?.appointmentStatusCounts?.cancelled || 0
                          ],
                          backgroundColor: [
-                           'rgba(59, 130, 246, 0.8)',
-                           'rgba(251, 191, 36, 0.8)',
                            'rgba(34, 197, 94, 0.8)',
                            'rgba(239, 68, 68, 0.8)',
-                           'rgba(156, 163, 175, 0.8)',
                          ],
                          borderColor: [
-                           'rgba(59, 130, 246, 1)',
-                           'rgba(251, 191, 36, 1)',
                            'rgba(34, 197, 94, 1)',
                            'rgba(239, 68, 68, 1)',
-                           'rgba(156, 163, 175, 1)',
                          ],
                          borderWidth: 2,
                        },
@@ -384,9 +377,34 @@ function Dashboard() {
           {/* Recent Activity */}
           <div className="md:col-span-2">
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
-                Recent Activity
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-brand-primary-1">
+                  Recent Activity
+                </h3>
+                {data?.recentCalls && data.recentCalls.length > itemsPerPage && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-sm text-gray-600 flex items-center px-2">
+                      Page {currentPage} of 2
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(2)}
+                      disabled={currentPage === 2}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -398,7 +416,13 @@ function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(data?.recentCalls || []).slice(0, 8).map((call: RecentCall, index: number) => (
+                    {(() => {
+                      const recentCalls = (data?.recentCalls || []).slice(0, maxItems);
+                      const startIndex = (currentPage - 1) * itemsPerPage;
+                      const endIndex = startIndex + itemsPerPage;
+                      const paginatedCalls = recentCalls.slice(startIndex, endIndex);
+                      
+                      return paginatedCalls.map((call: RecentCall, index: number) => (
                       <tr key={call.id || index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="py-3 px-1">
                           <p className="font-medium text-gray-900 truncate">
@@ -441,7 +465,8 @@ function Dashboard() {
                           </p>
                         </td>
                       </tr>
-                    )) || (
+                      ));
+                    })() || (
                       <tr>
                         <td colSpan={4} className="text-center py-8 text-brand-primary-2">
                           <p>No recent activity</p>
