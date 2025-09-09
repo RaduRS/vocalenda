@@ -93,6 +93,7 @@ export interface ComprehensiveBusinessData {
   phone: string;
   email: string;
   website?: string;
+  bypass_phone_number?: string;
 }
 
 export type PaymentMethod =

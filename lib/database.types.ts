@@ -108,6 +108,7 @@ export type Database = {
           sms_confirmation_template: string | null
           sms_reminder_template: string | null
           sms_cancellation_template: string | null
+          bypass_phone_number: string | null
           created_at: string
           updated_at: string
         }
@@ -126,6 +127,7 @@ export type Database = {
           sms_confirmation_template?: string | null
           sms_reminder_template?: string | null
           sms_cancellation_template?: string | null
+          bypass_phone_number?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -144,6 +146,7 @@ export type Database = {
           sms_confirmation_template?: string | null
           sms_reminder_template?: string | null
           sms_cancellation_template?: string | null
+          bypass_phone_number?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -648,6 +651,7 @@ export type Database = {
           p_greeting_message?: string
           p_booking_rules?: Json
           p_faq_data?: Json
+          p_bypass_phone_number?: string
         }
         Returns: boolean
       }

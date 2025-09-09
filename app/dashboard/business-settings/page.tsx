@@ -463,6 +463,8 @@ export default function BusinessSettings() {
                       className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
                     />
                   </div>
+
+
                 </div>
               </div>
             </Card>
@@ -1046,6 +1048,30 @@ export default function BusinessSettings() {
                     rows={5}
                   />
                 </div>
+
+                {/* Human Handoff Phone Number Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Phone className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <Label className="text-lg font-semibold text-gray-900">
+                      Human Handoff Phone Number
+                    </Label>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Phone number to connect customers to when they request to speak with a human or staff member during AI conversations
+                  </p>
+                  <Input
+                    type="tel"
+                    value={businessData.bypass_phone_number || ""}
+                    onChange={(e) =>
+                      handleInputChange("bypass_phone_number", e.target.value)
+                    }
+                    placeholder="+1 (555) 123-4567"
+                    className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
               </div>
             </Card>
           </div>
@@ -1093,41 +1119,58 @@ export default function BusinessSettings() {
                   <>
                     {/* Confirmation Message */}
                     <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="w-3 h-3 text-green-600" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                            <MessageSquare className="w-3 h-3 text-green-600" />
+                          </div>
+                          <Label className="text-base font-semibold text-gray-900">
+                            Confirmation Message
+                          </Label>
                         </div>
-                        <Label className="text-base font-semibold text-gray-900">
-                          Confirmation Message
-                        </Label>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          (businessData.sms_configuration?.confirmation_message || "").length > 320
+                            ? "bg-red-100 text-red-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}>
+                          {(businessData.sms_configuration?.confirmation_message || "").length}/320
+                        </span>
                       </div>
                       <p className="text-sm text-gray-600">
                         Message sent when an appointment is confirmed.
                       </p>
                       <Textarea
                         value={businessData.sms_configuration?.confirmation_message || ""}
-                        onChange={(e) =>
-                          handleInputChange("sms_configuration", {
-                            ...businessData.sms_configuration,
-                            confirmation_message: e.target.value,
-                          })
-                        }
+                        onChange={(e) => {
+                          if (e.target.value.length <= 320) {
+                            handleInputChange("sms_configuration", {
+                              ...businessData.sms_configuration,
+                              confirmation_message: e.target.value,
+                            })
+                          }
+                        }}
                         placeholder="Hi {customer_name}, your appointment at {business_name} is confirmed for {date} at {time} for {service_name}. Duration: {duration} mins. Questions? Call {business_phone}"
                         className="min-h-[80px] border-gray-200 focus:border-green-500 focus:ring-green-500 resize-none"
                         rows={3}
+                        maxLength={320}
                       />
                     </div>
 
                     {/* Reminder Message */}
                     <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="w-3 h-3 text-amber-600" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <MessageSquare className="w-3 h-3 text-amber-600" />
+                          </div>
+                          <Label className="text-base font-semibold text-gray-900">
+                            Reminder Message
+                          </Label>
+                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">Coming Soon</span>
                         </div>
-                        <Label className="text-base font-semibold text-gray-900">
-                          Reminder Message
-                        </Label>
-                        <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">Coming Soon</span>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                          0/320
+                        </span>
                       </div>
                       <p className="text-sm text-gray-600">
                         Message sent as appointment reminder.
@@ -1138,19 +1181,25 @@ export default function BusinessSettings() {
                         placeholder="Coming soon - Reminder functionality will be available in a future update"
                         className="min-h-[80px] border-gray-200 bg-gray-50 text-gray-500 resize-none cursor-not-allowed"
                         rows={3}
+                        maxLength={320}
                       />
                     </div>
 
                     {/* Cancellation Message */}
                     <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="w-3 h-3 text-red-600" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
+                            <MessageSquare className="w-3 h-3 text-red-600" />
+                          </div>
+                          <Label className="text-base font-semibold text-gray-900">
+                            Cancellation Message
+                          </Label>
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">Coming Soon</span>
                         </div>
-                        <Label className="text-base font-semibold text-gray-900">
-                          Cancellation Message
-                        </Label>
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">Coming Soon</span>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                          0/320
+                        </span>
                       </div>
                       <p className="text-sm text-gray-600">
                         Message sent when an appointment is cancelled.
@@ -1161,8 +1210,11 @@ export default function BusinessSettings() {
                         placeholder="Coming soon - Cancellation functionality will be available in a future update"
                         className="min-h-[80px] border-gray-200 bg-gray-50 text-gray-500 resize-none cursor-not-allowed"
                         rows={3}
+                        maxLength={320}
                       />
                     </div>
+
+
                   </>
                 )}
               </div>
