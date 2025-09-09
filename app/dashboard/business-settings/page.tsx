@@ -1055,58 +1055,54 @@ export default function BusinessSettings() {
         {activeTab === "sms" && (
           <div className="space-y-6">
             <Card className="p-8 bg-white shadow-sm border border-gray-200">
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
-                  </div>
-                  SMS Messages
-                </h3>
-                <p className="text-gray-600">
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-gray-900 flex items-center">
+                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+                      <MessageSquare className="w-5 h-5 text-blue-600" />
+                    </div>
+                    SMS Messages
+                  </h3>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={businessData.sms_configuration?.enabled || false}
+                      onChange={(e) =>
+                        handleInputChange("sms_configuration", {
+                          ...businessData.sms_configuration,
+                          enabled: e.target.checked,
+                        })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+                <p className="text-gray-600 mb-3">
                   Configure automated SMS messages for appointment confirmations, reminders, and cancellations
+                </p>
+                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                  <strong>Available variables:</strong> {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{duration}'}, {'{business_phone}'}
                 </p>
               </div>
 
-              <div className="space-y-8">
-                {/* SMS Enable/Disable Toggle */}
-                <div className="p-6 bg-gradient-to-r from-blue-50 to-white rounded-xl border border-blue-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-2">SMS Notifications</h4>
-                      <p className="text-sm text-gray-600">Enable or disable SMS notifications for your customers</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={businessData.sms_configuration?.enabled || false}
-                        onChange={(e) =>
-                          handleInputChange("sms_configuration", {
-                            ...businessData.sms_configuration,
-                            enabled: e.target.checked,
-                          })
-                        }
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                </div>
+              <div className="space-y-6">
 
                 {/* SMS Message Templates */}
                 {businessData.sms_configuration?.enabled && (
                   <>
                     {/* Confirmation Message */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="w-4 h-4 text-green-600" />
+                        <div className="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
+                          <MessageSquare className="w-3 h-3 text-green-600" />
                         </div>
-                        <Label className="text-lg font-semibold text-gray-900">
+                        <Label className="text-base font-semibold text-gray-900">
                           Confirmation Message
                         </Label>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Message sent when an appointment is confirmed. Available variables: {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{duration}'}, {'{business_phone}'}
+                        Message sent when an appointment is confirmed.
                       </p>
                       <Textarea
                         value={businessData.sms_configuration?.confirmation_message || ""}
@@ -1117,62 +1113,54 @@ export default function BusinessSettings() {
                           })
                         }
                         placeholder="Hi {customer_name}, your appointment at {business_name} is confirmed for {date} at {time} for {service_name}. Duration: {duration} mins. Questions? Call {business_phone}"
-                        className="min-h-[100px] border-gray-200 focus:border-green-500 focus:ring-green-500 resize-none"
-                        rows={4}
+                        className="min-h-[80px] border-gray-200 focus:border-green-500 focus:ring-green-500 resize-none"
+                        rows={3}
                       />
                     </div>
 
                     {/* Reminder Message */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="w-4 h-4 text-amber-600" />
+                        <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
+                          <MessageSquare className="w-3 h-3 text-amber-600" />
                         </div>
-                        <Label className="text-lg font-semibold text-gray-900">
+                        <Label className="text-base font-semibold text-gray-900">
                           Reminder Message
                         </Label>
+                        <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">Coming Soon</span>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Message sent as appointment reminder. Available variables: {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{business_phone}'}
+                        Message sent as appointment reminder.
                       </p>
                       <Textarea
                         value={businessData.sms_configuration?.reminder_message || ""}
-                        onChange={(e) =>
-                          handleInputChange("sms_configuration", {
-                            ...businessData.sms_configuration,
-                            reminder_message: e.target.value,
-                          })
-                        }
-                        placeholder="Reminder: {customer_name}, you have an appointment at {business_name} tomorrow ({date}) at {time} for {service_name}. See you then! {business_phone}"
-                        className="min-h-[100px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 resize-none"
-                        rows={4}
+                        readOnly
+                        placeholder="Coming soon - Reminder functionality will be available in a future update"
+                        className="min-h-[80px] border-gray-200 bg-gray-50 text-gray-500 resize-none cursor-not-allowed"
+                        rows={3}
                       />
                     </div>
 
                     {/* Cancellation Message */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                          <MessageSquare className="w-4 h-4 text-red-600" />
+                        <div className="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
+                          <MessageSquare className="w-3 h-3 text-red-600" />
                         </div>
-                        <Label className="text-lg font-semibold text-gray-900">
+                        <Label className="text-base font-semibold text-gray-900">
                           Cancellation Message
                         </Label>
+                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">Coming Soon</span>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Message sent when an appointment is cancelled. Available variables: {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{business_phone}'}
+                        Message sent when an appointment is cancelled.
                       </p>
                       <Textarea
                         value={businessData.sms_configuration?.cancellation_message || ""}
-                        onChange={(e) =>
-                          handleInputChange("sms_configuration", {
-                            ...businessData.sms_configuration,
-                            cancellation_message: e.target.value,
-                          })
-                        }
-                        placeholder="Hi {customer_name}, your appointment at {business_name} on {date} at {time} for {service_name} has been cancelled. To reschedule, call {business_phone}"
-                        className="min-h-[100px] border-gray-200 focus:border-red-500 focus:ring-red-500 resize-none"
-                        rows={4}
+                        readOnly
+                        placeholder="Coming soon - Cancellation functionality will be available in a future update"
+                        className="min-h-[80px] border-gray-200 bg-gray-50 text-gray-500 resize-none cursor-not-allowed"
+                        rows={3}
                       />
                     </div>
                   </>
