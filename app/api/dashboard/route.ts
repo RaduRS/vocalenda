@@ -26,7 +26,8 @@ export async function GET() {
           email,
           address,
           status,
-          google_calendar_id
+          google_calendar_id,
+          business_hours
         )
       `)
       .eq('clerk_user_id', userId)
@@ -141,21 +142,44 @@ export async function GET() {
     // Get weekly activity data (last 7 days)
     const weeklyActivityData = [];
     const currentDate = new Date();
+    const businessHours = user.businesses?.business_hours as Record<string, { closed?: boolean; open?: string; close?: string }> | null;
+    
+    // Day name mapping
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     
     for (let i = 6; i >= 0; i--) {
        const date = new Date(currentDate);
        date.setDate(date.getDate() - i);
       const dateStr = formatISODate(date);
+      const dayName = dayNames[date.getDay()];
       
-      const [dayAppointments, dayCalls] = await Promise.all([
-        supabase.from('appointments').select('id', { count: 'exact' })
-          .eq('business_id', businessId)
-          .eq('appointment_date', dateStr),
-        supabase.from('call_logs').select('id', { count: 'exact' })
+      // Check if business is closed on this day
+      const isDayClosed = businessHours && businessHours[dayName] && businessHours[dayName].closed === true;
+      
+      let dayAppointments, dayCalls;
+      
+      if (isDayClosed) {
+        // If business is closed, set appointments to 0 and still get calls
+        dayAppointments = { count: 0 };
+        const callsResult = await supabase.from('call_logs').select('id', { count: 'exact' })
           .eq('business_id', businessId)
           .gte('started_at', `${dateStr}T00:00:00Z`)
-          .lt('started_at', `${dateStr}T23:59:59Z`)
-      ]);
+          .lt('started_at', `${dateStr}T23:59:59Z`);
+        dayCalls = callsResult;
+      } else {
+        // Business is open, get both appointments and calls
+        const [appointmentsResult, callsResult] = await Promise.all([
+          supabase.from('appointments').select('id', { count: 'exact' })
+            .eq('business_id', businessId)
+            .eq('appointment_date', dateStr),
+          supabase.from('call_logs').select('id', { count: 'exact' })
+            .eq('business_id', businessId)
+            .gte('started_at', `${dateStr}T00:00:00Z`)
+            .lt('started_at', `${dateStr}T23:59:59Z`)
+        ]);
+        dayAppointments = appointmentsResult;
+        dayCalls = callsResult;
+      }
       
       weeklyActivityData.push({
         date: dateStr,
