@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useState, useMemo, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
+import { format, parseISO } from 'date-fns';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -233,13 +234,23 @@ function Dashboard() {
           {/* Appointment Trends - Takes 2 columns on large screens */}
           <div className="md:col-span-2 lg:col-span-2">
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
-                Weekly Activity Overview
-              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                <h3 className="text-lg font-semibold text-brand-primary-1">
+                  Weekly Activity Overview
+                </h3>
+                {data?.stats?.weeklyActivity && data.stats.weeklyActivity.length > 0 && (
+                  <p className="text-sm text-gray-600 mt-1 sm:mt-0">
+                    {format(parseISO(data.stats.weeklyActivity[0].date), 'MMM d')} - {format(parseISO(data.stats.weeklyActivity[data.stats.weeklyActivity.length - 1].date), 'MMM d, yyyy')}
+                  </p>
+                )}
+              </div>
               <div className="h-48 sm:h-56 md:h-64">
                 <Line
                   data={{
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: data?.stats?.weeklyActivity?.map(day => {
+                      const date = parseISO(day.date);
+                      return format(date, 'EEE');
+                    }) || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [
                       {
                         label: 'Appointments',
