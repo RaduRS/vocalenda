@@ -238,10 +238,10 @@ function Dashboard() {
 
 
         {/* Charts Section */}
-        <div className="space-y-6">
-          {/* Weekly Activity Overview - Full width */}
-          <div>
-              <Card className="p-6 h-96">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Appointment Trends - Takes 2 columns on large screens */}
+          <div className="md:col-span-2 lg:col-span-2">
+            <Card className="p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                 <h3 className="text-lg font-semibold text-brand-primary-1">
                   Weekly Activity Overview
@@ -318,11 +318,9 @@ function Dashboard() {
             </Card>
           </div>
 
-          {/* Bottom Charts Row - Equal Heights */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Call Status Distribution */}
-            <div>
-            <Card className="p-6 h-96">
+          {/* Call Status Distribution */}
+          <div>
+            <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                 Call Status
               </h3>
@@ -369,8 +367,8 @@ function Dashboard() {
           </div>
 
           {/* Appointment Status Distribution */}
-           <div>
-             <Card className="p-6 h-96">
+          <div>
+            <Card className="p-6 h-96">
                <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                  Appointment Status
                </h3>
@@ -411,8 +409,8 @@ function Dashboard() {
            </div>
 
             {/* Recent Activity */}
-            <div className="lg:col-span-2">
-              <Card className="p-6 h-96">
+          <div className="md:col-span-2">
+            <Card className="p-6 h-96">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-brand-primary-1">
                   Recent Activity
@@ -513,7 +511,6 @@ function Dashboard() {
                 </table>
               </div>
             </Card>
-          </div>
           </div>
         </div>
       </div>
