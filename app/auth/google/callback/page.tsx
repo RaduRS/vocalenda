@@ -60,9 +60,9 @@ function GoogleCallbackContent() {
         if (response.ok && data.success) {
 
           setStatus('success');
-          // Redirect to integrations page after a short delay
+          // Redirect to integrations page with calendar parameter after a short delay
           setTimeout(() => {
-             router.push('/dashboard/integrations');
+             router.push('/dashboard/integrations?calendar=connected');
            }, 1000);
         } else {
           console.error('❌ OAuth API error:', data);
@@ -112,10 +112,10 @@ function GoogleCallbackContent() {
               Your Google Calendar has been successfully connected. Redirecting to dashboard...
             </p>
             <button
-              onClick={() => router.push('/dashboard?calendar=connected')}
+              onClick={() => router.push('/dashboard/integrations?calendar=connected')}
               className="bg-[#6c47ff] hover:bg-[#5a3dd9] text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              Go to Dashboard
+              Go to Integrations
             </button>
           </>
         )}

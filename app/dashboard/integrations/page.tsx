@@ -99,17 +99,23 @@ function Integrations() {
       const isFromGoogle = referrer.includes('accounts.google.com') || referrer.includes('oauth');
       
       // If we have recent OAuth activity, URL params, or came from Google, refresh immediately
-      if ((lastActivity && (now - parseInt(lastActivity)) < 30000) || hasCalendarParam || isFromGoogle) {
-        console.log('Detected OAuth return, refreshing integration status...');
-        fetchBusinessData(true);
-        sessionStorage.removeItem('lastOAuthActivity');
-        
-        // Clean up URL parameters
-        if (hasCalendarParam) {
-          const newUrl = window.location.pathname;
-          window.history.replaceState({}, '', newUrl);
-        }
-      }
+       if ((lastActivity && (now - parseInt(lastActivity)) < 30000) || hasCalendarParam || isFromGoogle) {
+         console.log('Detected OAuth return, refreshing integration status...');
+         
+         // If we have calendar param indicating successful connection, update state immediately
+         if (hasCalendarParam && urlParams.get('calendar') === 'connected') {
+           setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
+         }
+         
+         fetchBusinessData(true);
+         sessionStorage.removeItem('lastOAuthActivity');
+         
+         // Clean up URL parameters
+         if (hasCalendarParam) {
+           const newUrl = window.location.pathname;
+           window.history.replaceState({}, '', newUrl);
+         }
+       }
     }
   }, [user, loading, fetchBusinessData]);
 
@@ -159,6 +165,10 @@ function Integrations() {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Immediately update local state
+        setBusiness(prev => prev ? { ...prev, google_calendar_connected: false } : null);
+        
+        // Also fetch fresh data from server
         await fetchBusinessData(true); // Bypass cache to get fresh data
         setSuccessMessage("Google Calendar disconnected successfully!");
         setShowSuccessModal(true);

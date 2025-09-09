@@ -44,8 +44,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle API requests with stale-while-revalidate strategy
-  if (url.pathname.startsWith('/api/')) {
+  // Handle API requests with stale-while-revalidate strategy (GET only)
+  if (url.pathname.startsWith('/api/') && request.method === 'GET') {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) => {
         return cache.match(request).then((cachedResponse) => {
@@ -65,6 +65,12 @@ self.addEventListener('fetch', (event) => {
         });
       })
     );
+    return;
+  }
+
+  // Handle non-GET API requests without caching
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(request));
     return;
   }
 
