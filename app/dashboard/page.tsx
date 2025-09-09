@@ -27,80 +27,10 @@ StatsCard.displayName = 'StatsCard';
 function Dashboard() {
   const { user } = useUser();
   const router = useRouter();
-  const { data, isLoading, refetch } = useDashboard();
+  const { data, isLoading } = useDashboard();
   const business = data?.business;
-  const [connectingCalendar, setConnectingCalendar] = useState(false);
-  const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
 
-  const handleConnectCalendar = useCallback(async () => {
-    setConnectingCalendar(true);
-    try {
-      if (!business?.id) {
-        alert("Business information not available. Please refresh the page.");
-        return;
-      }
 
-      const response = await fetch(
-        `/api/auth/google?businessId=${business.id}`
-      );
-      const data = await response.json();
-
-      if (data.authUrl) {
-        // Redirect to Google OAuth
-        window.location.href = data.authUrl;
-      } else {
-        throw new Error(data.error || "Failed to get OAuth URL");
-      }
-    } catch (error) {
-      console.error("Failed to connect calendar:", error);
-      alert("Failed to connect Google Calendar. Please try again.");
-    } finally {
-      setConnectingCalendar(false);
-    }
-  }, [business?.id]);
-
-  const handleDisconnectCalendar = useCallback(async () => {
-    if (
-      !confirm(
-        "Are you sure you want to disconnect Google Calendar? This will revoke all permissions and remove the integration."
-      )
-    ) {
-      return;
-    }
-
-    setDisconnectingCalendar(true);
-    try {
-      if (!business?.id) {
-        alert("Business information not available. Please refresh the page.");
-        return;
-      }
-
-      const response = await fetch("/api/auth/google/disconnect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ businessId: business.id }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Small delay to ensure database changes are committed
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        // Refetch dashboard data to get the updated connection status
-        await refetch();
-        alert("Google Calendar disconnected successfully!");
-      } else {
-        throw new Error(data.error || "Failed to disconnect Google Calendar");
-      }
-    } catch (error) {
-      console.error("Failed to disconnect calendar:", error);
-      alert("Failed to disconnect Google Calendar. Please try again.");
-    } finally {
-      setDisconnectingCalendar(false);
-    }
-  }, [business?.id, refetch]);
 
 
 
@@ -242,85 +172,7 @@ function Dashboard() {
           ))}
         </div>
 
-        {/* Google Calendar Integration */}
-        <div className="mb-8">
-          <Card className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-4 sm:mb-0">
-                <h3 className="text-lg font-semibold mb-2 text-brand-primary-1">
-                  Calendar Sync
-                </h3>
-                <p className="text-brand-primary-2">
-                  {business.google_calendar_connected
-                    ? "✅ Your calendar is synced! Customers can only book when you're available, and new appointments automatically appear in your Google Calendar."
-                    : "🔗 Connect your Google Calendar so customers can only book when you're free. All appointments will automatically sync to your calendar."}
-                </p>
-              </div>
-              <div className="flex-shrink-0">
-                {business.google_calendar_connected ? (
-                  <div className="flex items-center space-x-3">
-                    <div className="flex items-center text-brand-secondary-1">
-                      <svg
-                        className="w-5 h-5 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      Connected
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDisconnectCalendar}
-                      disabled={disconnectingCalendar}
-                    >
-                      {disconnectingCalendar
-                        ? "Disconnecting..."
-                        : "Disconnect"}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleConnectCalendar}
-                    disabled={connectingCalendar}
-                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
-                  >
-                    {connectingCalendar ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Connect Google Calendar
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </div>
-          </Card>
-        </div>
+
 
         {/* Business Info */}
         <div className="grid grid-cols-1 gap-6">

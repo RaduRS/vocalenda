@@ -32,6 +32,7 @@ function Integrations() {
   const router = useRouter();
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
@@ -60,6 +61,27 @@ function Integrations() {
       console.error("Failed to fetch business data:", error);
     }
   }, [router]);
+
+  const checkGoogleCalendarStatus = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      const response = await fetch('/api/integrations/google/status');
+      if (!response.ok) {
+        throw new Error('Failed to fetch Google Calendar status');
+      }
+      
+      const data = await response.json();
+      setBusiness(prev => prev ? {
+        ...prev,
+        google_calendar_connected: data.google_calendar_connected,
+        google_calendar_id: data.google_calendar_id
+      } : null);
+    } catch (error) {
+      console.error('Error checking Google Calendar status:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -176,13 +198,26 @@ function Integrations() {
           console.log('Recent OAuth activity detected, starting polling...');
           
           const pollForConnection = () => {
-            fetchBusinessData(true).then(() => {
+            checkGoogleCalendarStatus().then(() => {
               // Check if we're now connected
-              const checkConnection = () => {
-                if (business?.google_calendar_connected) {
-                  console.log('Connection detected via polling!');
-                  sessionStorage.removeItem('lastOAuthActivity');
-                  return;
+              const checkConnection = async () => {
+                try {
+                  const response = await fetch('/api/integrations/google/status');
+                  if (response.ok) {
+                    const data = await response.json();
+                    if (data.google_calendar_connected) {
+                      console.log('Connection detected via polling!');
+                      setBusiness(prev => prev ? {
+                        ...prev,
+                        google_calendar_connected: data.google_calendar_connected,
+                        google_calendar_id: data.google_calendar_id
+                      } : null);
+                      sessionStorage.removeItem('lastOAuthActivity');
+                      return;
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error checking connection:', error);
                 }
                 
                 // Continue polling for up to 30 seconds
@@ -224,7 +259,7 @@ function Integrations() {
         // If OAuth activity was very recent (within 10 seconds) and we're not connected, force a refresh
         if ((now - activityTime) < 10000 && !business.google_calendar_connected) {
           console.log('Very recent OAuth activity with no connection, forcing immediate refresh...');
-          fetchBusinessData(true);
+          checkGoogleCalendarStatus();
         }
       }
     }
@@ -293,8 +328,8 @@ function Integrations() {
   
   const handleManualRefresh = useCallback(() => {
     console.log('Manual refresh triggered');
-    fetchBusinessData(true);
-  }, [fetchBusinessData]);
+    checkGoogleCalendarStatus();
+  }, [checkGoogleCalendarStatus]);
 
   const handleDisconnectCalendar = useCallback(async () => {
     setDisconnectingCalendar(true);
@@ -422,12 +457,22 @@ function Integrations() {
                       variant="outline"
                       size="sm"
                       onClick={handleManualRefresh}
+                      disabled={refreshing}
                       className="text-xs"
                     >
-                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      Refresh
+                      {refreshing ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
+                          Checking...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          Refresh
+                        </>
+                      )}
                     </Button>
                     <Dialog open={showDisconnectModal} onOpenChange={setShowDisconnectModal}>
                       <DialogTrigger asChild>
@@ -503,12 +548,22 @@ function Integrations() {
                        variant="outline"
                        size="sm"
                        onClick={handleManualRefresh}
+                       disabled={refreshing}
                        className="text-xs"
                      >
-                       <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                       </svg>
-                       Check Status
+                       {refreshing ? (
+                         <>
+                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-600 mr-1"></div>
+                           Checking...
+                         </>
+                       ) : (
+                         <>
+                           <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                           </svg>
+                           Check Status
+                         </>
+                       )}
                      </Button>
                    </div>
                  )}
