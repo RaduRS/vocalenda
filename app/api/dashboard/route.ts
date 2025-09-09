@@ -171,7 +171,8 @@ export async function GET() {
         const [appointmentsResult, callsResult] = await Promise.all([
           supabase.from('appointments').select('id', { count: 'exact' })
             .eq('business_id', businessId)
-            .eq('appointment_date', dateStr),
+            .eq('appointment_date', dateStr)
+            .eq('status', 'confirmed'),
           supabase.from('call_logs').select('id', { count: 'exact' })
             .eq('business_id', businessId)
             .gte('started_at', `${dateStr}T00:00:00Z`)
