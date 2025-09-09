@@ -164,8 +164,71 @@ function Integrations() {
         const newUrl = window.location.pathname;
         window.history.replaceState({}, '', newUrl);
       }
+      
+      // Additional polling for OAuth return detection
+      const lastActivity = sessionStorage.getItem('lastOAuthActivity');
+      if (lastActivity) {
+        const now = Date.now();
+        const activityTime = parseInt(lastActivity);
+        
+        // If OAuth activity was recent (within 2 minutes), start polling
+        if ((now - activityTime) < 120000) {
+          console.log('Recent OAuth activity detected, starting polling...');
+          
+          const pollForConnection = () => {
+            fetchBusinessData(true).then(() => {
+              // Check if we're now connected
+              const checkConnection = () => {
+                if (business?.google_calendar_connected) {
+                  console.log('Connection detected via polling!');
+                  sessionStorage.removeItem('lastOAuthActivity');
+                  return;
+                }
+                
+                // Continue polling for up to 30 seconds
+                if ((Date.now() - activityTime) < 30000) {
+                  setTimeout(checkConnection, 1000);
+                }
+              };
+              
+              setTimeout(checkConnection, 500);
+            });
+          };
+          
+          // Start polling immediately and then every 2 seconds
+          pollForConnection();
+          const pollInterval = setInterval(() => {
+            if ((Date.now() - activityTime) < 30000) {
+              pollForConnection();
+            } else {
+              clearInterval(pollInterval);
+              sessionStorage.removeItem('lastOAuthActivity');
+            }
+          }, 2000);
+          
+          // Cleanup interval on unmount
+          return () => clearInterval(pollInterval);
+        }
+      }
     }
-  }, [user, loading, fetchBusinessData]);
+  }, [user, loading, fetchBusinessData, business?.google_calendar_connected]);
+  
+  // Immediate connection check on business data change
+  useEffect(() => {
+    if (business && user && !loading) {
+      const lastActivity = sessionStorage.getItem('lastOAuthActivity');
+      if (lastActivity) {
+        const now = Date.now();
+        const activityTime = parseInt(lastActivity);
+        
+        // If OAuth activity was very recent (within 10 seconds) and we're not connected, force a refresh
+        if ((now - activityTime) < 10000 && !business.google_calendar_connected) {
+          console.log('Very recent OAuth activity with no connection, forcing immediate refresh...');
+          fetchBusinessData(true);
+        }
+      }
+    }
+  }, [business, user, loading, fetchBusinessData]);
   
   // Listen for OAuth success messages from popup
   useEffect(() => {
@@ -206,6 +269,17 @@ function Integrations() {
       if (data.authUrl) {
         // Store timestamp for OAuth activity detection
         sessionStorage.setItem('lastOAuthActivity', Date.now().toString());
+        
+        // Set up a listener for when the user returns
+        const handleFocusAfterOAuth = () => {
+          console.log('Page focused after OAuth, checking connection...');
+          setTimeout(() => {
+            fetchBusinessData(true);
+          }, 1000);
+          window.removeEventListener('focus', handleFocusAfterOAuth);
+        };
+        
+        window.addEventListener('focus', handleFocusAfterOAuth);
         window.location.href = data.authUrl;
       } else {
         throw new Error(data.error || "Failed to get OAuth URL");
@@ -215,7 +289,12 @@ function Integrations() {
       alert("Failed to connect Google Calendar. Please try again.");
       setConnectingCalendar(false);
     }
-  }, [business?.id]);
+  }, [business?.id, fetchBusinessData]);
+  
+  const handleManualRefresh = useCallback(() => {
+    console.log('Manual refresh triggered');
+    fetchBusinessData(true);
+  }, [fetchBusinessData]);
 
   const handleDisconnectCalendar = useCallback(async () => {
     setDisconnectingCalendar(true);
@@ -339,6 +418,17 @@ function Integrations() {
                       </svg>
                       Connected
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleManualRefresh}
+                      className="text-xs"
+                    >
+                      <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Refresh
+                    </Button>
                     <Dialog open={showDisconnectModal} onOpenChange={setShowDisconnectModal}>
                       <DialogTrigger asChild>
                         <Button
@@ -379,35 +469,48 @@ function Integrations() {
                     </Dialog>
                    </div>
                  ) : (
-                   <Button
-                     onClick={handleConnectCalendar}
-                     disabled={connectingCalendar}
-                     className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
-                   >
-                     {connectingCalendar ? (
-                       <>
-                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                         Connecting...
-                       </>
-                     ) : (
-                       <>
-                         <svg
-                           className="w-4 h-4 mr-2"
-                           fill="none"
-                           stroke="currentColor"
-                           viewBox="0 0 24 24"
-                         >
-                           <path
-                             strokeLinecap="round"
-                             strokeLinejoin="round"
-                             strokeWidth={2}
-                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                           />
-                         </svg>
-                         Connect Google Calendar
-                       </>
-                     )}
-                   </Button>
+                   <div className="flex items-center space-x-3">
+                     <Button
+                       onClick={handleConnectCalendar}
+                       disabled={connectingCalendar}
+                       className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
+                     >
+                       {connectingCalendar ? (
+                         <>
+                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                           Connecting...
+                         </>
+                       ) : (
+                         <>
+                           <svg
+                             className="w-4 h-4 mr-2"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24"
+                           >
+                             <path
+                               strokeLinecap="round"
+                               strokeLinejoin="round"
+                               strokeWidth={2}
+                               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                             />
+                           </svg>
+                           Connect Google Calendar
+                         </>
+                       )}
+                     </Button>
+                     <Button
+                       variant="outline"
+                       size="sm"
+                       onClick={handleManualRefresh}
+                       className="text-xs"
+                     >
+                       <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                       </svg>
+                       Check Status
+                     </Button>
+                   </div>
                  )}
                </div>
              </div>
