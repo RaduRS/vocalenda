@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   DashboardSkeleton,
@@ -27,6 +27,38 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Reset navigation state when pathname actually changes
+  useEffect(() => {
+    if (isNavigating && targetRoute && pathname === targetRoute) {
+      // Route change completed, reset navigation state immediately
+      setIsNavigating(false);
+      setTargetRoute(null);
+      setCurrentSkeleton(null);
+    }
+  }, [pathname, isNavigating, targetRoute]);
+
+  // Clear any existing timeout when navigation state changes
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (isNavigating) {
+      // Fallback timeout in case useEffect doesn't catch the route change
+      timeoutId = setTimeout(() => {
+        if (isNavigating) {
+          setIsNavigating(false);
+          setTargetRoute(null);
+          setCurrentSkeleton(null);
+        }
+      }, 1000);
+    }
+    
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isNavigating]);
+
   const navigateWithSkeleton = (href: string) => {
     // Don't navigate if already on the target route
     if (pathname === href) {
@@ -40,14 +72,6 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     
     // Navigate immediately
     router.push(href);
-    
-    // Reset navigation state after a longer delay to allow skeleton to show
-    // This gives time for the skeleton to be visible and new page to load
-    setTimeout(() => {
-      setIsNavigating(false);
-      setTargetRoute(null);
-      setCurrentSkeleton(null);
-    }, 1500);
   };
 
   return (

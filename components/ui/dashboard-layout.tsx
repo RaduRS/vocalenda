@@ -16,8 +16,9 @@ interface DashboardLayoutProps {
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { isNavigating, currentSkeleton } = useNavigation();
   
+  // Show skeleton during navigation to prevent flashing of current page
   if (isNavigating && currentSkeleton) {
-    return currentSkeleton;
+    return <div className="w-full h-full">{currentSkeleton}</div>;
   }
   
   return <>{children}</>;
