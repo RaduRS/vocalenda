@@ -120,7 +120,8 @@ export async function GET() {
         confirmation_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_confirmation_template : business.business_config?.sms_confirmation_template) || 'Hi {customer_name}, your appointment at {business_name} is confirmed for {date} at {time} for {service_name}. See you then! {business_phone}',
         reminder_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_reminder_template : business.business_config?.sms_reminder_template) || 'Reminder: {customer_name}, you have an appointment at {business_name} tomorrow ({date}) at {time} for {service_name}. See you then! {business_phone}',
         cancellation_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_cancellation_template : business.business_config?.sms_cancellation_template) || 'Hi {customer_name}, your appointment at {business_name} on {date} at {time} for {service_name} has been cancelled. Call {business_phone} to reschedule.'
-      }
+      },
+      bypass_phone_number: (Array.isArray(business.business_config) ? business.business_config[0]?.bypass_phone_number : business.business_config?.bypass_phone_number) || null
     };
 
     return NextResponse.json(comprehensiveData);
@@ -197,6 +198,7 @@ export async function PUT(request: NextRequest) {
         sms_confirmation_template: businessData.sms_configuration?.confirmation_message || null,
         sms_reminder_template: businessData.sms_configuration?.reminder_message || null,
         sms_cancellation_template: businessData.sms_configuration?.cancellation_message || null,
+        bypass_phone_number: businessData.bypass_phone_number || null,
         updated_at: getCurrentUKDateTime().toISOString()
       }, {
         onConflict: 'business_id'

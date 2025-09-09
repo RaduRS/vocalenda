@@ -765,7 +765,7 @@ export default function SetupWizard() {
                                  staffMembers[index] = { ...staff, phone: e.target.value };
                                  handleInputChange('staff_members', staffMembers);
                                }}
-                               placeholder="+1 (555) 123-4567"
+                               placeholder="+44 7123 456789"
                                className="mt-1"
                              />
                            </div>

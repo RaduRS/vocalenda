@@ -1068,7 +1068,7 @@ export default function BusinessSettings() {
                     onChange={(e) =>
                       handleInputChange("bypass_phone_number", e.target.value)
                     }
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+44 7123 456789"
                     className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
