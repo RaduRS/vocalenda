@@ -106,12 +106,13 @@ function Integrations() {
         const now = Date.now();
         
         if (lastActivity && (now - parseInt(lastActivity)) < 120000) { // 2 minutes
-          console.log('Focus detected with recent OAuth activity, forcing refresh...');
-          setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
-          fetchBusinessData(true);
+          console.log('Focus detected with recent OAuth activity, refreshing after delay...');
+          setTimeout(() => {
+            checkGoogleCalendarStatus();
+          }, 2000); // 2 second delay
           sessionStorage.removeItem('lastOAuthActivity');
         } else {
-          fetchBusinessData(true); // Regular cache bypass on focus
+          checkGoogleCalendarStatus(); // Regular refresh on focus
         }
       }
     };
@@ -122,9 +123,10 @@ function Integrations() {
         const now = Date.now();
         
         if (lastActivity && (now - parseInt(lastActivity)) < 120000) { // 2 minutes
-          console.log('Page became visible with recent OAuth activity, forcing refresh...');
-          setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
-          fetchBusinessData(true);
+          console.log('Page became visible with recent OAuth activity, refreshing after delay...');
+          setTimeout(() => {
+            checkGoogleCalendarStatus();
+          }, 2000); // 2 second delay
           sessionStorage.removeItem('lastOAuthActivity');
         }
       }
@@ -137,7 +139,7 @@ function Integrations() {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user, loading, fetchBusinessData]);
+  }, [user, loading, checkGoogleCalendarStatus]);
 
   // OAuth success detection and page refresh
   useEffect(() => {
@@ -151,13 +153,12 @@ function Integrations() {
           
           // If OAuth success was recent (within 60 seconds)
           if (service === 'google_calendar' && (now - timestamp) < 60000) {
-            console.log('Detected OAuth success, updating state and refreshing...');
+            console.log('Detected OAuth success, refreshing after delay...');
             
-            // Immediately update state to connected
-            setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
-            
-            // Force refresh from server
-            fetchBusinessData(true);
+            // Add delay then refresh to allow backend processing
+            setTimeout(() => {
+              checkGoogleCalendarStatus();
+            }, 3000); // 3 second delay
             
             // Clean up
             sessionStorage.removeItem('oauthSuccess');
@@ -174,96 +175,23 @@ function Integrations() {
       const hasCalendarParam = urlParams.has('calendar');
       
       if (hasCalendarParam) {
-        console.log('Detected OAuth return via URL params, refreshing...');
+        console.log('Detected OAuth return via URL params, refreshing after delay...');
         
-        if (urlParams.get('calendar') === 'connected') {
-          setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
-        }
-        
-        fetchBusinessData(true);
+        // Add delay then refresh to allow backend processing
+        setTimeout(() => {
+          checkGoogleCalendarStatus();
+        }, 3000); // 3 second delay
         
         // Clean up URL parameters
         const newUrl = window.location.pathname;
         window.history.replaceState({}, '', newUrl);
-      }
-      
-      // Additional polling for OAuth return detection
-      const lastActivity = sessionStorage.getItem('lastOAuthActivity');
-      if (lastActivity) {
-        const now = Date.now();
-        const activityTime = parseInt(lastActivity);
         
-        // If OAuth activity was recent (within 2 minutes), start polling
-        if ((now - activityTime) < 120000) {
-          console.log('Recent OAuth activity detected, starting polling...');
-          
-          const pollForConnection = () => {
-            checkGoogleCalendarStatus().then(() => {
-              // Check if we're now connected
-              const checkConnection = async () => {
-                try {
-                  const response = await fetch('/api/integrations/google/status');
-                  if (response.ok) {
-                    const data = await response.json();
-                    if (data.google_calendar_connected) {
-                      console.log('Connection detected via polling!');
-                      setBusiness(prev => prev ? {
-                        ...prev,
-                        google_calendar_connected: data.google_calendar_connected,
-                        google_calendar_id: data.google_calendar_id
-                      } : null);
-                      sessionStorage.removeItem('lastOAuthActivity');
-                      return;
-                    }
-                  }
-                } catch (error) {
-                  console.error('Error checking connection:', error);
-                }
-                
-                // Continue polling for up to 30 seconds
-                if ((Date.now() - activityTime) < 30000) {
-                  setTimeout(checkConnection, 1000);
-                }
-              };
-              
-              setTimeout(checkConnection, 500);
-            });
-          };
-          
-          // Start polling immediately and then every 2 seconds
-          pollForConnection();
-          const pollInterval = setInterval(() => {
-            if ((Date.now() - activityTime) < 30000) {
-              pollForConnection();
-            } else {
-              clearInterval(pollInterval);
-              sessionStorage.removeItem('lastOAuthActivity');
-            }
-          }, 2000);
-          
-          // Cleanup interval on unmount
-          return () => clearInterval(pollInterval);
-        }
+        // Clear OAuth activity flag
+        sessionStorage.removeItem('lastOAuthActivity');
       }
     }
-  }, [user, loading, fetchBusinessData, business?.google_calendar_connected]);
-  
-  // Immediate connection check on business data change
-  useEffect(() => {
-    if (business && user && !loading) {
-      const lastActivity = sessionStorage.getItem('lastOAuthActivity');
-      if (lastActivity) {
-        const now = Date.now();
-        const activityTime = parseInt(lastActivity);
-        
-        // If OAuth activity was very recent (within 10 seconds) and we're not connected, force a refresh
-        if ((now - activityTime) < 10000 && !business.google_calendar_connected) {
-          console.log('Very recent OAuth activity with no connection, forcing immediate refresh...');
-          checkGoogleCalendarStatus();
-        }
-      }
-    }
-  }, [business, user, loading, fetchBusinessData]);
+  }, [user, loading, checkGoogleCalendarStatus]);
+
   
   // Listen for OAuth success messages from popup
   useEffect(() => {
@@ -309,8 +237,8 @@ function Integrations() {
         const handleFocusAfterOAuth = () => {
           console.log('Page focused after OAuth, checking connection...');
           setTimeout(() => {
-            fetchBusinessData(true);
-          }, 1000);
+            checkGoogleCalendarStatus();
+          }, 3000); // 3 second delay to allow backend processing
           window.removeEventListener('focus', handleFocusAfterOAuth);
         };
         
@@ -350,11 +278,11 @@ function Integrations() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Immediately update local state
-        setBusiness(prev => prev ? { ...prev, google_calendar_connected: false } : null);
+        // Add delay then refresh to allow backend processing
+        setTimeout(() => {
+          checkGoogleCalendarStatus();
+        }, 2000); // 2 second delay
         
-        // Also fetch fresh data from server
-        await fetchBusinessData(true); // Bypass cache to get fresh data
         setSuccessMessage("Google Calendar disconnected successfully!");
         setShowSuccessModal(true);
       } else {
