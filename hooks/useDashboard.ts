@@ -18,9 +18,19 @@ export interface DashboardStats {
   totalCalls: number;
 }
 
+export interface RecentCall {
+  id: string;
+  customer_name?: string;
+  caller_phone: string;
+  status: 'completed' | 'missed' | 'in_progress';
+  started_at?: string;
+  duration?: number;
+}
+
 export interface DashboardData {
   business: Business | null;
   stats: DashboardStats;
+  recentCalls?: RecentCall[];
 }
 
 const fetchDashboardData = async (): Promise<DashboardData> => {
@@ -42,7 +52,8 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
       todayAppointments: 0,
       totalCustomers: 0,
       totalCalls: 0,
-    }
+    },
+    recentCalls: data.recentCalls || []
   };
 };
 

@@ -3,13 +3,38 @@
 import { useUser } from "@clerk/nextjs";
 import { useState, useMemo, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
-// RefreshCw import removed as it's no longer used
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarElement,
+} from 'chart.js';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DashboardSkeleton } from "@/components/ui/skeleton-loading";
 
-import { useDashboard } from "@/hooks/useDashboard";
+import { useDashboard, type RecentCall } from "@/hooks/useDashboard";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarElement
+);
 
 // Memoized stats card component
 const StatsCard = memo(({ title, value, description }: { title: string; value: number; description: string }) => (
@@ -174,39 +199,174 @@ function Dashboard() {
 
 
 
-        {/* Business Info */}
-        <div className="grid grid-cols-1 gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
-              Business Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-brand-primary-2">
-                  Business Name
-                </p>
-                <p className="text-brand-primary-1">{business.name}</p>
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Appointment Trends - Takes 2 columns on large screens */}
+          <div className="md:col-span-2 lg:col-span-2">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
+                Weekly Activity Overview
+              </h3>
+              <div className="h-48 sm:h-56 md:h-64">
+                <Line
+                  data={{
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                      {
+                        label: 'Appointments',
+                        data: [12, 19, 8, 15, 22, 8, 14],
+                        borderColor: 'rgb(147, 51, 234)',
+                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                        tension: 0.4,
+                      },
+                      {
+                        label: 'Calls',
+                        data: [8, 12, 15, 10, 18, 5, 9],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'top' as const,
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                      },
+                    },
+                  }}
+                />
               </div>
-              <div>
-                <p className="text-sm font-medium text-brand-primary-2">
-                  Phone Number
-                </p>
-                <p className="text-brand-primary-1">{business.phone_number}</p>
+            </Card>
+          </div>
+
+          {/* Call Status Distribution */}
+          <div>
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
+                Call Status
+              </h3>
+              <div className="h-48 sm:h-56 md:h-64">
+                <Doughnut
+                  data={{
+                    labels: ['Completed', 'Missed', 'In Progress'],
+                    datasets: [
+                      {
+                        data: [65, 25, 10],
+                        backgroundColor: [
+                          'rgba(34, 197, 94, 0.8)',
+                          'rgba(239, 68, 68, 0.8)',
+                          'rgba(251, 191, 36, 0.8)',
+                        ],
+                        borderColor: [
+                          'rgba(34, 197, 94, 1)',
+                          'rgba(239, 68, 68, 1)',
+                          'rgba(251, 191, 36, 1)',
+                        ],
+                        borderWidth: 2,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: 'bottom' as const,
+                      },
+                    },
+                  }}
+                />
               </div>
-              <div>
-                <p className="text-sm font-medium text-brand-primary-2">
-                  Email
-                </p>
-                <p className="text-brand-primary-1">{business.email}</p>
+            </Card>
+          </div>
+
+          {/* Monthly Growth */}
+          <div>
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
+                Monthly Growth
+              </h3>
+              <div className="h-48 sm:h-56 md:h-64">
+                <Bar
+                  data={{
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                      {
+                        label: 'New Customers',
+                        data: [12, 18, 15, 25, 22, 30],
+                        backgroundColor: 'rgba(147, 51, 234, 0.8)',
+                        borderColor: 'rgba(147, 51, 234, 1)',
+                        borderWidth: 1,
+                      },
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                      },
+                    },
+                  }}
+                />
               </div>
-              <div>
-                <p className="text-sm font-medium text-brand-primary-2">
-                  Address
-                </p>
-                <p className="text-brand-primary-1">{business.address}</p>
+            </Card>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="md:col-span-2 lg:col-span-2">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
+                Recent Activity
+              </h3>
+              <div className="space-y-3">
+                {data?.recentCalls?.slice(0, 4).map((call: RecentCall, index: number) => (
+                  <div key={call.id || index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                       <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                         call.status === 'completed' ? 'bg-green-500' :
+                         call.status === 'missed' ? 'bg-red-500' : 'bg-yellow-500'
+                       }`}></div>
+                       <div className="min-w-0 flex-1">
+                         <p className="text-sm font-medium text-brand-primary-1 truncate">
+                           {call.customer_name || 'Unknown Caller'}
+                         </p>
+                         <p className="text-xs text-brand-primary-2 truncate">
+                           {call.caller_phone}
+                         </p>
+                       </div>
+                     </div>
+                     <div className="text-left sm:text-right flex-shrink-0">
+                       <p className="text-xs text-brand-primary-2">
+                         {call.started_at ? new Date(call.started_at).toLocaleDateString() : 'N/A'}
+                       </p>
+                       <p className="text-xs text-brand-primary-2">
+                         {call.duration ? `${Math.floor(call.duration / 60)}:${(call.duration % 60).toString().padStart(2, '0')}` : 'N/A'}
+                       </p>
+                     </div>
+                  </div>
+                )) || (
+                  <div className="text-center py-8 text-brand-primary-2">
+                    <p>No recent activity</p>
+                  </div>
+                )}
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
