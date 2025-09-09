@@ -87,6 +87,32 @@ function Integrations() {
     return () => window.removeEventListener('focus', handleFocus);
   }, [user, loading, fetchBusinessData]);
 
+  // Immediate refresh when component mounts (for OAuth returns)
+  useEffect(() => {
+    if (user && !loading) {
+      // Check multiple indicators that we returned from OAuth
+      const lastActivity = sessionStorage.getItem('lastOAuthActivity');
+      const now = Date.now();
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasCalendarParam = urlParams.has('calendar');
+      const referrer = document.referrer;
+      const isFromGoogle = referrer.includes('accounts.google.com') || referrer.includes('oauth');
+      
+      // If we have recent OAuth activity, URL params, or came from Google, refresh immediately
+      if ((lastActivity && (now - parseInt(lastActivity)) < 30000) || hasCalendarParam || isFromGoogle) {
+        console.log('Detected OAuth return, refreshing integration status...');
+        fetchBusinessData(true);
+        sessionStorage.removeItem('lastOAuthActivity');
+        
+        // Clean up URL parameters
+        if (hasCalendarParam) {
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+        }
+      }
+    }
+  }, [user, loading, fetchBusinessData]);
+
   const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
     try {
@@ -101,6 +127,8 @@ function Integrations() {
       const data = await response.json();
 
       if (data.authUrl) {
+        // Store timestamp for OAuth activity detection
+        sessionStorage.setItem('lastOAuthActivity', Date.now().toString());
         window.location.href = data.authUrl;
       } else {
         throw new Error(data.error || "Failed to get OAuth URL");

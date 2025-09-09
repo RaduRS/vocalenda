@@ -56,27 +56,25 @@ function SidebarButton({
   };
 
   return (
-    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      <Link href={href} onClick={handleClick}>
-        <Button
-          variant={isActive ? "default" : "ghost"}
+    <Link href={href} onClick={handleClick} className="block">
+      <Button
+        variant={isActive ? "default" : "ghost"}
+        className={cn(
+          "w-full justify-start h-12 px-4 text-left transition-colors duration-150",
+          isActive
+            ? "bg-brand-primary-1 text-white shadow-md"
+            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
+        )}
+      >
+        <Icon
           className={cn(
-            "w-full justify-start h-12 px-4 text-left transition-all duration-200",
-            isActive
-              ? "bg-brand-primary-1 text-white shadow-md"
-              : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
+            "mr-3 h-5 w-5",
+            isActive ? "text-white" : "text-gray-500"
           )}
-        >
-          <Icon
-            className={cn(
-              "mr-3 h-5 w-5",
-              isActive ? "text-white" : "text-gray-500"
-            )}
-          />
-          <span className="font-medium text-sm">{label}</span>
-        </Button>
-      </Link>
-    </motion.div>
+        />
+        <span className="font-medium text-sm">{label}</span>
+      </Button>
+    </Link>
   );
 }
 
@@ -94,7 +92,9 @@ export default function Sidebar({
   useEffect(() => {
     const fetchBusinessData = async () => {
       try {
-        const response = await fetch("/api/dashboard");
+        const response = await fetch("/api/dashboard", {
+          cache: 'force-cache'
+        });
         if (response.ok) {
           const data = await response.json();
           setBusiness(data.business);
@@ -104,10 +104,10 @@ export default function Sidebar({
       }
     };
 
-    if (user) {
+    if (user && !business) {
       fetchBusinessData();
     }
-  }, [user]);
+  }, [user, business]);
 
   // handleNavigation function removed - using navigation context instead
 
