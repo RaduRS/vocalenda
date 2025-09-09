@@ -36,13 +36,15 @@ function Integrations() {
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const fetchBusinessData = useCallback(async () => {
+  const fetchBusinessData = useCallback(async (bypassCache = false) => {
     try {
       const response = await fetch('/api/dashboard', {
-        next: { revalidate: 30 },
+        next: { revalidate: bypassCache ? 0 : 30 },
         headers: {
-          'Cache-Control': 'max-age=30, stale-while-revalidate=60',
+          'Cache-Control': bypassCache ? 'no-cache' : 'max-age=30, stale-while-revalidate=60',
         },
       });
       
@@ -73,6 +75,18 @@ function Integrations() {
       loadData();
     }
   }, [user, fetchBusinessData]);
+
+  // Refresh data when user returns from OAuth or page gains focus
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user && !loading) {
+        fetchBusinessData(true); // Bypass cache to get fresh connection status
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user, loading, fetchBusinessData]);
 
   const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
@@ -121,8 +135,9 @@ function Integrations() {
 
       if (response.ok && data.success) {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        await fetchBusinessData();
-        alert("Google Calendar disconnected successfully!");
+        await fetchBusinessData(true); // Bypass cache to get fresh data
+        setSuccessMessage("Google Calendar disconnected successfully!");
+        setShowSuccessModal(true);
       } else {
         throw new Error(data.error || "Failed to disconnect Google Calendar");
       }
@@ -257,9 +272,9 @@ function Integrations() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                  </div>
-                ) : (
-                  <Dialog open={showConnectModal} onOpenChange={setShowConnectModal}>
+                   </div>
+                 ) : (
+                   <Dialog open={showConnectModal} onOpenChange={setShowConnectModal}>
                     <DialogTrigger asChild>
                       <Button
                         disabled={connectingCalendar}
@@ -309,16 +324,32 @@ function Integrations() {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-                )}
-              </div>
-            </div>
-          </Card>
-        </div>
+                 )}
+               </div>
+             </div>
+           </Card>
+         </div>
 
+         {/* Success Modal */}
+         <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+           <DialogContent>
+             <DialogHeader>
+               <DialogTitle>Success</DialogTitle>
+               <DialogDescription>
+                 {successMessage}
+               </DialogDescription>
+             </DialogHeader>
+             <DialogFooter>
+               <Button onClick={() => setShowSuccessModal(false)}>
+                 OK
+               </Button>
+             </DialogFooter>
+           </DialogContent>
+         </Dialog>
 
-      </div>
-    </div>
-  );
-}
+       </div>
+     </div>
+   );
+ }
 
 export default memo(Integrations);
