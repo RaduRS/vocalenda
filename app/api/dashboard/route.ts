@@ -50,7 +50,7 @@ export async function GET() {
     // Optimize database queries with fewer parallel requests
     const today = formatISODate(getCurrentUKDate());
     
-    const [appointmentsResult, customersResult, callsResult, todayAppointmentsResult, recentCallsResult] = await Promise.all([
+    const [appointmentsResult, customersResult, callsResult, todayAppointmentsResult] = await Promise.all([
       // Total appointments
       supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId),
       // Total customers  
@@ -58,8 +58,11 @@ export async function GET() {
       // Total calls
       supabase.from('call_logs').select('id', { count: 'exact' }).eq('business_id', businessId),
       // Today's appointments (excluding cancelled)
-      supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId).eq('appointment_date', today).neq('status', 'cancelled'),
-      // Recent call logs with customer info joined by phone number
+      supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId).eq('appointment_date', today).neq('status', 'cancelled')
+    ]);
+
+    // Get recent call logs and customers separately to match by phone
+    const [recentCallsResult, dashboardCustomersResult] = await Promise.all([
       supabase
         .from('call_logs')
         .select(`
@@ -68,45 +71,52 @@ export async function GET() {
           status,
           started_at,
           ended_at,
-          twilio_call_sid,
           duration_seconds,
-          intent_detected
+          intent_detected,
+          twilio_call_sid
         `)
         .eq('business_id', businessId)
         .order('started_at', { ascending: false })
-        .limit(8)
+        .limit(8),
+      supabase
+        .from('customers')
+        .select('phone, first_name, last_name')
+        .eq('business_id', businessId)
     ]);
 
-    // Get customers for phone number lookup
-    const { data: customersData } = await supabase
-      .from('customers')
-      .select('phone, first_name, last_name')
-      .eq('business_id', businessId);
-
-    // Create phone to customer name mapping
+    // Create a phone number to customer mapping
     const phoneToCustomer = new Map();
-    (customersData || []).forEach(customer => {
-      if (customer.phone) {
-        phoneToCustomer.set(customer.phone, `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || null);
-      }
-    });
+    if (dashboardCustomersResult.data) {
+      dashboardCustomersResult.data.forEach(customer => {
+        if (customer.phone) {
+          phoneToCustomer.set(customer.phone, customer);
+        }
+      });
+    }
 
-    // Process recent calls data with customer name lookup
-     const recentCalls = (recentCallsResult.data || []).map(call => ({
-       id: call.id,
-       caller_phone: call.caller_phone,
-       status: call.status,
-       started_at: call.started_at,
-       ended_at: call.ended_at,
-       duration_seconds: call.duration_seconds,
-       duration: call.started_at && call.ended_at 
-         ? Math.round((new Date(call.ended_at).getTime() - new Date(call.started_at).getTime()) / 1000)
-         : call.duration_seconds,
-       customer_name: phoneToCustomer.get(call.caller_phone) || null,
-       intent_detected: call.intent_detected,
-       twilio_call_sid: call.twilio_call_sid,
-       created_at: call.started_at
-     }));
+    // Process recent calls data
+    const recentCalls = (recentCallsResult.data || []).map(call => {
+      // Find customer by matching phone number
+      const customer = phoneToCustomer.get(call.caller_phone);
+      
+      return {
+        id: call.id,
+        caller_phone: call.caller_phone,
+        status: call.status,
+        started_at: call.started_at,
+        ended_at: call.ended_at,
+        duration_seconds: call.duration_seconds,
+        duration: call.started_at && call.ended_at 
+          ? Math.round((new Date(call.ended_at).getTime() - new Date(call.started_at).getTime()) / 1000)
+          : call.duration_seconds,
+        customer_name: customer 
+          ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || null
+          : null,
+        intent_detected: call.intent_detected,
+        twilio_call_sid: call.twilio_call_sid,
+        created_at: call.started_at
+      };
+    });
 
     // Get appointment status distribution
     const { data: appointmentStatusData } = await supabase

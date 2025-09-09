@@ -34,12 +34,7 @@ export async function GET() {
         ended_at,
         duration_seconds,
         twilio_call_sid,
-        transcript,
-        customers (
-          first_name,
-          last_name,
-          phone
-        )
+        transcript
       `)
       .eq('business_id', businessId)
       .order('started_at', { ascending: false });
@@ -49,22 +44,47 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch call logs' }, { status: 500 });
     }
 
+    // Get all customers for this business to match by phone number
+    const { data: customers, error: customersError } = await supabaseAdmin
+      .from('customers')
+      .select('phone, first_name, last_name')
+      .eq('business_id', businessId);
+
+    if (customersError) {
+      console.error('Error fetching customers:', customersError);
+    }
+
+    // Create a phone number to customer mapping
+    const phoneToCustomer = new Map();
+    if (customers) {
+      customers.forEach(customer => {
+        if (customer.phone) {
+          phoneToCustomer.set(customer.phone, customer);
+        }
+      });
+    }
+
     // Process call logs data to match expected format
-    const processedCallLogs = (callLogs || []).map(call => ({
-      id: call.id,
-      caller_phone: call.caller_phone,
-      status: call.status,
-      started_at: call.started_at,
-      ended_at: call.ended_at,
-      duration: call.started_at && call.ended_at 
-        ? Math.round((new Date(call.ended_at).getTime() - new Date(call.started_at).getTime()) / 1000)
-        : call.duration_seconds,
-      customer_name: call.customers 
-        ? `${call.customers.first_name || ''} ${call.customers.last_name || ''}`.trim() || null
-        : null,
-      twilio_call_sid: call.twilio_call_sid,
-      transcript: call.transcript
-    }));
+    const processedCallLogs = (callLogs || []).map(call => {
+      // Find customer by matching phone number
+      const customer = phoneToCustomer.get(call.caller_phone);
+      
+      return {
+        id: call.id,
+        caller_phone: call.caller_phone,
+        status: call.status,
+        started_at: call.started_at,
+        ended_at: call.ended_at,
+        duration: call.started_at && call.ended_at 
+          ? Math.round((new Date(call.ended_at).getTime() - new Date(call.started_at).getTime()) / 1000)
+          : call.duration_seconds,
+        customer_name: customer 
+          ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || null
+          : null,
+        twilio_call_sid: call.twilio_call_sid,
+        transcript: call.transcript
+      };
+    });
 
     return NextResponse.json({
       callLogs: processedCallLogs
