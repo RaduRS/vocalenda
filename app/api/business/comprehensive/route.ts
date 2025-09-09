@@ -114,7 +114,13 @@ export async function GET() {
         cancellation_policy: 'Appointments can be cancelled up to 24 hours in advance',
         advance_booking_days: 30,
         min_advance_hours: 2
-      })
+      }),
+      sms_configuration: {
+        enabled: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_enabled : business.business_config?.sms_enabled) || false,
+        confirmation_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_confirmation_template : business.business_config?.sms_confirmation_template) || 'Hi {customer_name}, your appointment at {business_name} is confirmed for {date} at {time} for {service_name}. See you then! {business_phone}',
+        reminder_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_reminder_template : business.business_config?.sms_reminder_template) || 'Reminder: {customer_name}, you have an appointment at {business_name} tomorrow ({date}) at {time} for {service_name}. See you then! {business_phone}',
+        cancellation_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_cancellation_template : business.business_config?.sms_cancellation_template) || 'Hi {customer_name}, your appointment at {business_name} on {date} at {time} for {service_name} has been cancelled. Call {business_phone} to reschedule.'
+      }
     };
 
     return NextResponse.json(comprehensiveData);
@@ -187,6 +193,10 @@ export async function PUT(request: NextRequest) {
         restricted_ai_topics: businessData.ai_configuration.restricted_topics,
         ai_prompt: businessData.ai_configuration.custom_prompt,
         greeting_message: businessData.ai_configuration.greeting,
+        sms_enabled: businessData.sms_configuration?.enabled || false,
+        sms_confirmation_template: businessData.sms_configuration?.confirmation_message || null,
+        sms_reminder_template: businessData.sms_configuration?.reminder_message || null,
+        sms_cancellation_template: businessData.sms_configuration?.cancellation_message || null,
         updated_at: getCurrentUKDateTime().toISOString()
       }, {
         onConflict: 'business_id'

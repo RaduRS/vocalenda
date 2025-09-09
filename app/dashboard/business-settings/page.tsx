@@ -22,6 +22,7 @@ import {
   Edit3,
   FileText,
   Bot,
+  MessageSquare,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -31,6 +32,8 @@ import {
   Holiday,
   PaymentMethod,
   paymentMethodLabels,
+  SMSConfiguration,
+  defaultSMSConfiguration,
 } from "@/lib/types";
 
 export default function BusinessSettings() {
@@ -58,6 +61,7 @@ export default function BusinessSettings() {
       greeting: "Thank you for calling, how can I help you today?",
       response_mode: "flexible",
     },
+    sms_configuration: defaultSMSConfiguration,
     customer_notes_enabled: true,
     booking_policies: {
       cancellation_policy:
@@ -73,7 +77,7 @@ export default function BusinessSettings() {
   });
 
   const [activeTab, setActiveTab] = useState<
-    "basic" | "hours" | "services" | "staff" | "holidays" | "ai"
+    "basic" | "hours" | "services" | "staff" | "holidays" | "ai" | "sms"
   >("basic");
 
   useEffect(() => {
@@ -304,6 +308,7 @@ export default function BusinessSettings() {
                     | "staff"
                     | "holidays"
                     | "ai"
+                    | "sms"
                 )
               }
               className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900"
@@ -314,6 +319,7 @@ export default function BusinessSettings() {
               <option value="staff">👥 Staff</option>
               <option value="holidays">📅 Holidays</option>
               <option value="ai">🤖 AI & Policies</option>
+              <option value="sms">💬 SMS Messages</option>
             </select>
           </div>
 
@@ -326,6 +332,7 @@ export default function BusinessSettings() {
               { id: "staff", label: "Staff", icon: Users },
               { id: "holidays", label: "Holidays", icon: Calendar },
               { id: "ai", label: "AI & Policies", icon: Bot },
+              { id: "sms", label: "SMS Messages", icon: MessageSquare },
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -340,6 +347,7 @@ export default function BusinessSettings() {
                         | "staff"
                         | "holidays"
                         | "ai"
+                        | "sms"
                     )
                   }
                   className={`flex items-center space-x-1 lg:space-x-2 py-4 px-2 lg:px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
@@ -1038,6 +1046,137 @@ export default function BusinessSettings() {
                     rows={5}
                   />
                 </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* SMS Messages Tab */}
+        {activeTab === "sms" && (
+          <div className="space-y-6">
+            <Card className="p-8 bg-white shadow-sm border border-gray-200">
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+                    <MessageSquare className="w-5 h-5 text-blue-600" />
+                  </div>
+                  SMS Messages
+                </h3>
+                <p className="text-gray-600">
+                  Configure automated SMS messages for appointment confirmations, reminders, and cancellations
+                </p>
+              </div>
+
+              <div className="space-y-8">
+                {/* SMS Enable/Disable Toggle */}
+                <div className="p-6 bg-gradient-to-r from-blue-50 to-white rounded-xl border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">SMS Notifications</h4>
+                      <p className="text-sm text-gray-600">Enable or disable SMS notifications for your customers</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={businessData.sms_configuration?.enabled || false}
+                        onChange={(e) =>
+                          handleInputChange("sms_configuration", {
+                            ...businessData.sms_configuration,
+                            enabled: e.target.checked,
+                          })
+                        }
+                        className="sr-only"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* SMS Message Templates */}
+                {businessData.sms_configuration?.enabled && (
+                  <>
+                    {/* Confirmation Message */}
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                          <MessageSquare className="w-4 h-4 text-green-600" />
+                        </div>
+                        <Label className="text-lg font-semibold text-gray-900">
+                          Confirmation Message
+                        </Label>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Message sent when an appointment is confirmed. Available variables: {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{duration}'}, {'{business_phone}'}
+                      </p>
+                      <Textarea
+                        value={businessData.sms_configuration?.confirmation_message || ""}
+                        onChange={(e) =>
+                          handleInputChange("sms_configuration", {
+                            ...businessData.sms_configuration,
+                            confirmation_message: e.target.value,
+                          })
+                        }
+                        placeholder="Hi {customer_name}, your appointment at {business_name} is confirmed for {date} at {time} for {service_name}. Duration: {duration} mins. Questions? Call {business_phone}"
+                        className="min-h-[100px] border-gray-200 focus:border-green-500 focus:ring-green-500 resize-none"
+                        rows={4}
+                      />
+                    </div>
+
+                    {/* Reminder Message */}
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                          <MessageSquare className="w-4 h-4 text-amber-600" />
+                        </div>
+                        <Label className="text-lg font-semibold text-gray-900">
+                          Reminder Message
+                        </Label>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Message sent as appointment reminder. Available variables: {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{business_phone}'}
+                      </p>
+                      <Textarea
+                        value={businessData.sms_configuration?.reminder_message || ""}
+                        onChange={(e) =>
+                          handleInputChange("sms_configuration", {
+                            ...businessData.sms_configuration,
+                            reminder_message: e.target.value,
+                          })
+                        }
+                        placeholder="Reminder: {customer_name}, you have an appointment at {business_name} tomorrow ({date}) at {time} for {service_name}. See you then! {business_phone}"
+                        className="min-h-[100px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 resize-none"
+                        rows={4}
+                      />
+                    </div>
+
+                    {/* Cancellation Message */}
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                          <MessageSquare className="w-4 h-4 text-red-600" />
+                        </div>
+                        <Label className="text-lg font-semibold text-gray-900">
+                          Cancellation Message
+                        </Label>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Message sent when an appointment is cancelled. Available variables: {'{customer_name}'}, {'{business_name}'}, {'{date}'}, {'{time}'}, {'{service_name}'}, {'{business_phone}'}
+                      </p>
+                      <Textarea
+                        value={businessData.sms_configuration?.cancellation_message || ""}
+                        onChange={(e) =>
+                          handleInputChange("sms_configuration", {
+                            ...businessData.sms_configuration,
+                            cancellation_message: e.target.value,
+                          })
+                        }
+                        placeholder="Hi {customer_name}, your appointment at {business_name} on {date} at {time} for {service_name} has been cancelled. To reschedule, call {business_phone}"
+                        className="min-h-[100px] border-gray-200 focus:border-red-500 focus:ring-red-500 resize-none"
+                        rows={4}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
           </div>

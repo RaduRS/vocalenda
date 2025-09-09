@@ -104,6 +104,10 @@ export type Database = {
           ai_response_mode: string | null
           allowed_ai_topics: string[] | null
           restricted_ai_topics: string[] | null
+          sms_enabled: boolean | null
+          sms_confirmation_template: string | null
+          sms_reminder_template: string | null
+          sms_cancellation_template: string | null
           created_at: string
           updated_at: string
         }
@@ -118,6 +122,10 @@ export type Database = {
           ai_response_mode?: string | null
           allowed_ai_topics?: string[] | null
           restricted_ai_topics?: string[] | null
+          sms_enabled?: boolean | null
+          sms_confirmation_template?: string | null
+          sms_reminder_template?: string | null
+          sms_cancellation_template?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -132,6 +140,10 @@ export type Database = {
           ai_response_mode?: string | null
           allowed_ai_topics?: string[] | null
           restricted_ai_topics?: string[] | null
+          sms_enabled?: boolean | null
+          sms_confirmation_template?: string | null
+          sms_reminder_template?: string | null
+          sms_cancellation_template?: string | null
           created_at?: string
           updated_at?: string
         }

@@ -59,6 +59,13 @@ export interface AIConfiguration {
   custom_prompt?: string;
 }
 
+export interface SMSConfiguration {
+  confirmation_message?: string;
+  reminder_message?: string;
+  cancellation_message?: string;
+  enabled: boolean;
+}
+
 export interface ComprehensiveBusinessData {
   // Section 1: Business Basics
   name: string;
@@ -77,6 +84,7 @@ export interface ComprehensiveBusinessData {
 
   // Section 4: AI & Booking Rules
   ai_configuration: AIConfiguration;
+  sms_configuration?: SMSConfiguration;
   customer_notes_enabled: boolean;
   booking_policies: BookingPolicies;
 
@@ -138,6 +146,13 @@ export const defaultAIConfiguration: AIConfiguration = {
   key_information: "",
   allowed_topics: [],
   restricted_topics: [],
+};
+
+export const defaultSMSConfiguration: SMSConfiguration = {
+  confirmation_message: "Hi {customer_name}, your appointment at {business_name} is confirmed for {date} at {time} for {service_name}. Duration: {duration} mins. Questions? Call {business_phone}",
+  reminder_message: "Reminder: {customer_name}, you have an appointment at {business_name} tomorrow ({date}) at {time} for {service_name}. See you then! {business_phone}",
+  cancellation_message: "Hi {customer_name}, your appointment at {business_name} on {date} at {time} for {service_name} has been cancelled. To reschedule, call {business_phone}",
+  enabled: true,
 };
 
 export const defaultBookingPolicies: BookingPolicies = {
