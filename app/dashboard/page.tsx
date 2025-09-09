@@ -335,13 +335,13 @@ function Dashboard() {
                            data.stats?.appointmentStatusCounts?.cancelled || 0
                          ],
                          backgroundColor: [
-                           'rgba(251, 146, 60, 0.8)', // Orange
-                           'rgba(20, 184, 166, 0.8)', // Teal
-                         ],
-                         borderColor: [
-                           'rgba(251, 146, 60, 1)', // Orange
-                           'rgba(20, 184, 166, 1)', // Teal
-                         ],
+                            'rgba(20, 184, 166, 0.8)', // Teal
+                            'rgba(251, 146, 60, 0.8)', // Orange
+                          ],
+                          borderColor: [
+                            'rgba(20, 184, 166, 1)', // Teal
+                            'rgba(251, 146, 60, 1)', // Orange
+                          ],
                          borderWidth: 2,
                        },
                      ],

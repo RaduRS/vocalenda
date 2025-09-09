@@ -148,74 +148,91 @@ function Appointments() {
 
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {appointments.map((appointment) => (
-                  <div key={appointment.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        {/* Date and Time - Stack on mobile */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                            <span className="font-medium text-gray-900 text-sm sm:text-base">
-                              {formatDate(appointment.date)}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                            <span className="text-gray-600 text-sm">
-                              {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
-                            </span>
-                          </div>
+                  <Card key={appointment.id} className="p-6 hover:shadow-lg transition-all duration-200 border-l-4 border-l-brand-secondary-1">
+                    {/* Header with Date, Time and Status */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 pb-4 border-b border-gray-100">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3 sm:mb-0">
+                        <div className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg">
+                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <span className="font-semibold text-blue-900">
+                            {formatDate(appointment.date)}
+                          </span>
                         </div>
-                        
-                        {/* Customer and Service Info - Stack on mobile */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          <div className="min-w-0">
-                            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base truncate">
-                              {appointment.customer?.name || 'Unknown Customer'}
-                            </h3>
+                        <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
+                          <Clock className="w-4 h-4 text-gray-600" />
+                          <span className="text-gray-700 font-medium">
+                            {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold ${getStatusColor(appointment.status)} self-start sm:self-center`}>
+                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).replace('_', ' ')}
+                      </span>
+                    </div>
+                    
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Customer Information */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Customer</h4>
+                          <h3 className="text-xl font-bold text-gray-900 mb-3">
+                            {appointment.customer?.name || 'Unknown Customer'}
+                          </h3>
+                          <div className="space-y-2">
                             {appointment.customer?.phone && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                                <Phone className="w-3 h-3 flex-shrink-0" />
-                                <span className="truncate">{appointment.customer.phone}</span>
+                              <div className="flex items-center gap-3 text-gray-600">
+                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                  <Phone className="w-4 h-4 text-green-600" />
+                                </div>
+                                <span className="font-medium">{appointment.customer.phone}</span>
                               </div>
                             )}
                             {appointment.customer?.email && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <Mail className="w-3 h-3 flex-shrink-0" />
-                                <span className="truncate">{appointment.customer.email}</span>
+                              <div className="flex items-center gap-3 text-gray-600">
+                                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                  <Mail className="w-4 h-4 text-purple-600" />
+                                </div>
+                                <span className="font-medium truncate">{appointment.customer.email}</span>
                               </div>
                             )}
-                          </div>
-                          
-                          <div className="min-w-0">
-                            {appointment.service && (
-                              <div className="mb-2">
-                                <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{appointment.service.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  {appointment.service.duration} minutes • 
-                                  {appointment.service.currency === 'GBP' ? '£' : '$'}{appointment.service.price}
-                                </p>
-                              </div>
-                            )}
-                            {appointment.notes && (
-                               <p className="text-sm text-gray-600 italic line-clamp-2">
-                                 &ldquo;{appointment.notes}&rdquo;
-                               </p>
-                             )}
                           </div>
                         </div>
                       </div>
                       
-                      {/* Status Badge - Full width on mobile, aligned right on larger screens */}
-                      <div className="flex justify-start sm:justify-end">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
-                          {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).replace('_', ' ')}
-                        </span>
+                      {/* Service Information */}
+                      <div className="space-y-4">
+                        {appointment.service && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Service</h4>
+                            <div className="bg-gradient-to-r from-brand-secondary-1/10 to-brand-primary-1/10 p-4 rounded-lg">
+                              <h3 className="text-lg font-bold text-gray-900 mb-2">{appointment.service.name}</h3>
+                              <div className="flex items-center gap-4 text-sm">
+                                <span className="bg-white px-3 py-1 rounded-full font-semibold text-gray-700">
+                                  {appointment.service.duration} min
+                                </span>
+                                <span className="bg-white px-3 py-1 rounded-full font-semibold text-green-700">
+                                  {appointment.service.currency === 'GBP' ? '£' : '$'}{appointment.service.price}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {appointment.notes && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">Notes</h4>
+                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-r-lg">
+                              <p className="text-gray-700 italic">
+                                &ldquo;{appointment.notes}&rdquo;
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             </div>
