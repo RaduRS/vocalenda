@@ -158,12 +158,12 @@ export default function CallLogsPage() {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-brand-primary-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-brand-primary-1">
                   AI Call History
                 </h1>
-                <p className="text-brand-primary-2">
+                <p className="text-brand-primary-2 text-sm sm:text-base">
                   Complete history of all AI-handled calls
                 </p>
               </div>
@@ -172,7 +172,7 @@ export default function CallLogsPage() {
                 {callLogs.length > 0 && (
                   <Button
                     onClick={handleExport}
-                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 flex items-center gap-2"
+                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 flex items-center justify-center gap-2 text-sm sm:text-base flex-shrink-0 w-full sm:w-auto"
                   >
                     <Download className="h-4 w-4" />
                     Export CSV
@@ -217,8 +217,8 @@ export default function CallLogsPage() {
                     key={call.id}
                     className="border rounded-lg overflow-hidden"
                   >
-                    <div className="flex items-center justify-between p-4 hover:bg-brand-primary-2/5 transition-colors">
-                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-3 p-4 hover:bg-brand-primary-2/5 transition-colors">
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
                         <div className="flex-shrink-0">
                           <div className="w-10 h-10 bg-brand-secondary-1/10 rounded-full flex items-center justify-center">
                             <Phone className="h-5 w-5 text-brand-secondary-1" />
@@ -226,26 +226,26 @@ export default function CallLogsPage() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-brand-primary-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                            <span className="font-medium text-brand-primary-1 text-sm sm:text-base truncate">
                               {call.customer_name?.trim()
                                 ? call.customer_name.trim().split(" ")[0]
                                 : "Unknown Caller"}
                             </span>
-                            <Badge className={getStatusColor(call.status)}>
+                            <Badge className={`${getStatusColor(call.status)} w-fit`}>
                               {call.status.replace("_", " ")}
                             </Badge>
                           </div>
 
-                          <div className="flex items-center gap-4 text-sm text-brand-primary-2">
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-brand-primary-2">
+                            <span className="flex items-center gap-1 truncate">
+                              <User className="h-3 w-3 flex-shrink-0" />
                               {formatPhoneNumber(call.caller_phone)}
                             </span>
 
                             {call.duration !== null && (
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
+                              <span className="flex items-center gap-1 whitespace-nowrap">
+                                <Clock className="h-3 w-3 flex-shrink-0" />
                                 {formatDuration(call.duration)}
                               </span>
                             )}
@@ -253,9 +253,9 @@ export default function CallLogsPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <div className="text-sm text-brand-primary-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div className="text-left sm:text-right">
+                          <div className="text-sm text-brand-primary-2 whitespace-nowrap">
                             {formatTimestamp(call.started_at)}
                           </div>
                         </div>
@@ -271,7 +271,7 @@ export default function CallLogsPage() {
                                 expandedTranscript
                               )
                             }
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 text-sm flex-shrink-0 w-full sm:w-auto justify-center"
                           >
                             <MessageSquare className="h-4 w-4" />
                             Transcript
@@ -288,7 +288,7 @@ export default function CallLogsPage() {
                     {/* Expandable Transcript Section */}
                     {expandedTranscript === call.id && call.transcript && (
                       <div className="border-t bg-gray-50 p-4">
-                        <h4 className="font-medium text-brand-primary-1 mb-4 flex items-center gap-2">
+                        <h4 className="font-medium text-brand-primary-1 mb-4 flex items-center gap-2 text-sm sm:text-base">
                           <MessageSquare className="h-4 w-4" />
                           Conversation with{" "}
                           {call.customer_name
@@ -315,13 +315,13 @@ export default function CallLogsPage() {
                                     </div>
                                   )}
                                   <div
-                                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                    className={`max-w-xs sm:max-w-sm lg:max-w-md px-4 py-2 rounded-lg break-words overflow-hidden ${
                                       entry.speaker === "User"
                                         ? "bg-blue-500 text-white rounded-br-none"
                                         : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                                     }`}
                                   >
-                                    <div className="text-sm">
+                                    <div className="text-sm break-words">
                                       {entry.message}
                                     </div>
                                   </div>

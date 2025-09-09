@@ -152,13 +152,13 @@ function Customers() {
               <div className="space-y-4">
                 {customers.map((customer) => (
                   <div key={customer.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                      <div className="flex items-start space-x-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                           <User className="w-5 h-5 text-blue-600" />
                         </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">
                             {(() => {
                               const firstName = customer.firstName?.trim();
                               const lastName = customer.lastName?.trim();
@@ -175,30 +175,30 @@ function Customers() {
                             })()
                             }
                           </h4>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mt-1">
                             {customer.phone && (
-                              <div className="flex items-center space-x-1">
-                                <Phone className="w-3 h-3" />
-                                <span>{customer.phone}</span>
+                              <div className="flex items-center gap-1">
+                                <Phone className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{customer.phone}</span>
                               </div>
                             )}
                             {customer.email && (
-                              <div className="flex items-center space-x-1">
-                                <Mail className="w-3 h-3" />
-                                <span>{customer.email}</span>
+                              <div className="flex items-center gap-1">
+                                <Mail className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{customer.email}</span>
                               </div>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="text-right text-sm text-gray-600">
-                        <p>{customer.appointmentCount || 0} appointments</p>
+                      <div className="text-left sm:text-right text-sm text-gray-600 flex-shrink-0">
+                        <p className="font-medium">{customer.appointmentCount || 0} appointments</p>
                         <p>Added {customer.createdAt ? format(new Date(customer.createdAt), 'MMM d, yyyy') : 'N/A'}</p>
                       </div>
                     </div>
                     {customer.notes && (
-                      <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                        {customer.notes}
+                      <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                        <div className="break-words">{customer.notes}</div>
                       </div>
                     )}
                   </div>

@@ -151,46 +151,48 @@ function Appointments() {
               <div className="space-y-4">
                 {appointments.map((appointment) => (
                   <div key={appointment.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        {/* Date and Time - Stack on mobile */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
                           <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-gray-500" />
-                            <span className="font-medium text-gray-900">
+                            <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                            <span className="font-medium text-gray-900 text-sm sm:text-base">
                               {formatDate(appointment.date)}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-gray-500" />
-                            <span className="text-gray-600">
+                            <Clock className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                            <span className="text-gray-600 text-sm">
                               {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
                             </span>
                           </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 mb-1">
+                        {/* Customer and Service Info - Stack on mobile */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base truncate">
                               {appointment.customer?.name || 'Unknown Customer'}
                             </h3>
                             {appointment.customer?.phone && (
                               <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                                <Phone className="w-3 h-3" />
-                                <span>{appointment.customer.phone}</span>
+                                <Phone className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{appointment.customer.phone}</span>
                               </div>
                             )}
                             {appointment.customer?.email && (
                               <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <Mail className="w-3 h-3" />
-                                <span>{appointment.customer.email}</span>
+                                <Mail className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{appointment.customer.email}</span>
                               </div>
                             )}
                           </div>
                           
-                          <div>
+                          <div className="min-w-0">
                             {appointment.service && (
                               <div className="mb-2">
-                                <p className="font-medium text-gray-900">{appointment.service.name}</p>
+                                <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{appointment.service.name}</p>
                                 <p className="text-sm text-gray-600">
                                   {appointment.service.duration} minutes • 
                                   {appointment.service.currency === 'GBP' ? '£' : '$'}{appointment.service.price}
@@ -198,7 +200,7 @@ function Appointments() {
                               </div>
                             )}
                             {appointment.notes && (
-                               <p className="text-sm text-gray-600 italic">
+                               <p className="text-sm text-gray-600 italic line-clamp-2">
                                  &ldquo;{appointment.notes}&rdquo;
                                </p>
                              )}
@@ -206,7 +208,8 @@ function Appointments() {
                         </div>
                       </div>
                       
-                      <div className="ml-4">
+                      {/* Status Badge - Full width on mobile, aligned right on larger screens */}
+                      <div className="flex justify-start sm:justify-end">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                           {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).replace('_', ' ')}
                         </span>
