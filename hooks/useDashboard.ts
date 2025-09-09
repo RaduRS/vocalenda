@@ -51,8 +51,9 @@ export interface DashboardData {
   recentCalls?: RecentCall[];
 }
 
-const fetchDashboardData = async (): Promise<DashboardData> => {
-  const response = await fetch('/api/dashboard', {
+const fetchDashboardData = async (weekOffset: number = 0): Promise<DashboardData> => {
+  const url = weekOffset !== 0 ? `/api/dashboard?weekOffset=${weekOffset}` : '/api/dashboard';
+  const response = await fetch(url, {
     headers: {
       'Cache-Control': 'max-age=30, stale-while-revalidate=60',
     },
@@ -75,10 +76,10 @@ const fetchDashboardData = async (): Promise<DashboardData> => {
   };
 };
 
-export const useDashboard = () => {
+export const useDashboard = (weekOffset: number = 0) => {
   return useQuery({
-    queryKey: ['dashboard'],
-    queryFn: fetchDashboardData,
+    queryKey: ['dashboard', weekOffset],
+    queryFn: () => fetchDashboardData(weekOffset),
     staleTime: 5 * 60 * 1000, // 5 minutes - dashboard stats don't change frequently
     // Use global defaults for better performance and consistency
   });

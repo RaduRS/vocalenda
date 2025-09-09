@@ -53,11 +53,16 @@ StatsCard.displayName = 'StatsCard';
 function Dashboard() {
   const { user } = useUser();
   const router = useRouter();
-  const { data, isLoading, error } = useDashboard();
+  const [weekOffset, setWeekOffset] = useState(0);
+  const { data, isLoading, error } = useDashboard(weekOffset);
   const business = data?.business;
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const maxItems = 10;
+
+  const navigateWeek = useCallback((direction: 'prev' | 'next') => {
+    setWeekOffset(prev => direction === 'prev' ? prev - 1 : prev + 1);
+  }, []);
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(
@@ -233,19 +238,42 @@ function Dashboard() {
 
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Appointment Trends - Takes 2 columns on large screens */}
-          <div className="md:col-span-2 lg:col-span-2">
-            <Card className="p-6">
+        <div className="space-y-6">
+          {/* Weekly Activity Overview - Full width */}
+          <div>
+              <Card className="p-6 h-96">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                 <h3 className="text-lg font-semibold text-brand-primary-1">
                   Weekly Activity Overview
                 </h3>
-                {data?.stats?.weeklyActivity && data.stats.weeklyActivity.length > 0 && (
-                  <p className="text-sm text-gray-600 mt-1 sm:mt-0">
-                    {format(parseISO(data.stats.weeklyActivity[0].date), 'MMM d')} - {format(parseISO(data.stats.weeklyActivity[data.stats.weeklyActivity.length - 1].date), 'MMM d, yyyy')}
-                  </p>
-                )}
+                <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateWeek('prev')}
+                    className="p-2 h-8 w-8"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </Button>
+                  {data?.stats?.weeklyActivity && data.stats.weeklyActivity.length > 0 && (
+                    <p className="text-sm text-gray-600 px-2">
+                      {format(parseISO(data.stats.weeklyActivity[0].date), 'MMM d')} - {format(parseISO(data.stats.weeklyActivity[data.stats.weeklyActivity.length - 1].date), 'MMM d, yyyy')}
+                    </p>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigateWeek('next')}
+                    className="p-2 h-8 w-8"
+                    disabled={weekOffset >= 0}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Button>
+                </div>
               </div>
               <div className="h-48 sm:h-56 md:h-64">
                 <Line
@@ -290,18 +318,21 @@ function Dashboard() {
             </Card>
           </div>
 
-          {/* Call Status Distribution */}
-          <div>
-            <Card className="p-6">
+          {/* Bottom Charts Row - Equal Heights */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Call Status Distribution */}
+            <div>
+            <Card className="p-6 h-96">
               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                 Call Status
               </h3>
               <div className="h-48 sm:h-56 md:h-64">
-                <Doughnut
+                <Bar
                    data={{
                      labels: ['Completed', 'Failed'],
                      datasets: [
                        {
+                         label: 'Calls',
                          data: [
                            callStatusValues[0] || 0, // Completed
                            callStatusValues[1] || 0  // Failed
@@ -323,7 +354,12 @@ function Dashboard() {
                     maintainAspectRatio: false,
                     plugins: {
                       legend: {
-                        position: 'bottom' as const,
+                        display: false,
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
                       },
                     },
                   }}
@@ -334,7 +370,7 @@ function Dashboard() {
 
           {/* Appointment Status Distribution */}
            <div>
-             <Card className="p-6">
+             <Card className="p-6 h-96">
                <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                  Appointment Status
                </h3>
@@ -374,9 +410,9 @@ function Dashboard() {
              </Card>
            </div>
 
-          {/* Recent Activity */}
-          <div className="md:col-span-2">
-            <Card className="p-6">
+            {/* Recent Activity */}
+            <div className="lg:col-span-2">
+              <Card className="p-6 h-96">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-brand-primary-1">
                   Recent Activity
@@ -477,6 +513,7 @@ function Dashboard() {
                 </table>
               </div>
             </Card>
+          </div>
           </div>
         </div>
       </div>

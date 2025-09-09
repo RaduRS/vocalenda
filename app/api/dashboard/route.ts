@@ -3,9 +3,11 @@ import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getCurrentUKDate, formatISODate } from '@/lib/date-utils';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const { userId } = await auth();
+    const { searchParams } = new URL(request.url);
+    const weekOffset = parseInt(searchParams.get('weekOffset') || '0');
     
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -139,7 +141,7 @@ export async function GET() {
       }
     });
 
-    // Get weekly activity data (current week: Monday to Sunday)
+    // Get weekly activity data (current week + offset: Monday to Sunday)
     const weeklyActivityData = [];
     const currentDate = new Date();
     const businessHours = user.businesses?.business_hours as Record<string, { closed?: boolean; open?: string; close?: string }> | null;
@@ -147,11 +149,11 @@ export async function GET() {
     // Day name mapping
     const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     
-    // Get start of current week (Monday)
+    // Get start of target week (Monday) with offset
     const startOfWeek = new Date(currentDate);
     const dayOfWeek = currentDate.getDay();
     const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday = 0, so 6 days back to Monday
-    startOfWeek.setDate(currentDate.getDate() - daysToMonday);
+    startOfWeek.setDate(currentDate.getDate() - daysToMonday + (weekOffset * 7));
     
     for (let i = 0; i < 7; i++) {
        const date = new Date(startOfWeek);
