@@ -20,11 +20,17 @@ export interface DashboardStats {
 
 export interface RecentCall {
   id: string;
-  customer_name?: string;
+  customer_name?: string | null;
   caller_phone: string;
-  status: 'completed' | 'missed' | 'in_progress';
+  business_phone?: string;
+  status: 'incoming' | 'in_progress' | 'completed' | 'failed';
+  duration_seconds?: number | null;
+  duration?: number | null;
+  intent_detected?: string;
   started_at?: string;
-  duration?: number;
+  ended_at?: string;
+  created_at?: string;
+  twilio_call_sid?: string;
 }
 
 export interface DashboardData {

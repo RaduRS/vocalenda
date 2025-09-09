@@ -52,12 +52,8 @@ StatsCard.displayName = 'StatsCard';
 function Dashboard() {
   const { user } = useUser();
   const router = useRouter();
-  const { data, isLoading } = useDashboard();
+  const { data, isLoading, error } = useDashboard();
   const business = data?.business;
-
-
-
-
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(
@@ -111,6 +107,39 @@ function Dashboard() {
       "bg-brand-primary-2/10 text-brand-primary-2"
     );
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-brand-primary-1"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-500">Error loading dashboard data</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-500">No data available</div>
+      </div>
+    );
+  }
+
+  // Process call status data for chart
+  const callStatusData = data.recentCalls?.reduce((acc, call) => {
+    acc[call.status] = (acc[call.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>) || {};
+
+  const callStatusLabels = ['completed', 'failed', 'in_progress', 'incoming'];
+  const callStatusValues = callStatusLabels.map(status => callStatusData[status] || 0);
 
   // Redirect to setup if no business found
   if (data && !data.business) {
@@ -221,7 +250,11 @@ function Dashboard() {
                       },
                       {
                         label: 'Calls',
-                        data: [8, 12, 15, 10, 18, 5, 9],
+                        data: data.recentCalls?.slice(0, 7).map((_, index) => 
+                           data.recentCalls?.filter(call => 
+                             call.created_at && new Date(call.created_at).getDay() === index
+                           ).length || 0
+                         ) || [0, 0, 0, 0, 0, 0, 0],
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
@@ -255,25 +288,27 @@ function Dashboard() {
               </h3>
               <div className="h-48 sm:h-56 md:h-64">
                 <Doughnut
-                  data={{
-                    labels: ['Completed', 'Missed', 'In Progress'],
-                    datasets: [
-                      {
-                        data: [65, 25, 10],
-                        backgroundColor: [
-                          'rgba(34, 197, 94, 0.8)',
-                          'rgba(239, 68, 68, 0.8)',
-                          'rgba(251, 191, 36, 0.8)',
-                        ],
-                        borderColor: [
-                          'rgba(34, 197, 94, 1)',
-                          'rgba(239, 68, 68, 1)',
-                          'rgba(251, 191, 36, 1)',
-                        ],
-                        borderWidth: 2,
-                      },
-                    ],
-                  }}
+                   data={{
+                     labels: ['Completed', 'Failed', 'In Progress', 'Incoming'],
+                     datasets: [
+                       {
+                         data: callStatusValues,
+                         backgroundColor: [
+                           'rgba(34, 197, 94, 0.8)',
+                           'rgba(239, 68, 68, 0.8)',
+                           'rgba(251, 191, 36, 0.8)',
+                           'rgba(59, 130, 246, 0.8)',
+                         ],
+                         borderColor: [
+                           'rgba(34, 197, 94, 1)',
+                           'rgba(239, 68, 68, 1)',
+                           'rgba(251, 191, 36, 1)',
+                           'rgba(59, 130, 246, 1)',
+                         ],
+                         borderWidth: 2,
+                       },
+                     ],
+                   }}
                   options={{
                     responsive: true,
                     maintainAspectRatio: false,
@@ -288,76 +323,104 @@ function Dashboard() {
             </Card>
           </div>
 
-          {/* Monthly Growth */}
-          <div>
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
-                Monthly Growth
-              </h3>
-              <div className="h-48 sm:h-56 md:h-64">
-                <Bar
-                  data={{
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [
-                      {
-                        label: 'New Customers',
-                        data: [12, 18, 15, 25, 22, 30],
-                        backgroundColor: 'rgba(147, 51, 234, 0.8)',
-                        borderColor: 'rgba(147, 51, 234, 1)',
-                        borderWidth: 1,
-                      },
-                    ],
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                      },
-                    },
-                  }}
-                />
-              </div>
-            </Card>
-          </div>
+          {/* Appointment Status Distribution */}
+           <div>
+             <Card className="p-6">
+               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
+                 Appointment Status
+               </h3>
+               <div className="h-48 sm:h-56 md:h-64">
+                 <Doughnut
+                   data={{
+                     labels: ['Confirmed', 'Pending', 'Completed', 'Cancelled', 'No Show'],
+                     datasets: [
+                       {
+                         data: [40, 25, 20, 10, 5],
+                         backgroundColor: [
+                           'rgba(59, 130, 246, 0.8)',
+                           'rgba(251, 191, 36, 0.8)',
+                           'rgba(34, 197, 94, 0.8)',
+                           'rgba(239, 68, 68, 0.8)',
+                           'rgba(156, 163, 175, 0.8)',
+                         ],
+                         borderColor: [
+                           'rgba(59, 130, 246, 1)',
+                           'rgba(251, 191, 36, 1)',
+                           'rgba(34, 197, 94, 1)',
+                           'rgba(239, 68, 68, 1)',
+                           'rgba(156, 163, 175, 1)',
+                         ],
+                         borderWidth: 2,
+                       },
+                     ],
+                   }}
+                   options={{
+                     responsive: true,
+                     maintainAspectRatio: false,
+                     plugins: {
+                       legend: {
+                          position: 'bottom' as const,
+                        },
+                     },
+                   }}
+                 />
+               </div>
+             </Card>
+           </div>
 
           {/* Recent Activity */}
-          <div className="md:col-span-2 lg:col-span-2">
+          <div className="md:col-span-2">
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                 Recent Activity
               </h3>
-              <div className="space-y-3">
-                {data?.recentCalls?.slice(0, 4).map((call: RecentCall, index: number) => (
-                  <div key={call.id || index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0">
+              <div className="space-y-2">
+                {(data?.recentCalls || []).slice(0, 8).map((call: RecentCall, index: number) => (
+                  <div key={call.id || index} className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 rounded-md transition-colors">
                     <div className="flex items-center space-x-3 min-w-0 flex-1">
-                       <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                         call.status === 'completed' ? 'bg-green-500' :
-                         call.status === 'missed' ? 'bg-red-500' : 'bg-yellow-500'
-                       }`}></div>
-                       <div className="min-w-0 flex-1">
-                         <p className="text-sm font-medium text-brand-primary-1 truncate">
-                           {call.customer_name || 'Unknown Caller'}
-                         </p>
-                         <p className="text-xs text-brand-primary-2 truncate">
-                           {call.caller_phone}
-                         </p>
-                       </div>
-                     </div>
-                     <div className="text-left sm:text-right flex-shrink-0">
-                       <p className="text-xs text-brand-primary-2">
-                         {call.started_at ? new Date(call.started_at).toLocaleDateString() : 'N/A'}
-                       </p>
-                       <p className="text-xs text-brand-primary-2">
-                         {call.duration ? `${Math.floor(call.duration / 60)}:${(call.duration % 60).toString().padStart(2, '0')}` : 'N/A'}
-                       </p>
-                     </div>
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        call.status === 'completed' ? 'bg-green-500' :
+                        call.status === 'failed' ? 'bg-red-500' :
+                        call.status === 'in_progress' ? 'bg-yellow-500' : 'bg-blue-500'
+                      }`}></div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center space-x-2">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                             {call.customer_name || 'Unknown Caller'}
+                           </p>
+                           <p className="text-xs text-gray-500 truncate">
+                             {call.caller_phone}
+                           </p>
+                          <span className={`px-1.5 py-0.5 text-xs rounded ${
+                            call.status === 'completed' ? 'bg-green-100 text-green-700' :
+                            call.status === 'failed' ? 'bg-red-100 text-red-700' :
+                            call.status === 'in_progress' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'
+                          }`}>
+                            {call.status.replace('_', ' ')}
+                          </span>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 flex-shrink-0 text-xs text-gray-500">
+                      <span>
+                         {call.created_at ? new Date(call.created_at).toLocaleTimeString('en-US', { 
+                           hour: '2-digit', 
+                           minute: '2-digit',
+                           hour12: true 
+                         }) : call.started_at ? new Date(call.started_at).toLocaleTimeString('en-US', { 
+                           hour: '2-digit', 
+                           minute: '2-digit',
+                           hour12: true 
+                         }) : '--'}
+                       </span>
+                      <span>
+                          {(() => {
+                            const duration = call.duration_seconds || call.duration;
+                            return duration ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` : '--';
+                          })()}
+                        </span>
+                    </div>
                   </div>
                 )) || (
                   <div className="text-center py-8 text-brand-primary-2">
