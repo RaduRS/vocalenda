@@ -20,7 +20,7 @@ export async function loadBusinessConfig(businessId) {
     }
 
     // Load business configuration
-    const { data: config, error: configError } = await supabase
+    const { data: config } = await supabase
       .from("business_config")
       .select("*")
       .eq("business_id", businessId)

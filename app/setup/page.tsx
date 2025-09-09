@@ -604,7 +604,7 @@ export default function SetupWizard() {
                     size="sm"
                     onClick={() => {
                       const services = businessData.services || [];
-                      const newService: Service = { name: '', duration: 30, price: 0 };
+                      const newService: Service = { name: '', duration: 15, price: 0 };
                       handleInputChange('services', [...services, newService]);
                     }}
                   >
@@ -631,22 +631,38 @@ export default function SetupWizard() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor={`service-duration-${index}`}>Duration (min)</Label>
-                          <Input
-                            id={`service-duration-${index}`}
-                            type="number"
-                            value={service.duration}
-                            onChange={(e) => {
+                          <Label htmlFor={`service-duration-${index}`}>Duration</Label>
+                          <Select
+                            value={service.duration.toString()}
+                            onValueChange={(value) => {
                               const services = [...(businessData.services || [])];
-                              services[index] = { ...service, duration: parseInt(e.target.value) || 0 };
+                              services[index] = { ...service, duration: parseInt(value) };
                               handleInputChange('services', services);
                             }}
-                            className="mt-1"
-                          />
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select duration" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 32 }, (_, i) => {
+                                const minutes = (i + 1) * 15;
+                                const hours = Math.floor(minutes / 60);
+                                const remainingMinutes = minutes % 60;
+                                const label = hours > 0 
+                                  ? `${hours}h${remainingMinutes > 0 ? ` ${remainingMinutes}m` : ''}`
+                                  : `${minutes} min`;
+                                return (
+                                  <SelectItem key={minutes} value={minutes.toString()}>
+                                    {label}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex items-end gap-2">
                           <div className="flex-1">
-                            <Label htmlFor={`service-price-${index}`}>Price ($)</Label>
+                            <Label htmlFor={`service-price-${index}`}>Price (£)</Label>
                             <Input
                               id={`service-price-${index}`}
                               type="number"
@@ -698,6 +714,13 @@ export default function SetupWizard() {
                   </Button>
                 </div>
                 <div className="space-y-3">
+                  {(businessData.staff_members || []).length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <Users className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                      <p className="text-lg font-medium mb-2">No staff members added yet</p>
+                      <p className="text-sm">You need at least one staff member to continue. Click &quot;Add Staff Member&quot; to get started.</p>
+                    </div>
+                  )}
                   {(businessData.staff_members || []).map((staff, index) => (
                     <Card key={index} className="p-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -752,9 +775,14 @@ export default function SetupWizard() {
                             size="sm"
                             onClick={() => {
                               const staffMembers = [...(businessData.staff_members || [])];
+                              if (staffMembers.length <= 1) {
+                                toast.error('You must have at least one staff member');
+                                return;
+                              }
                               staffMembers.splice(index, 1);
                               handleInputChange('staff_members', staffMembers);
                             }}
+                            disabled={(businessData.staff_members || []).length <= 1}
                             className="mb-0"
                           >
                             <Trash2 className="h-4 w-4" />

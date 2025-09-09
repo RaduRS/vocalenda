@@ -280,37 +280,73 @@ class CalendarService {
         )
         .map(busy => ({ start: busy.start!, end: busy.end! }));
       const allBusyTimes: BusyTime[] = [...calendarBusyTimes, ...dbBusyTimes];
-      const availableSlots: Array<{ start: Date; end: Date }> = [];
+      
+      // Sort busy times by start time for gap analysis
+      const sortedBusyTimes = allBusyTimes
+        .map(busy => ({
+          start: new Date(busy.start),
+          end: new Date(busy.end)
+        }))
+        .sort((a, b) => a.start.getTime() - b.start.getTime());
 
-      // Generate potential slots every 30 minutes
-      const slotInterval = 30; // minutes
-      let currentTime = new Date(dayStart);
-
-      while (currentTime < dayEnd) {
-        const slotEnd = new Date(currentTime.getTime() + serviceDuration * 60000);
-        
-        if (slotEnd <= dayEnd) {
-          // Check if this slot conflicts with any busy time (Google Calendar + Database)
-          const isAvailable = !allBusyTimes.some((busy: BusyTime) => {
-            const busyStart = new Date(busy.start!);
-            const busyEnd = new Date(busy.end!);
-            
-            return (
-              (currentTime >= busyStart && currentTime < busyEnd) ||
-              (slotEnd > busyStart && slotEnd <= busyEnd) ||
-              (currentTime <= busyStart && slotEnd >= busyEnd)
-            );
-          });
-
-          if (isAvailable) {
-            availableSlots.push({
-              start: new Date(currentTime),
-              end: new Date(slotEnd)
-            });
+      // Merge overlapping busy times to create clean gaps
+      const mergedBusyTimes: Array<{ start: Date; end: Date }> = [];
+      for (const busyTime of sortedBusyTimes) {
+        if (mergedBusyTimes.length === 0) {
+          mergedBusyTimes.push(busyTime);
+        } else {
+          const lastMerged = mergedBusyTimes[mergedBusyTimes.length - 1];
+          // If current busy time overlaps or is adjacent to the last one, merge them
+          if (busyTime.start <= lastMerged.end) {
+            lastMerged.end = new Date(Math.max(lastMerged.end.getTime(), busyTime.end.getTime()));
+          } else {
+            mergedBusyTimes.push(busyTime);
           }
         }
+      }
 
-        currentTime = new Date(currentTime.getTime() + slotInterval * 60000);
+      const availableSlots: Array<{ start: Date; end: Date }> = [];
+      const serviceDurationMs = serviceDuration * 60000; // Convert to milliseconds
+      const slotInterval = 15; // Generate slots every 15 minutes for more flexibility
+      const slotIntervalMs = slotInterval * 60000;
+
+      // Generate slots in gaps between busy times
+      let currentGapStart = new Date(dayStart);
+      
+      for (const busyTime of mergedBusyTimes) {
+        // Generate slots in the gap before this busy time
+        const gapEnd = new Date(Math.min(busyTime.start.getTime(), dayEnd.getTime()));
+        
+        // Generate slots within this gap
+        let slotStart = new Date(currentGapStart);
+        while (slotStart.getTime() + serviceDurationMs <= gapEnd.getTime()) {
+          const slotEnd = new Date(slotStart.getTime() + serviceDurationMs);
+          
+          availableSlots.push({
+            start: new Date(slotStart),
+            end: new Date(slotEnd)
+          });
+          
+          slotStart = new Date(slotStart.getTime() + slotIntervalMs);
+        }
+        
+        // Move to the end of this busy time for the next gap
+        currentGapStart = new Date(Math.max(busyTime.end.getTime(), currentGapStart.getTime()));
+      }
+      
+      // Generate slots in the final gap (after the last busy time until end of day)
+      if (currentGapStart < dayEnd) {
+        let slotStart = new Date(currentGapStart);
+        while (slotStart.getTime() + serviceDurationMs <= dayEnd.getTime()) {
+          const slotEnd = new Date(slotStart.getTime() + serviceDurationMs);
+          
+          availableSlots.push({
+            start: new Date(slotStart),
+            end: new Date(slotEnd)
+          });
+          
+          slotStart = new Date(slotStart.getTime() + slotIntervalMs);
+        }
       }
 
       return availableSlots;

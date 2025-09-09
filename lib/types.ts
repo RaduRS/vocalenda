@@ -114,7 +114,7 @@ export const validateBusinessHours = (hours: BusinessHours): boolean => {
 };
 
 export const validateService = (service: Service): boolean => {
-  return !!service.name && service.duration > 0 && service.price >= 0;
+  return !!service.name && service.duration >= 15 && service.duration <= 480 && service.price >= 0;
 };
 
 export const validateStaffMember = (staff: StaffMember): boolean => {
@@ -223,7 +223,8 @@ export const setupWizardSteps: SetupWizardStep[] = [
     description: "Add your services and team members",
     fields: ["services", "staff_members"],
     isValid: (data) =>
-      !!(data.services?.length && data.services.every(validateService)),
+      !!(data.services?.length && data.services.every(validateService) &&
+         data.staff_members?.length && data.staff_members.every(validateStaffMember)),
   },
   {
     id: 4,

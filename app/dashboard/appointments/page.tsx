@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Users, Phone, Mail } from "lucide-react";
+import { Calendar, Clock, Users } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useAppointments } from "@/hooks/useAppointments";
 import { AppointmentsSkeleton } from "@/components/ui/skeleton-loading";

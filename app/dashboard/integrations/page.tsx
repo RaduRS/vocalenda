@@ -252,7 +252,7 @@ function Integrations() {
       alert("Failed to connect Google Calendar. Please try again.");
       setConnectingCalendar(false);
     }
-  }, [business?.id, fetchBusinessData]);
+  }, [business?.id, checkGoogleCalendarStatus]);
   
   const handleManualRefresh = useCallback(() => {
     console.log('Manual refresh triggered');
@@ -295,7 +295,7 @@ function Integrations() {
       setDisconnectingCalendar(false);
       setShowDisconnectModal(false);
     }
-  }, [business?.id, fetchBusinessData]);
+  }, [business?.id, checkGoogleCalendarStatus]);
 
   if (loading) {
     return <IntegrationsSkeleton />;

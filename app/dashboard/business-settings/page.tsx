@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { BusinessSettingsSkeleton } from "@/components/ui/skeleton-loading";
 import {
@@ -143,7 +144,7 @@ export default function BusinessSettings() {
   const addService = () => {
     const newService: Service = {
       name: "",
-      duration: 30,
+      duration: 15,
       price: 0,
     };
     setBusinessData((prev) => ({
@@ -198,6 +199,10 @@ export default function BusinessSettings() {
   };
 
   const removeStaffMember = (index: number) => {
+    if (businessData.staff_members.length <= 1) {
+      toast.error("Cannot delete the last staff member. At least one staff member is required.");
+      return;
+    }
     setBusinessData((prev) => ({
       ...prev,
       staff_members: prev.staff_members.filter((_, i) => i !== index),
@@ -612,24 +617,31 @@ export default function BusinessSettings() {
                           <Clock className="w-4 h-4 mr-1 text-gray-500" />
                           Duration
                         </Label>
-                        <div className="relative">
-                          <Input
-                            type="number"
-                            value={service.duration}
-                            onChange={(e) =>
-                              updateService(
-                                index,
-                                "duration",
-                                parseInt(e.target.value)
-                              )
-                            }
-                            placeholder="60"
-                            className="h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500 pr-12"
-                          />
-                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                            min
-                          </span>
-                        </div>
+                        <Select
+                          value={service.duration.toString()}
+                          onValueChange={(value) =>
+                            updateService(index, "duration", parseInt(value))
+                          }
+                        >
+                          <SelectTrigger className="h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500">
+                            <SelectValue placeholder="Select duration" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 32 }, (_, i) => {
+                              const minutes = (i + 1) * 15;
+                              const hours = Math.floor(minutes / 60);
+                              const remainingMinutes = minutes % 60;
+                              const label = hours > 0 
+                                ? `${hours}h${remainingMinutes > 0 ? ` ${remainingMinutes}m` : ''}`
+                                : `${minutes} min`;
+                              return (
+                                <SelectItem key={minutes} value={minutes.toString()}>
+                                  {label}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       <div className="lg:col-span-3">
@@ -638,7 +650,7 @@ export default function BusinessSettings() {
                         </Label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                            $
+                            £
                           </span>
                           <Input
                             type="number"
@@ -779,7 +791,12 @@ export default function BusinessSettings() {
                           variant="outline"
                           size="sm"
                           onClick={() => removeStaffMember(index)}
-                          className="h-10 w-10 p-0 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 group-hover:opacity-100 opacity-70 transition-opacity"
+                          disabled={businessData.staff_members.length <= 1}
+                          className={`h-10 w-10 p-0 group-hover:opacity-100 opacity-70 transition-opacity ${
+                            businessData.staff_members.length <= 1
+                              ? "border-gray-200 text-gray-400 cursor-not-allowed"
+                              : "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                          }`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
