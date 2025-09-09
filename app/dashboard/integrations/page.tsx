@@ -34,7 +34,6 @@ function Integrations() {
   const [loading, setLoading] = useState(true);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
-  const [showConnectModal, setShowConnectModal] = useState(false);
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -109,9 +108,7 @@ function Integrations() {
     } catch (error) {
       console.error("Failed to connect calendar:", error);
       alert("Failed to connect Google Calendar. Please try again.");
-    } finally {
       setConnectingCalendar(false);
-      setShowConnectModal(false);
     }
   }, [business?.id]);
 
@@ -134,7 +131,6 @@ function Integrations() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
         await fetchBusinessData(true); // Bypass cache to get fresh data
         setSuccessMessage("Google Calendar disconnected successfully!");
         setShowSuccessModal(true);
@@ -212,7 +208,7 @@ function Integrations() {
                 <p className="text-brand-primary-2">
                   {business.google_calendar_connected
                     ? "Your calendar is synced! Customers can only book when you're available, and new appointments automatically appear in your Google Calendar."
-                    : "Connect your Google Calendar so customers can only book when you&apos;re free. All appointments will automatically sync to your calendar."}
+                    : "Connect your Google Calendar so customers can only book when you're free. All appointments will automatically sync to your calendar."}
                 </p>
               </div>
               <div className="flex-shrink-0">
@@ -274,56 +270,35 @@ function Integrations() {
                     </Dialog>
                    </div>
                  ) : (
-                   <Dialog open={showConnectModal} onOpenChange={setShowConnectModal}>
-                    <DialogTrigger asChild>
-                      <Button
-                        disabled={connectingCalendar}
-                        className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
-                      >
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Connect Google Calendar
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Connect Google Calendar</DialogTitle>
-                        <DialogDescription>
-                           Connect your Google Calendar so customers can only book when you&apos;re free. All appointments will automatically sync to your calendar.
-                         </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowConnectModal(false)}>
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={handleConnectCalendar}
-                          disabled={connectingCalendar}
-                          className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
-                        >
-                          {connectingCalendar ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              Connecting...
-                            </>
-                          ) : (
-                            "Connect"
-                          )}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                   <Button
+                     onClick={handleConnectCalendar}
+                     disabled={connectingCalendar}
+                     className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
+                   >
+                     {connectingCalendar ? (
+                       <>
+                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                         Connecting...
+                       </>
+                     ) : (
+                       <>
+                         <svg
+                           className="w-4 h-4 mr-2"
+                           fill="none"
+                           stroke="currentColor"
+                           viewBox="0 0 24 24"
+                         >
+                           <path
+                             strokeLinecap="round"
+                             strokeLinejoin="round"
+                             strokeWidth={2}
+                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                           />
+                         </svg>
+                         Connect Google Calendar
+                       </>
+                     )}
+                   </Button>
                  )}
                </div>
              </div>

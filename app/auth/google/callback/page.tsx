@@ -60,9 +60,9 @@ function GoogleCallbackContent() {
         if (response.ok && data.success) {
 
           setStatus('success');
-          // Redirect to dashboard after a short delay
+          // Redirect to integrations page after a short delay
           setTimeout(() => {
-             router.push('/dashboard?calendar=connected');
+             router.push('/dashboard/integrations');
            }, 1000);
         } else {
           console.error('❌ OAuth API error:', data);
