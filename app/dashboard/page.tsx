@@ -318,9 +318,51 @@ function Dashboard() {
             </Card>
           </div>
 
-          {/* Call Status Distribution */}
+          {/* Appointment Status Distribution */}
           <div>
             <Card className="p-6">
+               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
+                 Appointment Status
+               </h3>
+               <div className="h-48 sm:h-56 md:h-64">
+                 <Doughnut
+                   data={{
+                     labels: ['Confirmed', 'Cancelled'],
+                     datasets: [
+                       {
+                         data: [
+                           data.stats?.appointmentStatusCounts?.confirmed || 0,
+                           data.stats?.appointmentStatusCounts?.cancelled || 0
+                         ],
+                         backgroundColor: [
+                           'rgba(251, 146, 60, 0.8)', // Orange
+                           'rgba(20, 184, 166, 0.8)', // Teal
+                         ],
+                         borderColor: [
+                           'rgba(251, 146, 60, 1)', // Orange
+                           'rgba(20, 184, 166, 1)', // Teal
+                         ],
+                         borderWidth: 2,
+                       },
+                     ],
+                   }}
+                   options={{
+                     responsive: true,
+                     maintainAspectRatio: false,
+                     plugins: {
+                       legend: {
+                          position: 'bottom' as const,
+                        },
+                     },
+                   }}
+                 />
+               </div>
+             </Card>
+           </div>
+
+          {/* Call Status Distribution */}
+          <div>
+            <Card className="p-6 h-96">
               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                 Call Status
               </h3>
@@ -365,48 +407,6 @@ function Dashboard() {
               </div>
             </Card>
           </div>
-
-          {/* Appointment Status Distribution */}
-          <div>
-            <Card className="p-6 h-96">
-               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
-                 Appointment Status
-               </h3>
-               <div className="h-48 sm:h-56 md:h-64">
-                 <Doughnut
-                   data={{
-                     labels: ['Confirmed', 'Cancelled'],
-                     datasets: [
-                       {
-                         data: [
-                           data.stats?.appointmentStatusCounts?.confirmed || 0,
-                           data.stats?.appointmentStatusCounts?.cancelled || 0
-                         ],
-                         backgroundColor: [
-                           'rgba(34, 197, 94, 0.8)',
-                           'rgba(239, 68, 68, 0.8)',
-                         ],
-                         borderColor: [
-                           'rgba(34, 197, 94, 1)',
-                           'rgba(239, 68, 68, 1)',
-                         ],
-                         borderWidth: 2,
-                       },
-                     ],
-                   }}
-                   options={{
-                     responsive: true,
-                     maintainAspectRatio: false,
-                     plugins: {
-                       legend: {
-                          position: 'bottom' as const,
-                        },
-                     },
-                   }}
-                 />
-               </div>
-             </Card>
-           </div>
 
             {/* Recent Activity */}
           <div className="md:col-span-2">
