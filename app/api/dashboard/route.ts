@@ -57,8 +57,8 @@ export async function GET() {
       supabase.from('customers').select('id', { count: 'exact' }).eq('business_id', businessId),
       // Total calls
       supabase.from('call_logs').select('id', { count: 'exact' }).eq('business_id', businessId),
-      // Today's appointments
-      supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId).eq('appointment_date', today),
+      // Today's appointments (excluding cancelled)
+      supabase.from('appointments').select('id', { count: 'exact' }).eq('business_id', businessId).eq('appointment_date', today).neq('status', 'cancelled'),
       // Recent call logs with customer info (reduced to 5 for performance)
       supabase
         .from('call_logs')

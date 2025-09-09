@@ -6,6 +6,15 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IntegrationsSkeleton } from "@/components/ui/skeleton-loading";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Business {
   id: string;
@@ -25,6 +34,8 @@ function Integrations() {
   const [loading, setLoading] = useState(true);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
   const fetchBusinessData = useCallback(async () => {
     try {
@@ -86,18 +97,11 @@ function Integrations() {
       alert("Failed to connect Google Calendar. Please try again.");
     } finally {
       setConnectingCalendar(false);
+      setShowConnectModal(false);
     }
   }, [business?.id]);
 
   const handleDisconnectCalendar = useCallback(async () => {
-    if (
-      !confirm(
-        "Are you sure you want to disconnect Google Calendar? This will revoke all permissions and remove the integration."
-      )
-    ) {
-      return;
-    }
-
     setDisconnectingCalendar(true);
     try {
       if (!business?.id) {
@@ -127,6 +131,7 @@ function Integrations() {
       alert("Failed to disconnect Google Calendar. Please try again.");
     } finally {
       setDisconnectingCalendar(false);
+      setShowDisconnectModal(false);
     }
   }, [business?.id, fetchBusinessData]);
 
@@ -192,7 +197,7 @@ function Integrations() {
                 <p className="text-brand-primary-2">
                   {business.google_calendar_connected
                     ? "Your calendar is synced! Customers can only book when you're available, and new appointments automatically appear in your Google Calendar."
-                    : "Connect your Google Calendar so customers can only book when you're free. All appointments will automatically sync to your calendar."}
+                    : "Connect your Google Calendar so customers can only book when you&apos;re free. All appointments will automatically sync to your calendar."}
                 </p>
               </div>
               <div className="flex-shrink-0">
@@ -214,30 +219,52 @@ function Integrations() {
                       </svg>
                       Connected
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDisconnectCalendar}
-                      disabled={disconnectingCalendar}
-                    >
-                      {disconnectingCalendar
-                        ? "Disconnecting..."
-                        : "Disconnect"}
-                    </Button>
+                    <Dialog open={showDisconnectModal} onOpenChange={setShowDisconnectModal}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={disconnectingCalendar}
+                        >
+                          Disconnect
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Disconnect Google Calendar</DialogTitle>
+                          <DialogDescription>
+                            Are you sure you want to disconnect Google Calendar? This will revoke all permissions and remove the integration.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setShowDisconnectModal(false)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            onClick={handleDisconnectCalendar}
+                            disabled={disconnectingCalendar}
+                          >
+                            {disconnectingCalendar ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Disconnecting...
+                              </>
+                            ) : (
+                              "Disconnect"
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 ) : (
-                  <Button
-                    onClick={handleConnectCalendar}
-                    disabled={connectingCalendar}
-                    className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
-                  >
-                    {connectingCalendar ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Connecting...
-                      </>
-                    ) : (
-                      <>
+                  <Dialog open={showConnectModal} onOpenChange={setShowConnectModal}>
+                    <DialogTrigger asChild>
+                      <Button
+                        disabled={connectingCalendar}
+                        className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
+                      >
                         <svg
                           className="w-4 h-4 mr-2"
                           fill="none"
@@ -252,72 +279,43 @@ function Integrations() {
                           />
                         </svg>
                         Connect Google Calendar
-                      </>
-                    )}
-                  </Button>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Connect Google Calendar</DialogTitle>
+                        <DialogDescription>
+                           Connect your Google Calendar so customers can only book when you&apos;re free. All appointments will automatically sync to your calendar.
+                         </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowConnectModal(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleConnectCalendar}
+                          disabled={connectingCalendar}
+                          className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
+                        >
+                          {connectingCalendar ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Connecting...
+                            </>
+                          ) : (
+                            "Connect"
+                          )}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 )}
               </div>
             </div>
           </Card>
         </div>
 
-        {/* Coming Soon Section */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 text-brand-primary-1">
-            Coming Soon
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Placeholder for future integrations */}
-            <Card className="p-6 opacity-60">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-gray-400 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-600">
-                  Zapier
-                </h3>
-              </div>
-              <p className="text-gray-500 text-sm">
-                Connect with 5000+ apps to automate your workflow
-              </p>
-            </Card>
 
-            <Card className="p-6 opacity-60">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-gray-400 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-600">
-                  Email Marketing
-                </h3>
-              </div>
-              <p className="text-gray-500 text-sm">
-                Integrate with Mailchimp, ConvertKit, and more
-              </p>
-            </Card>
-
-            <Card className="p-6 opacity-60">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-gray-400 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-600">
-                  CRM Systems
-                </h3>
-              </div>
-              <p className="text-gray-500 text-sm">
-                Sync with Salesforce, HubSpot, and other CRMs
-              </p>
-            </Card>
-          </div>
-        </div>
       </div>
     </div>
   );
