@@ -7,8 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-
+import { DashboardSkeleton } from "@/components/ui/skeleton-loading";
 
 import { useDashboard } from "@/hooks/useDashboard";
 
@@ -165,81 +164,7 @@ function Dashboard() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white pt-20">
-        {/* Header Skeleton */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
-              <div>
-                <div className="h-8 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
-                <div className="h-5 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
-              </div>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                <div className="h-10 bg-brand-primary-2/20 rounded w-24 animate-pulse"></div>
-                <div className="h-10 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Content Skeleton */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Stats Cards Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-brand-primary-2/20 rounded-lg w-12 h-12 animate-pulse"></div>
-                  <div className="ml-4 flex-1">
-                    <div className="h-4 bg-brand-primary-2/20 rounded w-24 mb-2 animate-pulse"></div>
-                    <div className="h-8 bg-brand-primary-2/20 rounded w-16 animate-pulse"></div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* Calendar Integration Skeleton */}
-          <Card className="p-6 mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-4 sm:mb-0 flex-1">
-                <div className="h-6 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
-                <div className="h-4 bg-brand-primary-2/20 rounded w-full max-w-md animate-pulse"></div>
-              </div>
-              <div className="h-10 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
-            </div>
-          </Card>
-
-          {/* Business Info Cards Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="p-6">
-              <div className="h-6 bg-brand-primary-2/20 rounded w-40 mb-4 animate-pulse"></div>
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i}>
-                    <div className="h-4 bg-brand-primary-2/20 rounded w-24 mb-1 animate-pulse"></div>
-                    <div className="h-5 bg-brand-primary-2/20 rounded w-full animate-pulse"></div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="h-6 bg-brand-primary-2/20 rounded w-32 mb-4 animate-pulse"></div>
-              <div className="space-y-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="h-10 bg-brand-primary-2/20 rounded w-full animate-pulse"
-                  ></div>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (!business) {

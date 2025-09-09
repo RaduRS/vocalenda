@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { IntegrationsSkeleton } from "@/components/ui/skeleton-loading";
 
 interface Business {
   id: string;
@@ -130,23 +131,7 @@ function Integrations() {
   }, [business?.id, fetchBusinessData]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white shadow-sm border-b">
-          <div className="px-6 py-6">
-            <div className="h-8 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
-            <div className="h-5 bg-brand-primary-2/20 rounded w-64 animate-pulse"></div>
-          </div>
-        </div>
-        <div className="px-6 py-8">
-          <Card className="p-6">
-            <div className="h-6 bg-brand-primary-2/20 rounded w-48 mb-4 animate-pulse"></div>
-            <div className="h-4 bg-brand-primary-2/20 rounded w-full max-w-md mb-4 animate-pulse"></div>
-            <div className="h-10 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
-          </Card>
-        </div>
-      </div>
-    );
+    return <IntegrationsSkeleton />;
   }
 
   if (!business) {

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useNavigation } from "@/contexts/NavigationContext";
+import Link from "next/link";
 
 interface SidebarProps {
   className?: string;
@@ -49,36 +49,33 @@ function SidebarButton({
   isActive,
   onMobileClick,
 }: SidebarButtonProps) {
-  const { navigateWithSkeleton, isNavigating, targetRoute } = useNavigation();
-  const isCurrentlyNavigating = isNavigating && targetRoute === href;
-
   const handleClick = () => {
     if (onMobileClick) {
       onMobileClick();
     }
-    navigateWithSkeleton(href);
   };
 
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      <Button
-        variant={isActive ? "default" : "ghost"}
-        className={cn(
-          "w-full justify-start h-12 px-4 text-left transition-all duration-200",
-          isActive
-            ? "bg-brand-primary-1 text-white shadow-md"
-            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
-        )}
-        onClick={handleClick}
-      >
-        <Icon
+      <Link href={href} onClick={handleClick}>
+        <Button
+          variant={isActive ? "default" : "ghost"}
           className={cn(
-            "mr-3 h-5 w-5",
-            isActive ? "text-white" : "text-gray-500"
+            "w-full justify-start h-12 px-4 text-left transition-all duration-200",
+            isActive
+              ? "bg-brand-primary-1 text-white shadow-md"
+              : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
           )}
-        />
-        <span className="font-medium text-sm">{label}</span>
-      </Button>
+        >
+          <Icon
+            className={cn(
+              "mr-3 h-5 w-5",
+              isActive ? "text-white" : "text-gray-500"
+            )}
+          />
+          <span className="font-medium text-sm">{label}</span>
+        </Button>
+      </Link>
     </motion.div>
   );
 }

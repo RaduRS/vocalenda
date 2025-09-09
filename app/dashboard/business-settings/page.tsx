@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { BusinessSettingsSkeleton } from "@/components/ui/skeleton-loading";
 import {
   Clock,
   MapPin,
@@ -244,14 +245,7 @@ export default function BusinessSettings() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading business settings...</p>
-        </div>
-      </div>
-    );
+    return <BusinessSettingsSkeleton />;
   }
 
   return (
@@ -538,9 +532,7 @@ export default function BusinessSettings() {
                                 }
                                 className="w-24 h-9 text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                               />
-                              <span className="text-gray-500 text-sm">
-                                to
-                              </span>
+                              <span className="text-gray-500 text-sm">to</span>
                               <Input
                                 type="time"
                                 value={hours.close}
@@ -833,14 +825,19 @@ export default function BusinessSettings() {
                     </div>
                     Holidays & Closures
                   </h3>
-                  <p className="text-gray-600">Manage special dates when your business is closed</p>
+                  <p className="text-gray-600">
+                    Manage special dates when your business is closed
+                  </p>
                 </div>
-                <Button onClick={addHoliday} className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 h-auto">
+                <Button
+                  onClick={addHoliday}
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 h-auto"
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Holiday
                 </Button>
               </div>
-              
+
               <div className="space-y-6">
                 {businessData.holidays.map((holiday, index) => (
                   <div
@@ -862,9 +859,11 @@ export default function BusinessSettings() {
                           className="h-12 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
                         />
                       </div>
-                      
+
                       <div className="lg:col-span-7">
-                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Description</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                          Description
+                        </Label>
                         <Input
                           value={holiday.description}
                           onChange={(e) =>
@@ -874,7 +873,7 @@ export default function BusinessSettings() {
                           className="h-12 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
                         />
                       </div>
-                      
+
                       <div className="lg:col-span-1 flex justify-end">
                         <Button
                           variant="outline"
@@ -888,15 +887,22 @@ export default function BusinessSettings() {
                     </div>
                   </div>
                 ))}
-                
+
                 {businessData.holidays.length === 0 && (
                   <div className="text-center py-16">
                     <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Calendar className="w-8 h-8 text-orange-600" />
                     </div>
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">No holidays added yet</h4>
-                    <p className="text-gray-500 mb-6">Add special dates when your business will be closed</p>
-                    <Button onClick={addHoliday} className="bg-orange-600 hover:bg-orange-700 text-white">
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">
+                      No holidays added yet
+                    </h4>
+                    <p className="text-gray-500 mb-6">
+                      Add special dates when your business will be closed
+                    </p>
+                    <Button
+                      onClick={addHoliday}
+                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                    >
                       <Plus className="w-4 h-4 mr-2" />
                       Add Your First Holiday
                     </Button>
@@ -913,14 +919,16 @@ export default function BusinessSettings() {
             <Card className="p-8 shadow-sm border-0 bg-white">
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                      <Bot className="w-5 h-5 text-purple-600" />
-                    </div>
-                    AI & Policies
-                  </h3>
-                <p className="text-gray-600">Configure payment methods, AI behavior, and booking policies</p>
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                    <Bot className="w-5 h-5 text-purple-600" />
+                  </div>
+                  AI & Policies
+                </h3>
+                <p className="text-gray-600">
+                  Configure payment methods, AI behavior, and booking policies
+                </p>
               </div>
-              
+
               <div className="space-y-8">
                 {/* Payment Methods Section */}
                 <div className="p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200">
@@ -931,24 +939,28 @@ export default function BusinessSettings() {
                     Payment Methods
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Object.entries(paymentMethodLabels).map(([method, label]) => (
-                      <label
-                        key={method}
-                        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer group"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={businessData.payment_methods.includes(
-                            method as PaymentMethod
-                          )}
-                          onChange={() =>
-                            togglePaymentMethod(method as PaymentMethod)
-                          }
-                          className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                        />
-                        <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
-                      </label>
-                    ))}
+                    {Object.entries(paymentMethodLabels).map(
+                      ([method, label]) => (
+                        <label
+                          key={method}
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer group"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={businessData.payment_methods.includes(
+                              method as PaymentMethod
+                            )}
+                            onChange={() =>
+                              togglePaymentMethod(method as PaymentMethod)
+                            }
+                            className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                          />
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                            {label}
+                          </span>
+                        </label>
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -962,7 +974,10 @@ export default function BusinessSettings() {
                       AI Instructions
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600 ml-10">Provide specific instructions for how the AI assistant should behave when handling customer calls</p>
+                  <p className="text-sm text-gray-600">
+                    Provide specific instructions for how the AI assistant
+                    should behave when handling customer calls
+                  </p>
                   <Textarea
                     value={businessData.ai_configuration.greeting}
                     onChange={(e) =>
@@ -972,7 +987,7 @@ export default function BusinessSettings() {
                       })
                     }
                     placeholder="e.g., Always be polite and professional, ask for customer preferences, suggest popular services..."
-                    className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 ml-10 resize-none"
+                    className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
                     rows={5}
                   />
                 </div>
@@ -987,9 +1002,14 @@ export default function BusinessSettings() {
                       Booking Policies
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600 ml-10">Define your booking rules, cancellation terms, and customer policies</p>
+                  <p className="text-sm text-gray-600">
+                    Define your booking rules, cancellation terms, and customer
+                    policies
+                  </p>
                   <Textarea
-                    value={businessData.booking_policies.cancellation_policy || ""}
+                    value={
+                      businessData.booking_policies.cancellation_policy || ""
+                    }
                     onChange={(e) =>
                       handleInputChange("booking_policies", {
                         ...businessData.booking_policies,
@@ -997,7 +1017,7 @@ export default function BusinessSettings() {
                       })
                     }
                     placeholder="e.g., 24-hour cancellation policy, 50% deposit required, no-show policy..."
-                    className="min-h-[120px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 ml-10 resize-none"
+                    className="min-h-[120px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 resize-none"
                     rows={5}
                   />
                 </div>

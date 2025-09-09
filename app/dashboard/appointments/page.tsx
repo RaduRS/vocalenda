@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Users, Phone, Mail } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useAppointments } from "@/hooks/useAppointments";
+import { AppointmentsSkeleton } from "@/components/ui/skeleton-loading";
 
 function Appointments() {
   const { data, isLoading, error, refetch } = useAppointments();
@@ -47,15 +48,7 @@ function Appointments() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading appointments...</p>
-          <p className="text-sm text-gray-500 mt-2">Fetching your latest data...</p>
-        </div>
-      </div>
-    );
+    return <AppointmentsSkeleton />;
   }
 
   if (error) {

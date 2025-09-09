@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 // RefreshCw import removed as it's no longer used
 import { useCallLogs } from "@/hooks/useCallLogs";
+import { CallLogsSkeleton } from "@/components/ui/skeleton-loading";
 
 // CallLog interface is now imported from the hook
 
@@ -149,36 +150,7 @@ export default function CallLogsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="px-6 py-6">
-            <div className="h-8 bg-brand-primary-2/20 rounded w-48 mb-2 animate-pulse"></div>
-            <div className="h-4 bg-brand-primary-2/20 rounded w-64 animate-pulse"></div>
-          </div>
-        </div>
-        
-        {/* Main Content */}
-        <div className="p-6">
-          <Card>
-            <CardHeader>
-              <div className="h-6 bg-brand-primary-2/20 rounded w-32 animate-pulse"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div
-                    key={i}
-                    className="h-16 bg-brand-primary-2/20 rounded animate-pulse"
-                  ></div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    return <CallLogsSkeleton />;
   }
 
   return (

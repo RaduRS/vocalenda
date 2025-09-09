@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Users, Plus, Phone, Mail, MapPin, User } from "lucide-react";
 import { format } from "date-fns";
 import { useCustomers } from "@/hooks/useCustomers";
+import { CustomersSkeleton } from "@/components/ui/skeleton-loading";
 
 // Customer interface imported from useCustomers hook
 
@@ -21,30 +22,7 @@ function Customers() {
 
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white shadow-sm border-b">
-          <div className="px-6 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-brand-primary-1">
-                  Customer Directory
-                </h1>
-                <p className="text-brand-primary-2">
-                  Manage your customer contacts and information
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-2 text-sm text-gray-600">Loading customers...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <CustomersSkeleton />;
   }
 
   if (error) {
