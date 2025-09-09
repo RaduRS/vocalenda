@@ -243,18 +243,14 @@ function Dashboard() {
                     datasets: [
                       {
                         label: 'Appointments',
-                        data: [12, 19, 8, 15, 22, 8, 14],
+                        data: data.stats?.weeklyActivity?.map(day => day.appointments) || [0, 0, 0, 0, 0, 0, 0],
                         borderColor: 'rgb(147, 51, 234)',
                         backgroundColor: 'rgba(147, 51, 234, 0.1)',
                         tension: 0.4,
                       },
                       {
                         label: 'Calls',
-                        data: data.recentCalls?.slice(0, 7).map((_, index) => 
-                           data.recentCalls?.filter(call => 
-                             call.created_at && new Date(call.created_at).getDay() === index
-                           ).length || 0
-                         ) || [0, 0, 0, 0, 0, 0, 0],
+                        data: data.stats?.weeklyActivity?.map(day => day.calls) || [0, 0, 0, 0, 0, 0, 0],
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
@@ -335,7 +331,13 @@ function Dashboard() {
                      labels: ['Confirmed', 'Pending', 'Completed', 'Cancelled', 'No Show'],
                      datasets: [
                        {
-                         data: [40, 25, 20, 10, 5],
+                         data: [
+                           data.stats?.appointmentStatusCounts?.confirmed || 0,
+                           data.stats?.appointmentStatusCounts?.pending || 0,
+                           data.stats?.appointmentStatusCounts?.completed || 0,
+                           data.stats?.appointmentStatusCounts?.cancelled || 0,
+                           data.stats?.appointmentStatusCounts?.no_show || 0
+                         ],
                          backgroundColor: [
                            'rgba(59, 130, 246, 0.8)',
                            'rgba(251, 191, 36, 0.8)',
@@ -374,59 +376,69 @@ function Dashboard() {
               <h3 className="text-lg font-semibold mb-4 text-brand-primary-1">
                 Recent Activity
               </h3>
-              <div className="space-y-2">
-                {(data?.recentCalls || []).slice(0, 8).map((call: RecentCall, index: number) => (
-                  <div key={call.id || index} className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 rounded-md transition-colors">
-                    <div className="flex items-center space-x-3 min-w-0 flex-1">
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                        call.status === 'completed' ? 'bg-green-500' :
-                        call.status === 'failed' ? 'bg-red-500' :
-                        call.status === 'in_progress' ? 'bg-yellow-500' : 'bg-blue-500'
-                      }`}></div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center space-x-2">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                             {call.customer_name || 'Unknown Caller'}
-                           </p>
-                           <p className="text-xs text-gray-500 truncate">
-                             {call.caller_phone}
-                           </p>
-                          <span className={`px-1.5 py-0.5 text-xs rounded ${
-                            call.status === 'completed' ? 'bg-green-100 text-green-700' :
-                            call.status === 'failed' ? 'bg-red-100 text-red-700' :
-                            call.status === 'in_progress' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'
-                          }`}>
-                            {call.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                        
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3 flex-shrink-0 text-xs text-gray-500">
-                      <span>
-                         {call.created_at ? new Date(call.created_at).toLocaleTimeString('en-US', { 
-                           hour: '2-digit', 
-                           minute: '2-digit',
-                           hour12: true 
-                         }) : call.started_at ? new Date(call.started_at).toLocaleTimeString('en-US', { 
-                           hour: '2-digit', 
-                           minute: '2-digit',
-                           hour12: true 
-                         }) : '--'}
-                       </span>
-                      <span>
-                          {(() => {
-                            const duration = call.duration_seconds || call.duration;
-                            return duration ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` : '--';
-                          })()}
-                        </span>
-                    </div>
-                  </div>
-                )) || (
-                  <div className="text-center py-8 text-brand-primary-2">
-                    <p>No recent activity</p>
-                  </div>
-                )}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-1 font-medium text-gray-700">Name</th>
+                      <th className="text-left py-2 px-1 font-medium text-gray-700">Phone</th>
+                      <th className="text-left py-2 px-1 font-medium text-gray-700">Duration</th>
+                      <th className="text-left py-2 px-1 font-medium text-gray-700">Call Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(data?.recentCalls || []).slice(0, 8).map((call: RecentCall, index: number) => (
+                      <tr key={call.id || index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td className="py-3 px-1">
+                          <p className="font-medium text-gray-900 truncate">
+                            {call.customer_name || 'Unknown Caller'}
+                          </p>
+                        </td>
+                        <td className="py-3 px-1">
+                          <p className="text-gray-600 truncate">
+                            {call.caller_phone}
+                          </p>
+                        </td>
+                        <td className="py-3 px-1">
+                          <p className="text-gray-600">
+                            {(() => {
+                              const duration = call.duration_seconds || call.duration;
+                              return duration ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` : '--';
+                            })()}
+                          </p>
+                        </td>
+                        <td className="py-3 px-1">
+                          <p className="text-gray-600">
+                            {call.created_at ? new Date(call.created_at).toLocaleTimeString('en-US', { 
+                              hour: '2-digit', 
+                              minute: '2-digit',
+                              hour12: true 
+                            }) : call.started_at ? new Date(call.started_at).toLocaleTimeString('en-US', { 
+                              hour: '2-digit', 
+                              minute: '2-digit',
+                              hour12: true 
+                            }) : '--'}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {call.created_at ? new Date(call.created_at).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric' 
+                            }) : call.started_at ? new Date(call.started_at).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric' 
+                            }) : '--'}
+                          </p>
+                        </td>
+                      </tr>
+                    )) || (
+                      <tr>
+                        <td colSpan={4} className="text-center py-8 text-brand-primary-2">
+                          <p>No recent activity</p>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </Card>
           </div>

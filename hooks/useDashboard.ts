@@ -16,6 +16,18 @@ export interface DashboardStats {
   todayAppointments: number;
   totalCustomers: number;
   totalCalls: number;
+  appointmentStatusCounts?: {
+    confirmed: number;
+    pending: number;
+    completed: number;
+    cancelled: number;
+    no_show: number;
+  };
+  weeklyActivity?: Array<{
+    date: string;
+    appointments: number;
+    calls: number;
+  }>;
 }
 
 export interface RecentCall {
