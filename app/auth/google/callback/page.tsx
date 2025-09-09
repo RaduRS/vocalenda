@@ -58,8 +58,18 @@ function GoogleCallbackContent() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-
           setStatus('success');
+          
+          // Notify parent window if opened in popup
+          if (window.opener) {
+            window.opener.postMessage({ type: 'OAUTH_SUCCESS', service: 'google_calendar' }, window.location.origin);
+            window.close();
+            return;
+          }
+          
+          // Store success flag in sessionStorage for detection
+          sessionStorage.setItem('oauthSuccess', JSON.stringify({ service: 'google_calendar', timestamp: Date.now() }));
+          
           // Redirect to integrations page with calendar parameter after a short delay
           setTimeout(() => {
              router.push('/dashboard/integrations?calendar=connected');

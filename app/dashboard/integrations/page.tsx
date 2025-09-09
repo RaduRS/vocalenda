@@ -75,49 +75,120 @@ function Integrations() {
     }
   }, [user, fetchBusinessData]);
 
-  // Refresh data when user returns from OAuth or page gains focus
+  // Enhanced focus and visibility change listeners for OAuth detection
   useEffect(() => {
     const handleFocus = () => {
       if (user && !loading) {
-        fetchBusinessData(true); // Bypass cache to get fresh connection status
+        // Check if we have recent OAuth activity
+        const lastActivity = sessionStorage.getItem('lastOAuthActivity');
+        const now = Date.now();
+        
+        if (lastActivity && (now - parseInt(lastActivity)) < 120000) { // 2 minutes
+          console.log('Focus detected with recent OAuth activity, forcing refresh...');
+          setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
+          fetchBusinessData(true);
+          sessionStorage.removeItem('lastOAuthActivity');
+        } else {
+          fetchBusinessData(true); // Regular cache bypass on focus
+        }
+      }
+    };
+    
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user && !loading) {
+        const lastActivity = sessionStorage.getItem('lastOAuthActivity');
+        const now = Date.now();
+        
+        if (lastActivity && (now - parseInt(lastActivity)) < 120000) { // 2 minutes
+          console.log('Page became visible with recent OAuth activity, forcing refresh...');
+          setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
+          fetchBusinessData(true);
+          sessionStorage.removeItem('lastOAuthActivity');
+        }
       }
     };
 
     window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [user, loading, fetchBusinessData]);
 
-  // Immediate refresh when component mounts (for OAuth returns)
+  // OAuth success detection and page refresh
   useEffect(() => {
     if (user && !loading) {
-      // Check multiple indicators that we returned from OAuth
-      const lastActivity = sessionStorage.getItem('lastOAuthActivity');
-      const now = Date.now();
+      // Check for OAuth success in sessionStorage
+      const oauthSuccess = sessionStorage.getItem('oauthSuccess');
+      if (oauthSuccess) {
+        try {
+          const { service, timestamp } = JSON.parse(oauthSuccess);
+          const now = Date.now();
+          
+          // If OAuth success was recent (within 60 seconds)
+          if (service === 'google_calendar' && (now - timestamp) < 60000) {
+            console.log('Detected OAuth success, updating state and refreshing...');
+            
+            // Immediately update state to connected
+            setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
+            
+            // Force refresh from server
+            fetchBusinessData(true);
+            
+            // Clean up
+            sessionStorage.removeItem('oauthSuccess');
+            sessionStorage.removeItem('lastOAuthActivity');
+          }
+        } catch (error) {
+          console.error('Error parsing OAuth success data:', error);
+          sessionStorage.removeItem('oauthSuccess');
+        }
+      }
+      
+      // Check URL parameters for OAuth return
       const urlParams = new URLSearchParams(window.location.search);
       const hasCalendarParam = urlParams.has('calendar');
-      const referrer = document.referrer;
-      const isFromGoogle = referrer.includes('accounts.google.com') || referrer.includes('oauth');
       
-      // If we have recent OAuth activity, URL params, or came from Google, refresh immediately
-       if ((lastActivity && (now - parseInt(lastActivity)) < 30000) || hasCalendarParam || isFromGoogle) {
-         console.log('Detected OAuth return, refreshing integration status...');
-         
-         // If we have calendar param indicating successful connection, update state immediately
-         if (hasCalendarParam && urlParams.get('calendar') === 'connected') {
-           setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
-         }
-         
-         fetchBusinessData(true);
-         sessionStorage.removeItem('lastOAuthActivity');
-         
-         // Clean up URL parameters
-         if (hasCalendarParam) {
-           const newUrl = window.location.pathname;
-           window.history.replaceState({}, '', newUrl);
-         }
-       }
+      if (hasCalendarParam) {
+        console.log('Detected OAuth return via URL params, refreshing...');
+        
+        if (urlParams.get('calendar') === 'connected') {
+          setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
+        }
+        
+        fetchBusinessData(true);
+        
+        // Clean up URL parameters
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
     }
   }, [user, loading, fetchBusinessData]);
+  
+  // Listen for OAuth success messages from popup
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data.type === 'OAUTH_SUCCESS' && event.data.service === 'google_calendar') {
+        console.log('Received OAuth success message, updating state...');
+        
+        // Immediately update state
+        setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
+        
+        // Force refresh from server
+        fetchBusinessData(true);
+        
+        // Clean up
+        sessionStorage.removeItem('lastOAuthActivity');
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [fetchBusinessData]);
 
   const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
