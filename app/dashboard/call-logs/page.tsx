@@ -118,25 +118,32 @@ export default function CallLogsPage() {
   );
 
   const handleExport = () => {
-    // Create CSV content
+    // Create CSV content with transcript
     const headers = [
       "Date",
       "Customer Name",
       "Phone Number",
       "Status",
       "Duration",
+      "Transcript",
     ];
     const csvContent = [
       headers.join(","),
-      ...callLogs.map((call) =>
-        [
+      ...callLogs.map((call) => {
+        // Clean transcript for CSV (remove quotes and newlines)
+        const cleanTranscript = call.transcript 
+          ? call.transcript.replace(/"/g, '""').replace(/\n/g, ' ').replace(/\r/g, ' ')
+          : 'No transcript available';
+        
+        return [
           formatTimestamp(call.started_at),
-          call.customer_name?.trim() || "Unknown Caller",
+          '"' + (call.customer_name?.trim() || "Unknown Caller") + '"',
           call.caller_phone,
           call.status,
           formatDuration(call.duration),
-        ].join(",")
-      ),
+          '"' + cleanTranscript + '"'
+        ].join(",");
+      }),
     ].join("\n");
 
     // Create and download file

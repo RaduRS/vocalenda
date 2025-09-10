@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useState, useMemo, useCallback, memo } from "react";
+import { useState, useMemo, useCallback, memo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format, parseISO } from 'date-fns';
 import {
@@ -57,12 +57,21 @@ function Dashboard() {
   const { data, isLoading, error } = useDashboard(weekOffset);
   const business = data?.business;
   const [currentPage, setCurrentPage] = useState(1);
+  const [hasRedirected, setHasRedirected] = useState(false);
   const itemsPerPage = 5;
   const maxItems = 10;
 
   const navigateWeek = useCallback((direction: 'prev' | 'next') => {
     setWeekOffset(prev => direction === 'prev' ? prev - 1 : prev + 1);
   }, []);
+
+  // Handle redirect to setup if no business found
+  useEffect(() => {
+    if (data && !data.business && !hasRedirected) {
+      setHasRedirected(true);
+      router.push("/setup");
+    }
+  }, [data, router, hasRedirected]);
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(
@@ -150,11 +159,7 @@ function Dashboard() {
   const callStatusLabels = ['completed', 'failed', 'in_progress', 'incoming'];
   const callStatusValues = callStatusLabels.map(status => callStatusData[status] || 0);
 
-  // Redirect to setup if no business found
-  if (data && !data.business) {
-    router.push("/setup");
-    return null;
-  }
+
 
   if (isLoading) {
     return <DashboardSkeleton />;

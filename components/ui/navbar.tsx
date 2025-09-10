@@ -108,6 +108,19 @@ export default function Navbar() {
               </SignUpButton>
             </SignedOut>
             <SignedIn>
+              <Link href="/dashboard">
+                <motion.div
+                  style={{ color: textColor }}
+                >
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="transition-colors duration-300 hover:bg-white/10 cursor-pointer"
+                  >
+                    Dashboard
+                  </Button>
+                </motion.div>
+              </Link>
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -142,22 +155,34 @@ export default function Navbar() {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <UserButton
-                  appearance={{
-                    elements: {
-                      avatarBox: 'w-8 h-8',
-                      userButtonPopoverCard:
-                        'shadow-lg border border-slate-200 dark:border-slate-700',
-                      userButtonPopoverActionButton:
-                        'hover:bg-slate-50 dark:hover:bg-slate-800',
-                    },
-                  }}
-                />
-              </motion.div>
+              <div className="flex items-center space-x-2">
+                <Link href="/dashboard">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-3 py-1 text-sm rounded-md cursor-pointer"
+                    style={{ color: textColor }}
+                  >
+                    Dashboard
+                  </motion.button>
+                </Link>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: 'w-8 h-8',
+                        userButtonPopoverCard:
+                          'shadow-lg border border-slate-200 dark:border-slate-700',
+                        userButtonPopoverActionButton:
+                          'hover:bg-slate-50 dark:hover:bg-slate-800',
+                      },
+                    }}
+                  />
+                </motion.div>
+              </div>
             </SignedIn>
           </div>
         </div>
