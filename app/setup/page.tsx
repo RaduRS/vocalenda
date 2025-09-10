@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,6 +36,7 @@ import { getCurrentUKDate, formatISODate } from '@/lib/date-utils'
 export default function SetupWizard() {
   const { user } = useUser();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -239,6 +241,10 @@ export default function SetupWizard() {
         const result = await response.json();
         toast.success('Business created successfully! Redirecting to dashboard...');
         console.log('Business created:', result);
+        
+        // Invalidate dashboard cache to ensure fresh data
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        
         // Use Next.js router for proper navigation
         setTimeout(() => {
           router.push(result.redirectTo || '/dashboard');
