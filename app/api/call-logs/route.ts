@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const { userId } = await auth();
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = (page - 1) * limit;
     
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,7 +27,18 @@ export async function GET() {
 
     const businessId = user.business_id;
 
-    // Fetch all call logs for this business, ordered by most recent first
+    // Get total count for pagination
+    const { count: totalCount, error: countError } = await supabaseAdmin
+      .from('call_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', businessId);
+
+    if (countError) {
+      console.error('Error counting call logs:', countError);
+      return NextResponse.json({ error: 'Failed to count call logs' }, { status: 500 });
+    }
+
+    // Fetch paginated call logs for this business, ordered by most recent first
     const { data: callLogs, error: callLogsError } = await supabaseAdmin
       .from('call_logs')
       .select(`
@@ -37,7 +52,8 @@ export async function GET() {
         transcript
       `)
       .eq('business_id', businessId)
-      .order('started_at', { ascending: false });
+      .order('started_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (callLogsError) {
       console.error('Error fetching call logs:', callLogsError);
@@ -87,7 +103,12 @@ export async function GET() {
     });
 
     return NextResponse.json({
-      callLogs: processedCallLogs
+      callLogs: processedCallLogs,
+      totalCount: totalCount || 0,
+      currentPage: page,
+      totalPages: Math.ceil((totalCount || 0) / limit),
+      hasNextPage: page < Math.ceil((totalCount || 0) / limit),
+      hasPreviousPage: page > 1
     });
 
   } catch (error) {

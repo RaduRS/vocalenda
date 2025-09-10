@@ -15,10 +15,14 @@ export interface CallLog {
 export interface CallLogsData {
   callLogs: CallLog[];
   totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
-const fetchCallLogs = async (): Promise<CallLogsData> => {
-  const response = await fetch('/api/call-logs');
+const fetchCallLogs = async (page: number = 1, limit: number = 10): Promise<CallLogsData> => {
+  const response = await fetch(`/api/call-logs?page=${page}&limit=${limit}`);
   
   if (!response.ok) {
     throw new Error('Failed to fetch call logs');
@@ -27,14 +31,18 @@ const fetchCallLogs = async (): Promise<CallLogsData> => {
   const data = await response.json();
   return {
     callLogs: data.callLogs || [],
-    totalCount: data.totalCount || 0
+    totalCount: data.totalCount || 0,
+    currentPage: data.currentPage || 1,
+    totalPages: data.totalPages || 0,
+    hasNextPage: data.hasNextPage || false,
+    hasPreviousPage: data.hasPreviousPage || false
   };
 };
 
-export const useCallLogs = () => {
+export const useCallLogs = (page: number = 1, limit: number = 10) => {
   return useQuery({
-    queryKey: ['call-logs'],
-    queryFn: fetchCallLogs,
+    queryKey: ['call-logs', page, limit],
+    queryFn: () => fetchCallLogs(page, limit),
     staleTime: 2 * 60 * 1000, // 2 minutes - call logs update less frequently than real-time data
     // Use global defaults for better performance and consistency
   });

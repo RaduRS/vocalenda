@@ -109,7 +109,9 @@ const toggleTranscript = (
 };
 
 export default function CallLogsPage() {
-  const { data, isLoading, error, refetch } = useCallLogs();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const { data, isLoading, error, refetch } = useCallLogs(currentPage, itemsPerPage);
   const callLogs = data?.callLogs || [];
   const [expandedTranscript, setExpandedTranscript] = useState<string | null>(
     null
@@ -191,7 +193,7 @@ export default function CallLogsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Phone className="h-5 w-5" />
-              All Calls ({callLogs.length})
+              All Calls ({data?.totalCount || 0})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -345,6 +347,40 @@ export default function CallLogsPage() {
                     )}
                   </div>
                 ))}
+                
+                {/* Pagination Controls */}
+                {data && data.totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                    <div className="text-sm text-brand-primary-2">
+                      Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, data.totalCount)} of {data.totalCount} calls
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={!data.hasPreviousPage}
+                        className="flex items-center gap-1"
+                      >
+                        <ChevronUp className="h-4 w-4 rotate-[-90deg]" />
+                        Previous
+                      </Button>
+                      <span className="text-sm text-brand-primary-2 px-3">
+                        Page {currentPage} of {data.totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(data.totalPages, prev + 1))}
+                        disabled={!data.hasNextPage}
+                        className="flex items-center gap-1"
+                      >
+                        Next
+                        <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
