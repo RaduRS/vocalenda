@@ -153,8 +153,8 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Script sources - removed 'unsafe-inline' for better security, kept necessary domains
-              `script-src 'self' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://clerk.vocalenda.com https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
+              // Script sources - 'unsafe-inline' required for Next.js and component functionality
+              `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://clerk.vocalenda.com https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
               // Style sources - 'unsafe-inline' required for Clerk components
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
