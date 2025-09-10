@@ -239,9 +239,9 @@ export default function SetupWizard() {
         const result = await response.json();
         toast.success('Business created successfully! Redirecting to dashboard...');
         console.log('Business created:', result);
-        // Redirect to dashboard
+        // Use Next.js router for proper navigation
         setTimeout(() => {
-          window.location.href = result.redirectTo || '/dashboard';
+          router.push(result.redirectTo || '/dashboard');
         }, 1500);
       } else {
         const error = await response.json();

@@ -1,5 +1,6 @@
 // Service Worker for caching static assets and API responses
-const CACHE_NAME = 'vocalenda-v1';
+// Updated cache name to force refresh and clear any cached user data
+const CACHE_NAME = 'vocalenda-v2-secure';
 const STATIC_CACHE_URLS = [
   '/',
   '/dashboard',
@@ -44,13 +45,35 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle API requests with stale-while-revalidate strategy (GET only)
+  // Define user-specific API routes that should NEVER be cached
+  const userSpecificRoutes = [
+    '/api/dashboard',
+    '/api/appointments',
+    '/api/customers', 
+    '/api/call-logs',
+    '/api/business',
+    '/api/auth'
+  ];
+  
+  // Check if this is a user-specific route
+  const isUserSpecificRoute = userSpecificRoutes.some(route => 
+    url.pathname.startsWith(route)
+  );
+
+  // Handle API requests - NEVER cache user-specific data
   if (url.pathname.startsWith('/api/') && request.method === 'GET') {
+    if (isUserSpecificRoute) {
+      // Always fetch from network for user-specific routes to prevent data leakage
+      event.respondWith(fetch(request));
+      return;
+    }
+    
+    // Only cache non-user-specific API routes (like public data)
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) => {
         return cache.match(request).then((cachedResponse) => {
           const fetchPromise = fetch(request).then((networkResponse) => {
-            // Only cache successful responses
+            // Only cache successful responses for non-user-specific routes
             if (networkResponse.status === 200) {
               cache.put(request, networkResponse.clone());
             }
