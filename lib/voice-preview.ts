@@ -63,14 +63,15 @@ export function getVoiceDisplayName(voiceId: string): string {
     'aura-2-thalia-en': 'Thalia (American, feminine)',
     'aura-2-orpheus-en': 'Orpheus (American, masculine)',
     'aura-2-arcas-en': 'Arcas (American, masculine)',
-    'aura-2-perseus-en': 'Perseus (American, masculine)',
-    'aura-2-angus-en': 'Angus (Irish, masculine)',
+    'aura-2-apollo-en': 'Apollo (American, masculine)',
+    'aura-2-zeus-en': 'Zeus (American, masculine)',
     'aura-2-orion-en': 'Orion (American, masculine)',
-    'aura-2-helios-en': 'Helios (British, masculine)',
+    'aura-2-draco-en': 'Draco (British, masculine)',
     'aura-2-luna-en': 'Luna (American, feminine)',
-    'aura-2-stella-en': 'Stella (American, feminine)',
-    'aura-2-athena-en': 'Athena (British, feminine)',
+    'aura-2-aurora-en': 'Aurora (American, feminine)',
+    'aura-2-athena-en': 'Athena (American, feminine)',
     'aura-2-hera-en': 'Hera (American, feminine)',
+    'aura-2-asteria-en': 'Asteria (American, feminine)',
   };
   
   return voiceMap[voiceId] || voiceId;

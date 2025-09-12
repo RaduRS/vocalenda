@@ -41,6 +41,7 @@ export default function SetupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{
     slug?: string;
     phone?: string;
@@ -875,14 +876,15 @@ export default function SetupWizard() {
                       <SelectItem value="aura-2-thalia-en">Thalia (American, feminine)</SelectItem>
                       <SelectItem value="aura-2-asteria-en">Asteria (American, feminine)</SelectItem>
                       <SelectItem value="aura-2-luna-en">Luna (American, feminine)</SelectItem>
-                      <SelectItem value="aura-2-stella-en">Stella (American, feminine)</SelectItem>
                       <SelectItem value="aura-2-athena-en">Athena (American, feminine)</SelectItem>
                       <SelectItem value="aura-2-hera-en">Hera (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-aurora-en">Aurora (American, feminine)</SelectItem>
                       <SelectItem value="aura-2-orion-en">Orion (American, masculine)</SelectItem>
                       <SelectItem value="aura-2-arcas-en">Arcas (American, masculine)</SelectItem>
-                      <SelectItem value="aura-2-perseus-en">Perseus (American, masculine)</SelectItem>
+                      <SelectItem value="aura-2-apollo-en">Apollo (American, masculine)</SelectItem>
                       <SelectItem value="aura-2-orpheus-en">Orpheus (American, masculine)</SelectItem>
                       <SelectItem value="aura-2-zeus-en">Zeus (American, masculine)</SelectItem>
+                      <SelectItem value="aura-2-draco-en">Draco (British, masculine)</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -890,13 +892,23 @@ export default function SetupWizard() {
                     variant="outline"
                     size="sm"
                     className="flex items-center space-x-2"
-                    onClick={() => {
+                    disabled={isPreviewLoading}
+                    onClick={async () => {
                       const currentVoice = businessData.ai_configuration?.voice || 'aura-2-thalia-en';
-                      previewVoice(currentVoice);
+                      setIsPreviewLoading(true);
+                      try {
+                        await previewVoice(currentVoice);
+                      } finally {
+                        setIsPreviewLoading(false);
+                      }
                     }}
                   >
-                    <Play className="h-4 w-4" />
-                    <span>Preview</span>
+                    {isPreviewLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Play className="h-4 w-4" />
+                    )}
+                    <span>{isPreviewLoading ? 'Loading...' : 'Preview'}</span>
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">Choose the voice for your AI receptionist and preview each option</p>

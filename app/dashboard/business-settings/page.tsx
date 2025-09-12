@@ -24,6 +24,7 @@ import {
   Bot,
   MessageSquare,
   Play,
+  Loader2,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -40,6 +41,7 @@ import { previewVoice } from "@/lib/voice-preview";
 export default function BusinessSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [businessData, setBusinessData] = useState<ComprehensiveBusinessData>({
     name: "",
     business_type: "",
@@ -298,11 +300,11 @@ export default function BusinessSettings() {
         <div className="px-6">
           {/* Mobile Tab Selector */}
           <div className="sm:hidden py-4">
-            <select
+            <Select
               value={activeTab}
-              onChange={(e) =>
+              onValueChange={(value) =>
                 setActiveTab(
-                  e.target.value as
+                  value as
                     | "basic"
                     | "hours"
                     | "services"
@@ -312,16 +314,65 @@ export default function BusinessSettings() {
                     | "sms"
                 )
               }
-              className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900"
             >
-              <option value="basic">📋 Basic Info</option>
-              <option value="hours">🕐 Operating Hours</option>
-              <option value="services">✂️ Services</option>
-              <option value="staff">👥 Staff</option>
-              <option value="holidays">📅 Holidays</option>
-              <option value="ai">🤖 AI & Policies</option>
-              <option value="sms">💬 SMS Messages</option>
-            </select>
+              <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-900">
+                <SelectValue>
+                  <div className="flex items-center space-x-2">
+                    {activeTab === "basic" && <><Settings className="w-4 h-4" /><span>Basic Info</span></>}
+                    {activeTab === "hours" && <><Clock className="w-4 h-4" /><span>Operating Hours</span></>}
+                    {activeTab === "services" && <><Edit3 className="w-4 h-4" /><span>Services</span></>}
+                    {activeTab === "staff" && <><Users className="w-4 h-4" /><span>Staff</span></>}
+                    {activeTab === "holidays" && <><Calendar className="w-4 h-4" /><span>Holidays</span></>}
+                    {activeTab === "ai" && <><Bot className="w-4 h-4" /><span>AI & Policies</span></>}
+                    {activeTab === "sms" && <><MessageSquare className="w-4 h-4" /><span>SMS Messages</span></>}
+                  </div>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="basic">
+                  <div className="flex items-center space-x-2">
+                    <Settings className="w-4 h-4" />
+                    <span>Basic Info</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="hours">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Operating Hours</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="services">
+                  <div className="flex items-center space-x-2">
+                    <Edit3 className="w-4 h-4" />
+                    <span>Services</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="staff">
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-4 h-4" />
+                    <span>Staff</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="holidays">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>Holidays</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="ai">
+                  <div className="flex items-center space-x-2">
+                    <Bot className="w-4 h-4" />
+                    <span>AI & Policies</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="sms">
+                  <div className="flex items-center space-x-2">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>SMS Messages</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Desktop Tab Navigation */}
@@ -477,15 +528,15 @@ export default function BusinessSettings() {
         {/* Operating Hours Tab */}
         {activeTab === "hours" && (
           <div className="space-y-6">
-            <Card className="p-6 shadow-sm border-0 bg-white">
+            <Card className="p-4 sm:p-6 shadow-sm border-0 bg-white">
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <Clock className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 flex items-center">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
                   Operating Hours
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Set your business hours for each day of the week
                 </p>
               </div>
@@ -507,13 +558,13 @@ export default function BusinessSettings() {
                   return (
                     <div
                       key={day}
-                      className={`p-4 rounded-lg border transition-all duration-200 ${
+                      className={`p-3 sm:p-4 rounded-lg border transition-all duration-200 ${
                         !hours.closed
                           ? "bg-blue-50 border-blue-200"
                           : "bg-gray-50 border-gray-200"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                         <div className="flex items-center space-x-3">
                           <input
                             type="checkbox"
@@ -535,7 +586,7 @@ export default function BusinessSettings() {
                           </Label>
                         </div>
 
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2 sm:space-x-3 ml-7 sm:ml-0">
                           {!hours.closed ? (
                             <>
                               <Input
@@ -548,9 +599,9 @@ export default function BusinessSettings() {
                                     e.target.value
                                   )
                                 }
-                                className="w-24 h-9 text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                                className="w-20 sm:w-24 h-8 sm:h-9 text-xs sm:text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                               />
-                              <span className="text-gray-500 text-sm">to</span>
+                              <span className="text-gray-500 text-xs sm:text-sm px-1">to</span>
                               <Input
                                 type="time"
                                 value={hours.close}
@@ -561,11 +612,11 @@ export default function BusinessSettings() {
                                     e.target.value
                                   )
                                 }
-                                className="w-24 h-9 text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                                className="w-20 sm:w-24 h-8 sm:h-9 text-xs sm:text-sm border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                               />
                             </>
                           ) : (
-                            <span className="text-sm text-gray-500 font-medium">
+                            <span className="text-xs sm:text-sm text-gray-500 font-medium">
                               Closed
                             </span>
                           )}
@@ -945,30 +996,30 @@ export default function BusinessSettings() {
 
         {/* AI & Policies Tab */}
         {activeTab === "ai" && (
-          <div className="space-y-8">
-            <Card className="p-8 shadow-sm border-0 bg-white">
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                    <Bot className="w-5 h-5 text-purple-600" />
+          <div className="space-y-6 sm:space-y-8">
+            <Card className="p-4 sm:p-6 lg:p-8 shadow-sm border-0 bg-white">
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 flex items-center">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                    <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                   </div>
                   AI & Policies
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm sm:text-base text-gray-600">
                   Configure payment methods, AI behavior, and booking policies
                 </p>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Payment Methods Section */}
-                <div className="p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-2">
-                      <Settings className="w-4 h-4 text-green-600" />
+                <div className="p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200">
+                  <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center mr-2">
+                      <Settings className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                     </div>
                     Payment Methods
                   </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {Object.entries(paymentMethodLabels).map(
                       ([method, label]) => (
                         <label
@@ -983,9 +1034,9 @@ export default function BusinessSettings() {
                             onChange={() =>
                               togglePaymentMethod(method as PaymentMethod)
                             }
-                            className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                            className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2 flex-shrink-0"
                           />
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                          <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-gray-900">
                             {label}
                           </span>
                         </label>
@@ -995,16 +1046,16 @@ export default function BusinessSettings() {
                 </div>
 
                 {/* AI Instructions Section */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Settings className="w-4 h-4 text-blue-600" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Settings className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                     </div>
-                    <Label className="text-lg font-semibold text-gray-900">
+                    <Label className="text-base sm:text-lg font-semibold text-gray-900">
                       AI Instructions
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Provide specific instructions for how the AI assistant
                     should behave when handling customer calls
                   </p>
@@ -1017,25 +1068,25 @@ export default function BusinessSettings() {
                       })
                     }
                     placeholder="e.g., Always be polite and professional, ask for customer preferences, suggest popular services..."
-                    className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
-                    rows={5}
+                    className="min-h-[100px] sm:min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none text-sm"
+                    rows={4}
                   />
                 </div>
 
                 {/* AI Voice Selection */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <MessageSquare className="w-4 h-4 text-purple-600" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                     </div>
-                    <Label className="text-lg font-semibold text-gray-900">
+                    <Label className="text-base sm:text-lg font-semibold text-gray-900">
                       AI Voice
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Choose the voice for your AI receptionist and preview each option
                   </p>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
                     <div className="flex-1">
                       <Select
                         value={businessData.ai_configuration.voice || 'aura-2-thalia-en'}
@@ -1046,21 +1097,22 @@ export default function BusinessSettings() {
                           });
                         }}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full h-10 text-sm">
                           <SelectValue placeholder="Select a voice" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="aura-2-thalia-en">Thalia (American, feminine)</SelectItem>
                           <SelectItem value="aura-2-asteria-en">Asteria (American, feminine)</SelectItem>
                           <SelectItem value="aura-2-luna-en">Luna (American, feminine)</SelectItem>
-                          <SelectItem value="aura-2-stella-en">Stella (American, feminine)</SelectItem>
                           <SelectItem value="aura-2-athena-en">Athena (American, feminine)</SelectItem>
                           <SelectItem value="aura-2-hera-en">Hera (American, feminine)</SelectItem>
+                          <SelectItem value="aura-2-aurora-en">Aurora (American, feminine)</SelectItem>
                           <SelectItem value="aura-2-orion-en">Orion (American, masculine)</SelectItem>
                           <SelectItem value="aura-2-arcas-en">Arcas (American, masculine)</SelectItem>
-                          <SelectItem value="aura-2-perseus-en">Perseus (American, masculine)</SelectItem>
+                          <SelectItem value="aura-2-apollo-en">Apollo (American, masculine)</SelectItem>
                           <SelectItem value="aura-2-orpheus-en">Orpheus (American, masculine)</SelectItem>
                           <SelectItem value="aura-2-zeus-en">Zeus (American, masculine)</SelectItem>
+                          <SelectItem value="aura-2-draco-en">Draco (British, masculine)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1068,29 +1120,39 @@ export default function BusinessSettings() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="flex items-center space-x-2"
-                      onClick={() => {
+                      className="flex items-center space-x-2 w-full sm:w-auto h-10"
+                      disabled={isPreviewLoading}
+                      onClick={async () => {
                         const currentVoice = businessData.ai_configuration.voice || 'aura-2-thalia-en';
-                        previewVoice(currentVoice);
+                        setIsPreviewLoading(true);
+                        try {
+                          await previewVoice(currentVoice);
+                        } finally {
+                          setIsPreviewLoading(false);
+                        }
                       }}
                     >
-                      <Play className="h-4 w-4" />
-                      <span>Preview</span>
+                      {isPreviewLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                      <span className="text-sm">{isPreviewLoading ? 'Loading...' : 'Preview'}</span>
                     </Button>
                   </div>
                 </div>
 
                 {/* Booking Policies Section */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                      <Settings className="w-4 h-4 text-amber-600" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <Settings className="w-3 h-3 sm:w-4 sm:h-4 text-amber-600" />
                     </div>
-                    <Label className="text-lg font-semibold text-gray-900">
+                    <Label className="text-base sm:text-lg font-semibold text-gray-900">
                       Booking Policies
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Define your booking rules, cancellation terms, and customer
                     policies
                   </p>
@@ -1105,22 +1167,22 @@ export default function BusinessSettings() {
                       })
                     }
                     placeholder="e.g., 24-hour cancellation policy, 50% deposit required, no-show policy..."
-                    className="min-h-[120px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 resize-none"
-                    rows={5}
+                    className="min-h-[100px] sm:min-h-[120px] border-gray-200 focus:border-amber-500 focus:ring-amber-500 resize-none text-sm"
+                    rows={4}
                   />
                 </div>
 
                 {/* Human Handoff Phone Number Section */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Phone className="w-4 h-4 text-purple-600" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                     </div>
-                    <Label className="text-lg font-semibold text-gray-900">
+                    <Label className="text-base sm:text-lg font-semibold text-gray-900">
                       Human Handoff Phone Number
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Phone number to connect customers to when they request to speak with a human or staff member during AI conversations
                   </p>
                   <Input
@@ -1130,7 +1192,7 @@ export default function BusinessSettings() {
                       handleInputChange("bypass_phone_number", e.target.value)
                     }
                     placeholder="+44 7123 456789"
-                    className="border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                    className="h-10 text-sm border-gray-200 focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
               </div>

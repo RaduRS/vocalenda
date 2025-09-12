@@ -170,7 +170,7 @@ const nextConfig: NextConfig = {
               "upgrade-insecure-requests",
               // Additional security directives
               "manifest-src 'self'",
-              "media-src 'self'"
+              "media-src 'self' blob:"
             ].join('; ')
           },
           {

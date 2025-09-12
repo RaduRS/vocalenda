@@ -11,6 +11,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate API key
+    if (!process.env.DEEPGRAM_API_KEY) {
+      console.error('DEEPGRAM_API_KEY is not configured');
+      return NextResponse.json(
+        { error: 'TTS service not configured' },
+        { status: 500 }
+      );
+    }
+
     // Generate speech using Deepgram TTS API directly
     const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
       method: 'POST',
@@ -19,7 +28,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        text
+        text: text
       }),
     });
 
@@ -28,9 +37,24 @@ export async function POST(request: NextRequest) {
       console.error('Deepgram API error details:', {
         status: response.status,
         statusText: response.statusText,
-        body: errorText
+        body: errorText,
+        voice: voice,
+        text: text
       });
-      throw new Error(`Deepgram API error: ${response.statusText}`);
+      
+      // Try to parse error response as JSON
+      let errorMessage = 'Failed to generate voice preview';
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorJson.error || errorMessage;
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+      
+      return NextResponse.json(
+        { error: errorMessage },
+        { status: response.status }
+      );
     }
 
     // Get the audio buffer
