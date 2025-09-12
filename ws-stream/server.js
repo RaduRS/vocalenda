@@ -8,7 +8,6 @@ import {
   handleDeepgramMessage,
   cleanupAudioSystem,
   closeDeepgramConnection,
-  initializeTranscriptTracking,
   saveConversationTranscript,
 } from "./deepgram.js";
 import { clearCallSession } from "./functionHandlers.js";
@@ -44,6 +43,7 @@ wss.on("connection", async (ws, req) => {
   let businessId = null;
   let callSid = null;
   let businessConfig = null;
+  let transcriptSaved = false;
   let deepgramReady = false; // Track if Deepgram is ready to receive audio
   let expectingFunctionCall = false;
   let functionCallTimeout = null;
@@ -140,8 +140,7 @@ wss.on("connection", async (ws, req) => {
               await db.updateCallStatus(callSid, "in_progress");
               console.log(`📞 Call status updated to in_progress: ${callSid}`);
               
-              // Initialize transcript tracking
-              initializeTranscriptTracking(callSid);
+              // Transcript tracking is now handled by ConnectionState
             }
           } catch (error) {
             console.error("❌ Failed to log call:", error);
@@ -207,7 +206,7 @@ wss.on("connection", async (ws, req) => {
               `Deepgram WebSocket closed. Code: ${code}, Reason: ${reason}`
             );
             // Clean up audio system when Deepgram closes
-            cleanupAudioSystem();
+            cleanupAudioSystem(deepgramWs);
             // Only close Twilio connection if it's an unexpected close
             if (code !== 1000 && code !== 1001) {
               console.error(
@@ -271,7 +270,8 @@ wss.on("connection", async (ws, req) => {
               console.log(`✅ Call completion logged: ${callSid}`);
               
               // Save conversation transcript
-              await saveConversationTranscript(callSid);
+              await saveConversationTranscript(callSid, deepgramWs);
+              transcriptSaved = true;
             }
           } catch (error) {
             console.error("❌ Failed to log call completion:", error);
@@ -298,8 +298,10 @@ wss.on("connection", async (ws, req) => {
         await db.updateCallStatus(callSid, 'completed', endTime);
         console.log(`✅ Call completion logged on close: ${callSid}`);
         
-        // Save conversation transcript
-        await saveConversationTranscript(callSid);
+        // Save conversation transcript only if not already saved
+        if (!transcriptSaved) {
+          await saveConversationTranscript(callSid, deepgramWs);
+        }
       }
     } catch (error) {
       console.error("❌ Failed to log call completion on close:", error);

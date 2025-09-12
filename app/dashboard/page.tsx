@@ -272,7 +272,6 @@ function Dashboard() {
                     size="sm"
                     onClick={() => navigateWeek('next')}
                     className="p-2 h-8 w-8"
-                    disabled={weekOffset >= 0}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
