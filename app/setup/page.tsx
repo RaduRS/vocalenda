@@ -857,61 +857,47 @@ export default function SetupWizard() {
 
               <div>
                 <Label htmlFor="ai-voice">AI Voice *</Label>
-                <div className="mt-1 space-y-2">
-                  {[
-                    { value: 'aura-2-thalia-en', label: 'Thalia (American, feminine)' },
-                    { value: 'aura-2-asteria-en', label: 'Asteria (American, feminine)' },
-                    { value: 'aura-2-luna-en', label: 'Luna (American, feminine)' },
-                    { value: 'aura-2-stella-en', label: 'Stella (American, feminine)' },
-                    { value: 'aura-2-athena-en', label: 'Athena (American, feminine)' },
-                    { value: 'aura-2-hera-en', label: 'Hera (American, feminine)' },
-                    { value: 'aura-2-orion-en', label: 'Orion (American, masculine)' },
-                    { value: 'aura-2-arcas-en', label: 'Arcas (American, masculine)' },
-                    { value: 'aura-2-perseus-en', label: 'Perseus (American, masculine)' },
-                    { value: 'aura-2-orpheus-en', label: 'Orpheus (American, masculine)' },
-                    { value: 'aura-2-zeus-en', label: 'Zeus (American, masculine)' },
-                  ].map((voice) => (
-                    <div
-                      key={voice.value}
-                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                        (businessData.ai_configuration?.voice || 'aura-2-thalia-en') === voice.value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => {
-                        const updated = {
-                          ...businessData.ai_configuration,
-                          voice: voice.value
-                        };
-                        handleInputChange('ai_configuration', updated);
-                      }}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-4 h-4 rounded-full border-2 ${
-                          (businessData.ai_configuration?.voice || 'aura-2-thalia-en') === voice.value
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
-                        }`}>
-                          {(businessData.ai_configuration?.voice || 'aura-2-thalia-en') === voice.value && (
-                            <div className="w-2 h-2 bg-white rounded-full m-0.5" />
-                          )}
-                        </div>
-                        <span className="text-sm font-medium">{voice.label}</span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 hover:bg-gray-100"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          previewVoice(voice.value);
-                        }}
-                      >
-                        <Play className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                <div className="flex items-center space-x-2 mt-1">
+                  <Select
+                    value={businessData.ai_configuration?.voice || 'aura-2-thalia-en'}
+                    onValueChange={(value) => {
+                      const updated = {
+                        ...businessData.ai_configuration,
+                        voice: value
+                      };
+                      handleInputChange('ai_configuration', updated);
+                    }}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select a voice" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="aura-2-thalia-en">Thalia (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-asteria-en">Asteria (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-luna-en">Luna (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-stella-en">Stella (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-athena-en">Athena (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-hera-en">Hera (American, feminine)</SelectItem>
+                      <SelectItem value="aura-2-orion-en">Orion (American, masculine)</SelectItem>
+                      <SelectItem value="aura-2-arcas-en">Arcas (American, masculine)</SelectItem>
+                      <SelectItem value="aura-2-perseus-en">Perseus (American, masculine)</SelectItem>
+                      <SelectItem value="aura-2-orpheus-en">Orpheus (American, masculine)</SelectItem>
+                      <SelectItem value="aura-2-zeus-en">Zeus (American, masculine)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                    onClick={() => {
+                      const currentVoice = businessData.ai_configuration?.voice || 'aura-2-thalia-en';
+                      previewVoice(currentVoice);
+                    }}
+                  >
+                    <Play className="h-4 w-4" />
+                    <span>Preview</span>
+                  </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">Choose the voice for your AI receptionist and preview each option</p>
               </div>

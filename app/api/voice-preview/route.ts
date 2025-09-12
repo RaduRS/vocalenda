@@ -12,21 +12,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate speech using Deepgram TTS API directly
-    const response = await fetch('https://api.deepgram.com/v1/speak', {
+    const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
       method: 'POST',
       headers: {
         'Authorization': `Token ${process.env.DEEPGRAM_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        text,
-        model: voice,
-        encoding: 'mp3',
-        container: 'mp3',
+        text
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Deepgram API error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      });
       throw new Error(`Deepgram API error: ${response.statusText}`);
     }
 
