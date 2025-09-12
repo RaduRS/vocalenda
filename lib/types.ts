@@ -57,6 +57,7 @@ export interface AIConfiguration {
   allowed_topics?: string[];
   restricted_topics?: string[];
   custom_prompt?: string;
+  voice?: string;
 }
 
 export interface SMSConfiguration {

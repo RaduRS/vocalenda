@@ -107,7 +107,8 @@ export async function GET() {
         response_mode: ((Array.isArray(business.business_config) ? business.business_config[0]?.ai_response_mode : business.business_config?.ai_response_mode) || 'flexible') as 'flexible' | 'restricted',
         allowed_topics: (Array.isArray(business.business_config) ? business.business_config[0]?.allowed_ai_topics : business.business_config?.allowed_ai_topics) || [],
         restricted_topics: (Array.isArray(business.business_config) ? business.business_config[0]?.restricted_ai_topics : business.business_config?.restricted_ai_topics) || [],
-        custom_prompt: (Array.isArray(business.business_config) ? business.business_config[0]?.ai_prompt : business.business_config?.ai_prompt) || ''
+        custom_prompt: (Array.isArray(business.business_config) ? business.business_config[0]?.ai_prompt : business.business_config?.ai_prompt) || '',
+        voice: (Array.isArray(business.business_config) ? business.business_config[0]?.ai_voice : business.business_config?.ai_voice) || 'aura-2-thalia-en'
       },
       customer_notes_enabled: business.customer_notes_enabled ?? true,
       booking_policies: (business.booking_policies && typeof business.booking_policies === 'object' && !Array.isArray(business.booking_policies) ? business.booking_policies as unknown as { cancellation_policy: string; advance_booking_days: number; min_advance_hours: number } : {
@@ -194,6 +195,7 @@ export async function PUT(request: NextRequest) {
         restricted_ai_topics: businessData.ai_configuration.restricted_topics,
         ai_prompt: businessData.ai_configuration.custom_prompt,
         greeting_message: businessData.ai_configuration.greeting,
+        ai_voice: businessData.ai_configuration.voice || 'aura-2-thalia-en',
         sms_enabled: businessData.sms_configuration?.enabled || false,
         sms_confirmation_template: businessData.sms_configuration?.confirmation_message || null,
         sms_reminder_template: businessData.sms_configuration?.reminder_message || null,

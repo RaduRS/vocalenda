@@ -23,6 +23,7 @@ import {
   FileText,
   Bot,
   MessageSquare,
+  Play,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -32,9 +33,9 @@ import {
   Holiday,
   PaymentMethod,
   paymentMethodLabels,
-  SMSConfiguration,
   defaultSMSConfiguration,
 } from "@/lib/types";
+import { previewVoice } from "@/lib/voice-preview";
 
 export default function BusinessSettings() {
   const [loading, setLoading] = useState(true);
@@ -1017,6 +1018,76 @@ export default function BusinessSettings() {
                     className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
                     rows={5}
                   />
+                </div>
+
+                {/* AI Voice Selection */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <Label className="text-lg font-semibold text-gray-900">
+                      AI Voice
+                    </Label>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Choose the voice for your AI receptionist and preview each option
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      { value: 'aura-2-thalia-en', label: 'Thalia (American, feminine)' },
+                      { value: 'aura-2-asteria-en', label: 'Asteria (American, feminine)' },
+                      { value: 'aura-2-luna-en', label: 'Luna (American, feminine)' },
+                      { value: 'aura-2-stella-en', label: 'Stella (American, feminine)' },
+                      { value: 'aura-2-athena-en', label: 'Athena (American, feminine)' },
+                      { value: 'aura-2-hera-en', label: 'Hera (American, feminine)' },
+                      { value: 'aura-2-orion-en', label: 'Orion (American, masculine)' },
+                      { value: 'aura-2-arcas-en', label: 'Arcas (American, masculine)' },
+                      { value: 'aura-2-perseus-en', label: 'Perseus (American, masculine)' },
+                      { value: 'aura-2-orpheus-en', label: 'Orpheus (American, masculine)' },
+                      { value: 'aura-2-zeus-en', label: 'Zeus (American, masculine)' },
+                    ].map((voice) => (
+                      <div
+                        key={voice.value}
+                        className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                          (businessData.ai_configuration.voice || 'aura-2-thalia-en') === voice.value
+                            ? 'border-purple-500 bg-purple-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => {
+                          handleInputChange("ai_configuration", {
+                            ...businessData.ai_configuration,
+                            voice: voice.value,
+                          });
+                        }}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-4 h-4 rounded-full border-2 ${
+                            (businessData.ai_configuration.voice || 'aura-2-thalia-en') === voice.value
+                              ? 'border-purple-500 bg-purple-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {(businessData.ai_configuration.voice || 'aura-2-thalia-en') === voice.value && (
+                              <div className="w-2 h-2 bg-white rounded-full m-0.5" />
+                            )}
+                          </div>
+                          <span className="text-sm font-medium">{voice.label}</span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            previewVoice(voice.value);
+                          }}
+                        >
+                          <Play className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Booking Policies Section */}

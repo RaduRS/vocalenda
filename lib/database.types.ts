@@ -104,6 +104,7 @@ export type Database = {
           ai_response_mode: string | null
           allowed_ai_topics: string[] | null
           restricted_ai_topics: string[] | null
+          ai_voice: string | null
           sms_enabled: boolean | null
           sms_confirmation_template: string | null
           sms_reminder_template: string | null
@@ -123,6 +124,7 @@ export type Database = {
           ai_response_mode?: string | null
           allowed_ai_topics?: string[] | null
           restricted_ai_topics?: string[] | null
+          ai_voice?: string | null
           sms_enabled?: boolean | null
           sms_confirmation_template?: string | null
           sms_reminder_template?: string | null
@@ -142,6 +144,7 @@ export type Database = {
           ai_response_mode?: string | null
           allowed_ai_topics?: string[] | null
           restricted_ai_topics?: string[] | null
+          ai_voice?: string | null
           sms_enabled?: boolean | null
           sms_confirmation_template?: string | null
           sms_reminder_template?: string | null
@@ -651,6 +654,7 @@ export type Database = {
           p_greeting_message?: string
           p_booking_rules?: Json
           p_faq_data?: Json
+          p_ai_voice?: string
           p_bypass_phone_number?: string
         }
         Returns: boolean

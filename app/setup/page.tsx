@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { Loader2, CheckCircle, Plus, Trash2, Clock, MapPin, Users, Settings, Phone, Calendar, X } from 'lucide-react'
+import { Loader2, CheckCircle, Plus, Trash2, Clock, MapPin, Users, Settings, Phone, Calendar, X, Play } from 'lucide-react'
 import { 
   ComprehensiveBusinessData, 
   setupWizardSteps, 
@@ -32,6 +32,7 @@ import {
   validateStaffMember
 } from '@/lib/types'
 import { getCurrentUKDate, formatISODate } from '@/lib/date-utils'
+import { previewVoice } from '@/lib/voice-preview'
 
 export default function SetupWizard() {
   const { user } = useUser();
@@ -852,6 +853,67 @@ export default function SetupWizard() {
                   rows={4}
                 />
                 <p className="text-sm text-gray-500 mt-1">Provide context to help the AI assist customers effectively</p>
+              </div>
+
+              <div>
+                <Label htmlFor="ai-voice">AI Voice *</Label>
+                <div className="mt-1 space-y-2">
+                  {[
+                    { value: 'aura-2-thalia-en', label: 'Thalia (American, feminine)' },
+                    { value: 'aura-2-asteria-en', label: 'Asteria (American, feminine)' },
+                    { value: 'aura-2-luna-en', label: 'Luna (American, feminine)' },
+                    { value: 'aura-2-stella-en', label: 'Stella (American, feminine)' },
+                    { value: 'aura-2-athena-en', label: 'Athena (American, feminine)' },
+                    { value: 'aura-2-hera-en', label: 'Hera (American, feminine)' },
+                    { value: 'aura-2-orion-en', label: 'Orion (American, masculine)' },
+                    { value: 'aura-2-arcas-en', label: 'Arcas (American, masculine)' },
+                    { value: 'aura-2-perseus-en', label: 'Perseus (American, masculine)' },
+                    { value: 'aura-2-orpheus-en', label: 'Orpheus (American, masculine)' },
+                    { value: 'aura-2-zeus-en', label: 'Zeus (American, masculine)' },
+                  ].map((voice) => (
+                    <div
+                      key={voice.value}
+                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                        (businessData.ai_configuration?.voice || 'aura-2-thalia-en') === voice.value
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => {
+                        const updated = {
+                          ...businessData.ai_configuration,
+                          voice: voice.value
+                        };
+                        handleInputChange('ai_configuration', updated);
+                      }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-4 h-4 rounded-full border-2 ${
+                          (businessData.ai_configuration?.voice || 'aura-2-thalia-en') === voice.value
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300'
+                        }`}>
+                          {(businessData.ai_configuration?.voice || 'aura-2-thalia-en') === voice.value && (
+                            <div className="w-2 h-2 bg-white rounded-full m-0.5" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium">{voice.label}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 hover:bg-gray-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          previewVoice(voice.value);
+                        }}
+                      >
+                        <Play className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-1">Choose the voice for your AI receptionist and preview each option</p>
               </div>
 
               <div>
