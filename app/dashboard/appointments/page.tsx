@@ -68,13 +68,13 @@ function Appointments() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-brand-primary-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-brand-primary-1">
                 Appointments
               </h1>
-              <p className="text-brand-primary-2">
+              <p className="text-sm sm:text-base text-brand-primary-2">
                 Manage your upcoming and past appointments
               </p>
             </div>
@@ -88,48 +88,48 @@ function Appointments() {
       {/* Main Content */}
       <div className="px-6 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.todayAppointments}</p>
-                <p className="text-sm text-gray-600">Today&apos;s Appointments</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.todayAppointments}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Today&apos;s Appointments</p>
               </div>
             </div>
           </Card>
           
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                <Clock className="w-6 h-6 text-green-600" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.thisWeekAppointments}</p>
-                <p className="text-sm text-gray-600">This Week</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.thisWeekAppointments}</p>
+                <p className="text-xs sm:text-sm text-gray-600">This Week</p>
               </div>
             </div>
           </Card>
           
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-3 sm:mr-4">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalCustomers}</p>
-                <p className="text-sm text-gray-600">Total Customers</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.totalCustomers}</p>
+                <p className="text-xs sm:text-sm text-gray-600">Total Customers</p>
               </div>
             </div>
           </Card>
         </div>
 
         {/* Appointments List */}
-        <Card className="p-6">
+        <Card className="overflow-hidden">
           {appointments.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-12 px-4 sm:px-6">
               <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No Appointments Yet
@@ -143,52 +143,59 @@ function Appointments() {
             </div>
           ) : (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Appointments</h2>
-
+              <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                  Recent Appointments
+                </h3>
               </div>
               
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 px-1 font-medium text-gray-700">Name</th>
-                      <th className="text-left py-2 px-1 font-medium text-gray-700">Phone</th>
-                      <th className="text-left py-2 px-1 font-medium text-gray-700">Date & Time</th>
-                      <th className="text-left py-2 px-1 font-medium text-gray-700">Service</th>
-                      <th className="text-left py-2 px-1 font-medium text-gray-700">Status</th>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                      <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="bg-white divide-y divide-gray-200">
                     {appointments.map((appointment) => (
-                      <tr key={appointment.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td className="py-3 px-1">
-                          <p className="font-medium text-gray-900 truncate">
+                      <tr key={appointment.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
                             {appointment.customer?.name || 'Unknown Customer'}
-                          </p>
-                        </td>
-                        <td className="py-3 px-1">
-                          <p className="text-gray-600 truncate">
+                          </div>
+                          <div className="text-sm text-gray-500 sm:hidden">
                             {appointment.customer?.phone || '--'}
-                          </p>
+                          </div>
                         </td>
-                        <td className="py-3 px-1">
-                          <p className="text-gray-600">
+                        <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600">
+                            {appointment.customer?.phone || '--'}
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
                             {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
-                          </p>
-                          <p className="text-xs text-gray-400">
+                          </div>
+                          <div className="text-xs text-gray-500">
                             {formatDate(appointment.date)}
-                          </p>
+                          </div>
                         </td>
-                        <td className="py-3 px-1">
-                          <p className="text-gray-600 truncate">
+                        <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600">
                             {appointment.service?.name || '--'}
-                          </p>
+                          </div>
                         </td>
-                        <td className="py-3 px-1">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                             {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).replace('_', ' ')}
                           </span>
+                          <div className="text-xs text-gray-500 md:hidden mt-1">
+                            {appointment.service?.name || '--'}
+                          </div>
                         </td>
                       </tr>
                     ))}

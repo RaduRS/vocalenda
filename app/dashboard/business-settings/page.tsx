@@ -262,20 +262,20 @@ export default function BusinessSettings() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-brand-primary-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-brand-primary-1">
                 Business Settings
               </h1>
-              <p className="text-brand-primary-2">
+              <p className="text-sm sm:text-base text-brand-primary-2">
                 Manage your business information and preferences
               </p>
             </div>
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90"
+              className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 w-full sm:w-auto"
             >
               {saving ? (
                 <>
@@ -325,50 +325,52 @@ export default function BusinessSettings() {
           </div>
 
           {/* Desktop Tab Navigation */}
-          <div className="hidden sm:flex space-x-2 lg:space-x-8 overflow-x-auto">
-            {[
-              { id: "basic", label: "Basic Info", icon: Settings },
-              { id: "hours", label: "Operating Hours", icon: Clock },
-              { id: "services", label: "Services", icon: Edit3 },
-              { id: "staff", label: "Staff", icon: Users },
-              { id: "holidays", label: "Holidays", icon: Calendar },
-              { id: "ai", label: "AI & Policies", icon: Bot },
-              { id: "sms", label: "SMS Messages", icon: MessageSquare },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() =>
-                    setActiveTab(
-                      tab.id as
-                        | "basic"
-                        | "hours"
-                        | "services"
-                        | "staff"
-                        | "holidays"
-                        | "ai"
-                        | "sms"
-                    )
-                  }
-                  className={`flex items-center space-x-1 lg:space-x-2 py-4 px-2 lg:px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden md:inline">{tab.label}</span>
-                  <span className="md:hidden">{tab.label.split(" ")[0]}</span>
-                </button>
-              );
-            })}
+          <div className="hidden sm:block">
+            <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
+              {[
+                { id: "basic", label: "Basic Info", icon: Settings },
+                { id: "hours", label: "Operating Hours", icon: Clock },
+                { id: "services", label: "Services", icon: Edit3 },
+                { id: "staff", label: "Staff", icon: Users },
+                { id: "holidays", label: "Holidays", icon: Calendar },
+                { id: "ai", label: "AI & Policies", icon: Bot },
+                { id: "sms", label: "SMS Messages", icon: MessageSquare },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() =>
+                      setActiveTab(
+                        tab.id as
+                          | "basic"
+                          | "hours"
+                          | "services"
+                          | "staff"
+                          | "holidays"
+                          | "ai"
+                          | "sms"
+                      )
+                    }
+                    className={`flex items-center space-x-1 py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex-shrink-0 ${
+                      activeTab === tab.id
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden lg:inline">{tab.label}</span>
+                    <span className="lg:hidden">{tab.label.split(" ")[0]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Basic Information Tab */}
         {activeTab === "basic" && (
           <div className="space-y-8">
