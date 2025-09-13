@@ -184,6 +184,8 @@ export type Database = {
           key_information: string | null
           customer_notes_enabled: boolean | null
           booking_policies: Json | null
+          minutes_allowed: number
+          minutes_used: number
           created_at: string
           updated_at: string
         }
@@ -207,6 +209,8 @@ export type Database = {
           key_information?: string | null
           customer_notes_enabled?: boolean | null
           booking_policies?: Json | null
+          minutes_allowed?: number
+          minutes_used?: number
           created_at?: string
           updated_at?: string
         }
@@ -230,6 +234,8 @@ export type Database = {
           key_information?: string | null
           customer_notes_enabled?: boolean | null
           booking_policies?: Json | null
+          minutes_allowed?: number
+          minutes_used?: number
           created_at?: string
           updated_at?: string
         }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getCurrentUKDate, formatISODate } from '@/lib/date-utils';
+import { calculateTotalMinutesUsed, calculateMinutesLeft } from '@/lib/minutes-utils';
 
 export async function GET(request: Request) {
   try {
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
 
     const supabase = supabaseAdmin;
 
-    // Get user's business
+    // Get user's business with minutes tracking
     const { data: user, error: userError } = await supabase
       .from('users')
       .select(`
@@ -29,7 +30,9 @@ export async function GET(request: Request) {
           address,
           status,
           google_calendar_id,
-          business_hours
+          business_hours,
+          minutes_allowed,
+          minutes_used
         )
       `)
       .eq('clerk_user_id', userId)
@@ -197,11 +200,37 @@ export async function GET(request: Request) {
       });
     }
 
+    // Calculate current minutes usage from all call logs
+    const { data: allCallLogs } = await supabase
+      .from('call_logs')
+      .select('duration_seconds')
+      .eq('business_id', businessId)
+      .not('duration_seconds', 'is', null);
+    
+    const currentMinutesUsed = calculateTotalMinutesUsed(
+      (allCallLogs || []).map(call => call.duration_seconds)
+    );
+    
+    // Get business minutes allocation
+    const minutesAllowed = user.businesses?.minutes_allowed || 500;
+    const minutesLeft = calculateMinutesLeft(minutesAllowed, currentMinutesUsed);
+    
+    // Update the business record with current usage if it differs
+    if (user.businesses?.minutes_used !== currentMinutesUsed) {
+      await supabase
+        .from('businesses')
+        .update({ minutes_used: currentMinutesUsed })
+        .eq('id', businessId);
+    }
+
     const stats = {
       totalAppointments: appointmentsResult.count || 0,
       todayAppointments: todayAppointmentsResult.count || 0,
       totalCustomers: customersResult.count || 0,
       totalCalls: callsResult.count || 0,
+      minutesAllowed,
+      minutesUsed: currentMinutesUsed,
+      minutesLeft,
       appointmentStatusCounts,
       weeklyActivity: weeklyActivityData
     };

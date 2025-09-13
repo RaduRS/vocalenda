@@ -81,6 +81,9 @@ function Dashboard() {
         todayAppointments: 0,
         totalCustomers: 0,
         totalCalls: 0,
+        minutesAllowed: 0,
+        minutesUsed: 0,
+        minutesLeft: 0,
       };
       
       return [
@@ -108,6 +111,12 @@ function Dashboard() {
           icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
           color: "orange",
         },
+        {
+          title: "Minutes Left",
+          value: currentStats.minutesLeft,
+          icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+          color: "red",
+        },
       ];
     },
     [data?.stats]
@@ -119,6 +128,7 @@ function Dashboard() {
       green: "bg-brand-secondary-1/10 text-brand-secondary-1",
       purple: "bg-brand-primary-1/10 text-brand-primary-1",
       orange: "bg-brand-primary-2/10 text-brand-primary-2",
+      red: "bg-red-500/10 text-red-600",
     };
     return (
       colorMap[color as keyof typeof colorMap] ||
@@ -203,7 +213,7 @@ function Dashboard() {
       {/* Main Content */}
       <div className="px-6 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           {statsCards.map((card) => (
             <Card
               key={card.title}

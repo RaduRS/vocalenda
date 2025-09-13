@@ -16,6 +16,9 @@ export interface DashboardStats {
   todayAppointments: number;
   totalCustomers: number;
   totalCalls: number;
+  minutesAllowed: number;
+  minutesUsed: number;
+  minutesLeft: number;
   appointmentStatusCounts?: {
     confirmed: number;
     pending: number;
