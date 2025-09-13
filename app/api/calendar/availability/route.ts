@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@supabase/supabase-js';
 import { google } from 'googleapis';
-import { parseISODate, getDayOfWeekName, formatUKTime } from '@/lib/date-utils';
+import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime } from '@/lib/date-utils';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -140,14 +140,12 @@ export async function GET(request: NextRequest) {
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
-    // Calculate day boundaries
-    const dayStart = new Date(requestDate);
-    const [startHour, startMinute] = dayHours.open.split(':').map(Number);
-    dayStart.setHours(startHour, startMinute, 0, 0);
-
-    const dayEnd = new Date(requestDate);
-    const [endHour, endMinute] = dayHours.close.split(':').map(Number);
-    dayEnd.setHours(endHour, endMinute, 0, 0);
+    // Calculate day boundaries using proper timezone handling
+    const businessTimezone = business.timezone || 'Europe/London';
+    
+    // Create timezone-aware day boundaries using UK date utilities
+    const dayStart = createUKDateTime(date, dayHours.open);
+    const dayEnd = createUKDateTime(date, dayHours.close);
 
     // Get busy times from Google Calendar
     let googleBusyTimes: Array<{ start?: string | null; end?: string | null }> = [];
@@ -156,7 +154,7 @@ export async function GET(request: NextRequest) {
         requestBody: {
           timeMin: dayStart.toISOString(),
           timeMax: dayEnd.toISOString(),
-          timeZone: business.timezone || 'Europe/London',
+          timeZone: businessTimezone,
           items: [{ id: business.google_calendar_id }]
         }
       });
