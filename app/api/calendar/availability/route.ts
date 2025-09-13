@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@supabase/supabase-js';
 import { google } from 'googleapis';
 import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime } from '@/lib/date-utils';
+import { toZonedTime } from 'date-fns-tz';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -243,12 +244,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Format slots for response
-    const formattedSlots = availableSlots.map(slot => ({
-      start: slot.start.toISOString(),
-      end: slot.end.toISOString(),
-      startTime: formatUKTime(slot.start),
-      endTime: formatUKTime(slot.end)
-    }));
+    const formattedSlots = availableSlots.map(slot => {
+      // Convert UTC times to UK timezone for display
+      const startUK = toZonedTime(slot.start, businessTimezone);
+      const endUK = toZonedTime(slot.end, businessTimezone);
+      
+      return {
+        start: slot.start.toISOString(),
+        end: slot.end.toISOString(),
+        startTime: formatUKTime(startUK),
+        endTime: formatUKTime(endUK)
+      };
+    });
 
     return NextResponse.json({ 
       slots: formattedSlots,
