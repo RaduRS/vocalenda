@@ -222,6 +222,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Add a small delay to ensure database consistency before checking availability
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Check if slot is still available
     const isAvailable = await calendarService.isTimeSlotAvailable(
       business.google_calendar_id,
@@ -310,7 +313,7 @@ ${notes ? `\nNotes: ${notes}` : ''}
         end_time: endTime,
         status: 'confirmed',
         notes,
-        calendar_event_id: calendarEventId
+        google_calendar_event_id: calendarEventId
       })
       .select('id')
       .single();

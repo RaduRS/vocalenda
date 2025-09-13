@@ -153,13 +153,17 @@ class CalendarService {
         }
       }
       
-      // Also check database for confirmed bookings (in case Google Calendar sync is delayed)
+      // Also check database for confirmed and pending bookings (in case Google Calendar sync is delayed)
       const startDate = formatISODate(startTime);
+      
+      // Add a small delay to ensure any recently created bookings are visible
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
       let query = supabase
         .from('appointments')
         .select('id, start_time, end_time, appointment_date')
         .eq('business_id', this.businessId)
-        .eq('status', 'confirmed')
+        .in('status', ['confirmed', 'pending'])
         .eq('appointment_date', startDate);
       
       // Exclude the current booking if updating
@@ -169,11 +173,18 @@ class CalendarService {
       
       const { data: dbBookings } = await query;
 
-      // Convert database bookings to busy times format
-      const dbBusyTimes = (dbBookings || []).map(booking => ({
-        start: `${booking.appointment_date}T${booking.start_time}`,
-        end: `${booking.appointment_date}T${booking.end_time}`
-      }));
+      // Convert database bookings to busy times format using consistent date handling
+      const dbBusyTimes = (dbBookings || []).map(booking => {
+        // Convert HH:mm:ss to HH:mm format for createUKDateTime
+        const startTime = booking.start_time.substring(0, 5); // "10:00:00" -> "10:00"
+        const endTime = booking.end_time.substring(0, 5); // "10:20:00" -> "10:20"
+        const startDateTime = createUKDateTime(booking.appointment_date, startTime);
+        const endDateTime = createUKDateTime(booking.appointment_date, endTime);
+        return {
+          start: startDateTime.toISOString(),
+          end: endDateTime.toISOString()
+        };
+      });
 
 
 
@@ -243,8 +254,8 @@ class CalendarService {
       const dateString = formatISODate(date);
       
       // Add a small delay to ensure any recently created bookings are visible
-      // This prevents race conditions where get_available_slots is called immediately after booking creation
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // This prevents race conditions where availability checks happen immediately after booking creation
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       console.log(`🔍 Checking calendar availability for business ${this.businessId} on ${dateString}`);
       
@@ -254,7 +265,7 @@ class CalendarService {
         .select('start_time, end_time, status, appointment_date, created_at')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
-        .eq('status', 'confirmed')
+        .in('status', ['confirmed', 'pending'])
         .order('created_at', { ascending: false });
         
       console.log(`📊 Found ${existingBookings?.length || 0} existing bookings for ${dateString}:`, existingBookings?.map(b => `${b.start_time}-${b.end_time}`));
