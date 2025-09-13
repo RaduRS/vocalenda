@@ -195,7 +195,12 @@ class CalendarService {
           busy.start != null && busy.end != null
         )
         .map(busy => ({ start: busy.start!, end: busy.end! }));
+      
+      console.log(`🔍 Google Calendar busy times:`, calendarBusyTimes);
+      console.log(`🔍 Database busy times:`, dbBusyTimes);
+      
       const allBusyTimes: BusyTime[] = [...calendarBusyTimes, ...dbBusyTimes];
+      console.log(`🔍 Combined busy times (${allBusyTimes.length} total):`, allBusyTimes);
       
 
 
@@ -238,16 +243,24 @@ class CalendarService {
       dayEnd.setHours(endHour, endMinute, 0, 0);
 
       // Get busy times from Google Calendar
-      const response = await this.calendar.freebusy.query({
-        requestBody: {
-          timeMin: dayStart.toISOString(),
-          timeMax: dayEnd.toISOString(),
-          timeZone: timezone,
-          items: [{ id: calendarId }]
-        }
-      });
-
-      const busyTimes = response.data.calendars?.[calendarId]?.busy || [];
+      console.log(`🔍 getAvailableSlots: About to query Google Calendar for ${calendarId}`);
+      let busyTimes: Array<{ start?: string | null; end?: string | null }> = [];
+      try {
+        const response = await this.calendar.freebusy.query({
+          requestBody: {
+            timeMin: dayStart.toISOString(),
+            timeMax: dayEnd.toISOString(),
+            timeZone: timezone,
+            items: [{ id: calendarId }]
+          }
+        });
+        busyTimes = response.data.calendars?.[calendarId]?.busy || [];
+        console.log(`🔍 getAvailableSlots: Google Calendar returned ${busyTimes.length} busy times`);
+      } catch (calendarError) {
+        console.error('🔍 getAvailableSlots: Google Calendar API error:', calendarError);
+        // Continue with empty busy times from Google Calendar, rely on database
+        busyTimes = [];
+      }
 
       // Also get existing bookings from database to prevent double bookings
       // when Google Calendar sync is delayed
@@ -258,15 +271,20 @@ class CalendarService {
       await new Promise(resolve => setTimeout(resolve, 200));
       
       console.log(`🔍 Checking calendar availability for business ${this.businessId} on ${dateString}`);
+      console.log(`🔍 getAvailableSlots: Querying database for business ${this.businessId} on ${dateString}`);
       
       // Force a fresh read from the database by adding a timestamp to prevent caching
-      const { data: existingBookings } = await supabase
+      const { data: existingBookings, error: dbError } = await supabase
         .from('appointments')
         .select('start_time, end_time, status, appointment_date, created_at')
         .eq('business_id', this.businessId)
         .eq('appointment_date', dateString)
         .in('status', ['confirmed', 'pending'])
         .order('created_at', { ascending: false });
+        
+      if (dbError) {
+        console.error('🔍 getAvailableSlots: Database error:', dbError);
+      }
         
       console.log(`📊 Found ${existingBookings?.length || 0} existing bookings for ${dateString}:`, existingBookings?.map(b => `${b.start_time}-${b.end_time}`));
 
@@ -277,11 +295,14 @@ class CalendarService {
         const endTime = booking.end_time.substring(0, 5); // "10:20:00" -> "10:20"
         const startDateTime = createUKDateTime(dateString, startTime);
         const endDateTime = createUKDateTime(dateString, endTime);
+        console.log(`🔍 Converting booking ${startTime}-${endTime} to busy time: ${startDateTime.toISOString()} - ${endDateTime.toISOString()}`);
         return {
           start: startDateTime.toISOString(),
           end: endDateTime.toISOString()
         };
       });
+      
+      console.log(`🔍 Database busy times:`, dbBusyTimes);
 
       // Combine Google Calendar and database busy times
       type BusyTime = { start: string; end: string };

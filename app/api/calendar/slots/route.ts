@@ -130,6 +130,13 @@ export async function GET(request: NextRequest) {
     console.log(`Business hours for ${dayOfWeek}:`, dayHours);
 
     // Get available slots
+    console.log(`🔍 SLOTS ROUTE: About to call getAvailableSlots for business ${businessId}`);
+    console.log(`🔍 SLOTS ROUTE: Calendar ID: ${business.google_calendar_id}`);
+    console.log(`🔍 SLOTS ROUTE: Date: ${requestDate}`);
+    console.log(`🔍 SLOTS ROUTE: Service duration: ${service.duration_minutes}`);
+    console.log(`🔍 SLOTS ROUTE: Business hours:`, { start: dayHours.open, end: dayHours.close });
+    console.log(`🔍 SLOTS ROUTE: Timezone: ${business.timezone}`);
+    
     const availableSlots = await calendarService.getAvailableSlots(
       business.google_calendar_id,
       requestDate,
@@ -137,6 +144,8 @@ export async function GET(request: NextRequest) {
       { start: dayHours.open, end: dayHours.close },
       business.timezone
     );
+    
+    console.log(`🔍 SLOTS ROUTE: getAvailableSlots returned ${availableSlots.length} slots`);
 
     // Format slots for response
     const formattedSlots = availableSlots.map(slot => ({
