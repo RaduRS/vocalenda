@@ -86,16 +86,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if slot is still available
-    // Combine date and time for availability check
-    const startDateTime = parseISO(`${appointmentDate}T${startTime}`);
-    const endDateTime = parseISO(`${appointmentDate}T${endTime}`);
 
-    const isAvailable = await calendarService.isTimeSlotAvailable(
-      business.google_calendar_id,
-      startDateTime,
-      endDateTime,
-      business.timezone
+    // Check availability by querying Google Calendar directly
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/calendar/availability`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.INTERNAL_API_SECRET!,
+        },
+        body: JSON.stringify({
+          businessId: business.id,
+          serviceId: serviceId,
+          appointmentDate: appointmentDate,
+          startTime: startTime,
+          endTime: endTime,
+        }),
+      }
     );
+
+    const availabilityResult = await response.json();
+    const isAvailable = availabilityResult.available === true;
 
     if (!isAvailable) {
       return NextResponse.json(

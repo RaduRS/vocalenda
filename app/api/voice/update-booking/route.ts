@@ -224,16 +224,27 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const startDateTime = parseISO(newStartTime);
-      const endDateTime = parseISO(newEndTime);
-
-      const isAvailable = await calendarService.isTimeSlotAvailable(
-        business.google_calendar_id,
-        startDateTime,
-        endDateTime,
-        business.timezone,
-        existingBooking.id // Exclude current booking from availability check
+      // Check availability by querying Google Calendar directly
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/calendar/availability`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_API_SECRET!,
+          },
+          body: JSON.stringify({
+            businessId: business.id,
+            serviceId: existingBooking.service_id,
+            appointmentDate: new_date || current_date,
+            startTime: formatISOTime(parseISO(newStartTime)),
+            endTime: formatISOTime(parseISO(newEndTime)),
+          }),
+        }
       );
+
+      const availabilityResult = await response.json();
+      const isAvailable = availabilityResult.available === true;
 
       if (!isAvailable) {
         return NextResponse.json(
