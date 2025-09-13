@@ -349,16 +349,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse appointment datetime
-    const appointmentDate_parsed = parseISODate(appointmentDate);
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
+    // Parse appointment datetime with proper timezone handling
+    // Strip seconds from time strings if present (createUKDateTime expects HH:mm format)
+    const startTimeFormatted = startTime.substring(0, 5); // "14:00:00" -> "14:00"
+    const endTimeFormatted = endTime.substring(0, 5); // "14:30:00" -> "14:30"
     
-    const startDateTime = new Date(appointmentDate_parsed);
-    startDateTime.setHours(startHour, startMinute, 0, 0);
+    // Create timezone-aware start and end times
+    const dayStart = createUKDateTime(appointmentDate, startTimeFormatted);
+    const dayEnd = createUKDateTime(appointmentDate, endTimeFormatted);
     
-    const endDateTime = new Date(appointmentDate_parsed);
-    endDateTime.setHours(endHour, endMinute, 0, 0);
+    const startDateTime = dayStart;
+    const endDateTime = dayEnd;
 
     // Set up Google Calendar API
     const oauth2Client = new google.auth.OAuth2(
