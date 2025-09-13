@@ -160,6 +160,8 @@ export async function GET(request: NextRequest) {
         }
       });
       googleBusyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+      console.log('🔍 Google Calendar raw response:', JSON.stringify(response.data.calendars?.[business.google_calendar_id], null, 2));
+      console.log('🔍 Google Calendar busy times:', JSON.stringify(googleBusyTimes, null, 2));
 
     } catch (calendarError) {
       console.error('Google Calendar API error:', calendarError);
@@ -178,9 +180,9 @@ export async function GET(request: NextRequest) {
         busy.start != null && busy.end != null
       )
       .map((busy: { start: string; end: string }) => ({
-        start: new Date(busy.start),
-        end: new Date(busy.end)
-      }))
+         start: new Date(busy.start),
+         end: new Date(busy.end)
+       }))
       .sort((a: { start: Date; end: Date }, b: { start: Date; end: Date }) => a.start.getTime() - b.start.getTime());
     
 
@@ -200,11 +202,27 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Debug: Log merged busy times
+    console.log('🔍 Merged busy times:', mergedBusyTimes.map(bt => ({
+      start: bt.start.toISOString(),
+      end: bt.end.toISOString(),
+      startBST: bt.start.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+      endBST: bt.end.toLocaleString('en-GB', { timeZone: 'Europe/London' })
+    })));
+    console.log('🔍 Day boundaries:', {
+      dayStart: dayStart.toISOString(),
+      dayEnd: dayEnd.toISOString(),
+      dayStartBST: dayStart.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+      dayEndBST: dayEnd.toLocaleString('en-GB', { timeZone: 'Europe/London' })
+    });
+
     // Generate available slots
     const availableSlots: Array<{ start: Date; end: Date }> = [];
     const serviceDurationMs = service.duration_minutes * 60000;
     const slotInterval = 15; // 15-minute intervals
     const slotIntervalMs = slotInterval * 60000;
+    
+
 
 
 
