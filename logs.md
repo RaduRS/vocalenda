@@ -1,88 +1,167 @@
-
-[2025-09-13T08:23:25.588Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:25.443Z] ✅ COMPLETED: handleFunctionCall for get_day_of_week
-[2025-09-13T08:23:26.445Z] ▶️ KEEPALIVE: Resumed after function processing
-[2025-09-13T08:23:25.443Z] ▶️ SILENCE: Resuming timer - Function processing completed
-📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_Zx7GR8UVZQAG2xB0J3eUbV72","name":"get_available_slots","arguments":"{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}","client_side":true}]}...
-Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_Zx7GR8UVZQAG2xB0J3eUbV72","name":"get_available_slots","arguments":"{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}","client_side":true}]}
-[2025-09-13T08:23:26.550Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_Zx7GR8UVZQAG2xB0J3eUbV72","name":"get_available_slots","arguments":"{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}","client_side":true}]}
-[2025-09-13T08:23:26.550Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:39.552Z] 🔇 Audio stream ended (timeout)
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"What time would you prefer for your haircut today, Saturday?"}...
+Message string: {"type":"ConversationText","role":"assistant","content":"What time would you prefer for your haircut today, Saturday?"}
+[2025-09-13T08:37:40.922Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"What time would you prefer for your haircut today, Saturday?"}
+[2025-09-13T08:37:40.922Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "ConversationText",
+  "role": "assistant",
+  "content": "What time would you prefer for your haircut today, Saturday?"
+}
+[2025-09-13T08:37:40.922Z] === END PARSED JSON ===
+[2025-09-13T08:37:40.922Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:37:40.922Z] 💭 CONVERSATION_TEXT: What time would you prefer for your haircut today, Saturday?
+[2025-09-13T08:37:40.922Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: What time would you prefer for your haircut today, Saturday?
+📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"What time would you prefer for your haircut today, Saturday?"}...
+Message string: {"type":"History","role":"assistant","content":"What time would you prefer for your haircut today, Saturday?"}
+[2025-09-13T08:37:40.933Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"What time would you prefer for your haircut today, Saturday?"}
+[2025-09-13T08:37:40.933Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "History",
+  "role": "assistant",
+  "content": "What time would you prefer for your haircut today, Saturday?"
+}
+[2025-09-13T08:37:40.933Z] === END PARSED JSON ===
+[2025-09-13T08:37:40.933Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:37:40.933Z] 📜 HISTORY: Message logged
+[2025-09-13T08:37:40.933Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Skipping duplicate AI: What time would you prefer for your haircut today, Saturday?
+[2025-09-13T08:37:40.933Z] 📝 Added transcript: [AI] What time would you prefer for your haircut today, Saturday?
+[2025-09-13T08:37:40.933Z] 🎵 Starting audio stream - feeding buffer
+📨 Received Deepgram JSON message: {"type":"AgentAudioDone"}...
+Message string: {"type":"AgentAudioDone"}
+[2025-09-13T08:37:41.005Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
+[2025-09-13T08:37:41.005Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "AgentAudioDone"
+}
+[2025-09-13T08:37:41.005Z] === END PARSED JSON ===
+[2025-09-13T08:37:41.005Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
+[2025-09-13T08:37:41.005Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
+[2025-09-13T08:37:41.005Z] 🔇 SILENCE: Started tracking
+[2025-09-13T08:37:41.005Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
+[2025-09-13T08:37:41.283Z] 💓 KEEPALIVE: Sent to Deepgram
+[2025-09-13T08:37:41.005Z] 🔇 SILENCE_CHECK: 1000ms of silence
+[2025-09-13T08:37:41.005Z] 🔇 SILENCE_CHECK: 2000ms of silence
+[2025-09-13T08:37:41.005Z] 🔇 SILENCE_CHECK: 2999ms of silence
+[2025-09-13T08:37:41.005Z] 🔇 SILENCE_CHECK: 4000ms of silence
+📨 Received Deepgram JSON message: {"type":"UserStartedSpeaking"}...
+Message string: {"type":"UserStartedSpeaking"}
+[2025-09-13T08:37:45.148Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
+[2025-09-13T08:37:45.148Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "UserStartedSpeaking"
+}
+[2025-09-13T08:37:45.148Z] === END PARSED JSON ===
+[2025-09-13T08:37:45.148Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
+[2025-09-13T08:37:45.148Z] 🎤 USER_STARTED_SPEAKING: User began speaking
+[2025-09-13T08:37:45.148Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
+[2025-09-13T08:37:45.148Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
+[2025-09-13T08:37:45.283Z] 💓 KEEPALIVE: Sent to Deepgram
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"user","content":"I want to be at three PM."}...
+Message string: {"type":"ConversationText","role":"user","content":"I want to be at three PM."}
+[2025-09-13T08:37:47.265Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":"I want to be at three PM."}
+[2025-09-13T08:37:47.265Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "ConversationText",
+  "role": "user",
+  "content": "I want to be at three PM."
+}
+[2025-09-13T08:37:47.265Z] === END PARSED JSON ===
+[2025-09-13T08:37:47.265Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:37:47.265Z] 💭 CONVERSATION_TEXT: I want to be at three PM.
+[2025-09-13T08:37:47.265Z] 🔍 ConversationText role: 'user' -> Speaker: 'User'
+📝 TRANSCRIPT: Added User: I want to be at three PM.
+📨 Received Deepgram JSON message: {"type":"History","role":"user","content":"I want to be at three PM."}...
+Message string: {"type":"History","role":"user","content":"I want to be at three PM."}
+[2025-09-13T08:37:47.272Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":"I want to be at three PM."}
+[2025-09-13T08:37:47.272Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "History",
+  "role": "user",
+  "content": "I want to be at three PM."
+}
+[2025-09-13T08:37:47.272Z] === END PARSED JSON ===
+[2025-09-13T08:37:47.272Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:37:47.272Z] 📜 HISTORY: Message logged
+[2025-09-13T08:37:47.272Z] 🔍 History role: 'user' -> Speaker: 'User'
+📝 TRANSCRIPT: Skipping duplicate User: I want to be at three PM.
+[2025-09-13T08:37:47.272Z] 📝 Added transcript: [User] I want to be at three PM.
+📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_l4eoWLUFScrBy5YZ3NA0AeBJ","name":"get_available_slots","arguments":"{\"date\":\"2025-09-13\"}","client_side":true}]}...
+Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_l4eoWLUFScrBy5YZ3NA0AeBJ","name":"get_available_slots","arguments":"{\"date\":\"2025-09-13\"}","client_side":true}]}
+[2025-09-13T08:37:48.025Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_l4eoWLUFScrBy5YZ3NA0AeBJ","name":"get_available_slots","arguments":"{\"date\":\"2025-09-13\"}","client_side":true}]}
+[2025-09-13T08:37:48.025Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "FunctionCallRequest",
   "functions": [
     {
-      "id": "call_Zx7GR8UVZQAG2xB0J3eUbV72",
+      "id": "call_l4eoWLUFScrBy5YZ3NA0AeBJ",
       "name": "get_available_slots",
-      "arguments": "{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}",
+      "arguments": "{\"date\":\"2025-09-13\"}",
       "client_side": true
     }
   ]
 }
-[2025-09-13T08:23:26.550Z] === END PARSED JSON ===
-[2025-09-13T08:23:26.550Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
-[2025-09-13T08:23:26.550Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
-[2025-09-13T08:23:26.550Z] ✅ SUCCESS: AI requesting function calls!
-[2025-09-13T08:23:26.550Z] 📋 Functions: [
+[2025-09-13T08:37:48.025Z] === END PARSED JSON ===
+[2025-09-13T08:37:48.025Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
+[2025-09-13T08:37:48.025Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
+[2025-09-13T08:37:48.025Z] ✅ SUCCESS: AI requesting function calls!
+[2025-09-13T08:37:48.025Z] 📋 Functions: [
   {
-    "id": "call_Zx7GR8UVZQAG2xB0J3eUbV72",
+    "id": "call_l4eoWLUFScrBy5YZ3NA0AeBJ",
     "name": "get_available_slots",
-    "arguments": "{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}",
+    "arguments": "{\"date\":\"2025-09-13\"}",
     "client_side": true
   }
 ]
-[2025-09-13T08:23:26.550Z] ⏸️ SILENCE: Pausing timer - Processing function calls
-[2025-09-13T08:23:26.550Z] ⏸️ KEEPALIVE: Paused for function processing
-[2025-09-13T08:23:26.550Z] 🔧 Processing function: get_available_slots
-[2025-09-13T08:23:26.550Z] 🔧 CALLING: handleFunctionCall for get_available_slots...
-📝 Session updated for call CA4e38b9cf500eb5ac036d7e88a52c87d0: { callerPhone: '+447468306825' }
-[2025-09-13T08:23:26.550Z] 🚀 STARTING handleFunctionCall
-[2025-09-13T08:23:26.550Z] 🔧 Function call received: {
+[2025-09-13T08:37:48.025Z] ⏸️ SILENCE: Pausing timer - Processing function calls
+[2025-09-13T08:37:48.026Z] ⏸️ KEEPALIVE: Paused for function processing
+[2025-09-13T08:37:48.025Z] 🔧 Processing function: get_available_slots
+[2025-09-13T08:37:48.025Z] 🔧 CALLING: handleFunctionCall for get_available_slots...
+📝 Session updated for call CA9be095ec0bbc3c23c29d32b0d62636e7: { callerPhone: '+447469735254' }
+[2025-09-13T08:37:48.026Z] 🚀 STARTING handleFunctionCall
+[2025-09-13T08:37:48.026Z] 🔧 Function call received: {
   "function_name": "get_available_slots",
-  "function_call_id": "call_Zx7GR8UVZQAG2xB0J3eUbV72",
+  "function_call_id": "call_l4eoWLUFScrBy5YZ3NA0AeBJ",
   "parameters": {
-    "date": "2025-09-13",
-    "service_id": "haircut"
+    "date": "2025-09-13"
   }
 }
-[2025-09-13T08:23:26.550Z] 📋 Function name: get_available_slots
-[2025-09-13T08:23:26.550Z] 📊 Parameters: {
-  "date": "2025-09-13",
-  "service_id": "haircut"
+[2025-09-13T08:37:48.026Z] 📋 Function name: get_available_slots
+[2025-09-13T08:37:48.026Z] 📊 Parameters: {
+  "date": "2025-09-13"
 }
-[2025-09-13T08:23:26.550Z] 🏢 Business config exists: true
-[2025-09-13T08:23:26.550Z] 🌐 WebSocket state: 1
+[2025-09-13T08:37:48.026Z] 🏢 Business config exists: true
+[2025-09-13T08:37:48.026Z] 🌐 WebSocket state: 1
 🔧 Function call received: {
   "function_name": "get_available_slots",
-  "function_call_id": "call_Zx7GR8UVZQAG2xB0J3eUbV72",
+  "function_call_id": "call_l4eoWLUFScrBy5YZ3NA0AeBJ",
   "parameters": {
-    "date": "2025-09-13",
-    "service_id": "haircut"
+    "date": "2025-09-13"
   }
 }
-[2025-09-13T08:23:26.550Z] 🚀 STARTING getAvailableSlots with params: {
-  "date": "2025-09-13",
-  "service_id": "haircut"
+[2025-09-13T08:37:48.026Z] 🚀 STARTING getAvailableSlots with params: {
+  "date": "2025-09-13"
 }
-[2025-09-13T08:23:26.550Z] 🏢 Business config: Gents Barbershop
-[2025-09-13T08:23:26.550Z] 📋 Services count: 2
-[2025-09-13T08:23:26.550Z] 🌐 Site URL: https://www.vocalenda.com
-[2025-09-13T08:23:26.550Z] 🔑 Secret exists: true
+[2025-09-13T08:37:48.026Z] 🏢 Business config: Gents Barbershop
+[2025-09-13T08:37:48.026Z] 📋 Services count: 2
+[2025-09-13T08:37:48.026Z] 🌐 Site URL: https://www.vocalenda.com
+[2025-09-13T08:37:48.026Z] 🔑 Secret exists: true
 🗓️ Getting available slots for: {
-  "date": "2025-09-13",
-  "service_id": "haircut"
+  "date": "2025-09-13"
 }
 📅 Business open on Saturday
-📋 Found service by name 'haircut' -> ID: 4395775e-fa81-4a69-8425-e46c3853dea4
-📋 Using service: haircut (Duration: 30 minutes)
-[2025-09-13T08:23:26.550Z] 🌐 About to make API call:
-[2025-09-13T08:23:26.550Z] 🔗 API URL: https://www.vocalenda.com/api/calendar/slots?businessId=1bb3c552-053f-40c4-b3f2-bdb51af87b52&serviceId=4395775e-fa81-4a69-8425-e46c3853dea4&date=2025-09-13
-[2025-09-13T08:23:26.550Z] 🔑 Secret exists: true
-[2025-09-13T08:23:26.550Z] 🏢 Business ID: 1bb3c552-053f-40c4-b3f2-bdb51af87b52
-[2025-09-13T08:23:26.550Z] 📋 Service ID: 4395775e-fa81-4a69-8425-e46c3853dea4
-[2025-09-13T08:23:26.550Z] 📅 Date: 2025-09-13
-[2025-09-13T08:23:26.550Z] 📡 API Response status: 200
-[2025-09-13T08:23:26.550Z] 📡 API Response ok: true
-[2025-09-13T08:23:26.550Z] 📅 Calendar API response: {
+📋 Using default service: haircut (Duration: 30 minutes)
+[2025-09-13T08:37:48.026Z] 🌐 About to make API call:
+[2025-09-13T08:37:48.026Z] 🔗 API URL: https://www.vocalenda.com/api/calendar/slots?businessId=1bb3c552-053f-40c4-b3f2-bdb51af87b52&serviceId=4395775e-fa81-4a69-8425-e46c3853dea4&date=2025-09-13
+[2025-09-13T08:37:48.026Z] 🔑 Secret exists: true
+[2025-09-13T08:37:48.026Z] 🏢 Business ID: 1bb3c552-053f-40c4-b3f2-bdb51af87b52
+[2025-09-13T08:37:48.026Z] 📋 Service ID: 4395775e-fa81-4a69-8425-e46c3853dea4
+[2025-09-13T08:37:48.026Z] 📅 Date: 2025-09-13
+[2025-09-13T08:37:48.026Z] 📡 API Response status: 200
+[2025-09-13T08:37:48.026Z] 📡 API Response ok: true
+[2025-09-13T08:37:48.026Z] 📅 Calendar API response: {
   "slots": [
     {
       "start": "2025-09-13T12:00:00.000Z",
@@ -152,9 +231,9 @@ Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_Zx7GR8UVZ
     }
   ]
 }
-[2025-09-13T08:23:26.550Z] 📊 Response type: object
-[2025-09-13T08:23:26.550Z] 📊 Has slots: true
-[2025-09-13T08:23:26.550Z] 📊 Slots count: 11
+[2025-09-13T08:37:48.026Z] 📊 Response type: object
+[2025-09-13T08:37:48.026Z] 📊 Has slots: true
+[2025-09-13T08:37:48.026Z] 📊 Slots count: 11
 ✅ Available time slots: [
   '12:00', '12:15',
   '12:30', '12:45',
@@ -166,524 +245,349 @@ Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_Zx7GR8UVZ
 ✅ Sending get_available_slots response to Deepgram
 ✅ Function response sent successfully to Deepgram
 🔄 Waiting for Deepgram to process the response...
-📨 Received Deepgram JSON message: {"type":"History","function_calls":[{"id":"call_Zx7GR8UVZQAG2xB0J3eUbV72","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}","response":...
-Message string: {"type":"History","function_calls":[{"id":"call_Zx7GR8UVZQAG2xB0J3eUbV72","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}","response":"{\"available_slots\":[\"12:00\",\"12:15\",\"12:30\",\"12:45\",\"13:00\",\"13:15\",\"13:30\",\"14:45\",\"15:00\",\"15:15\",\"15:30\"]}"}]}
-[2025-09-13T08:23:29.405Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","function_calls":[{"id":"call_Zx7GR8UVZQAG2xB0J3eUbV72","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}","response":"{\"available_slots\":[\"12:00\",\"12:15\",\"12:30\",\"12:45\",\"13:00\",\"13:15\",\"13:30\",\"14:45\",\"15:00\",\"15:15\",\"15:30\"]}"}]}
-[2025-09-13T08:23:29.405Z] === PARSED DEEPGRAM JSON ===
+📨 Received Deepgram JSON message: {"type":"History","function_calls":[{"id":"call_l4eoWLUFScrBy5YZ3NA0AeBJ","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-13\"}","response":"{\"available_slots\":[\"12...
+Message string: {"type":"History","function_calls":[{"id":"call_l4eoWLUFScrBy5YZ3NA0AeBJ","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-13\"}","response":"{\"available_slots\":[\"12:00\",\"12:15\",\"12:30\",\"12:45\",\"13:00\",\"13:15\",\"13:30\",\"14:45\",\"15:00\",\"15:15\",\"15:30\"]}"}]}
+[2025-09-13T08:37:51.910Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","function_calls":[{"id":"call_l4eoWLUFScrBy5YZ3NA0AeBJ","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-13\"}","response":"{\"available_slots\":[\"12:00\",\"12:15\",\"12:30\",\"12:45\",\"13:00\",\"13:15\",\"13:30\",\"14:45\",\"15:00\",\"15:15\",\"15:30\"]}"}]}
+[2025-09-13T08:37:51.910Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "History",
   "function_calls": [
     {
-      "id": "call_Zx7GR8UVZQAG2xB0J3eUbV72",
+      "id": "call_l4eoWLUFScrBy5YZ3NA0AeBJ",
       "name": "get_available_slots",
       "client_side": true,
-      "arguments": "{\"date\":\"2025-09-13\",\"service_id\":\"haircut\"}",
+      "arguments": "{\"date\":\"2025-09-13\"}",
       "response": "{\"available_slots\":[\"12:00\",\"12:15\",\"12:30\",\"12:45\",\"13:00\",\"13:15\",\"13:30\",\"14:45\",\"15:00\",\"15:15\",\"15:30\"]}"
     }
   ]
 }
-[2025-09-13T08:23:29.405Z] === END PARSED JSON ===
-[2025-09-13T08:23:29.405Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:29.405Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:26.550Z] ✅ COMPLETED: handleFunctionCall for get_available_slots
-[2025-09-13T08:23:30.261Z] ▶️ KEEPALIVE: Resumed after function processing
-[2025-09-13T08:23:26.550Z] ▶️ SILENCE: Resuming timer - Function processing completed
+[2025-09-13T08:37:51.910Z] === END PARSED JSON ===
+[2025-09-13T08:37:51.910Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:37:51.910Z] 📜 HISTORY: Message logged
+[2025-09-13T08:37:48.025Z] ✅ COMPLETED: handleFunctionCall for get_available_slots
+[2025-09-13T08:37:52.761Z] ▶️ KEEPALIVE: Resumed after function processing
+[2025-09-13T08:37:48.025Z] ▶️ SILENCE: Resuming timer - Function processing completed
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"Perfect!"}...
+Message string: {"type":"ConversationText","role":"assistant","content":"Perfect!"}
+[2025-09-13T08:37:52.871Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"Perfect!"}
+[2025-09-13T08:37:52.871Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "ConversationText",
+  "role": "assistant",
+  "content": "Perfect!"
+}
+[2025-09-13T08:37:52.871Z] === END PARSED JSON ===
+[2025-09-13T08:37:52.871Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:37:52.871Z] 💭 CONVERSATION_TEXT: Perfect!
+[2025-09-13T08:37:52.871Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: Perfect!
+📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"Perfect!"}...
+Message string: {"type":"History","role":"assistant","content":"Perfect!"}
+[2025-09-13T08:37:52.880Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"Perfect!"}
+[2025-09-13T08:37:52.880Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "History",
+  "role": "assistant",
+  "content": "Perfect!"
+}
+[2025-09-13T08:37:52.880Z] === END PARSED JSON ===
+[2025-09-13T08:37:52.880Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:37:52.880Z] 📜 HISTORY: Message logged
+[2025-09-13T08:37:52.880Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Skipping duplicate AI: Perfect!
+[2025-09-13T08:37:52.880Z] 📝 Added transcript: [AI] Perfect!
+[2025-09-13T08:37:52.880Z] 🎵 Starting audio stream - feeding buffer
+[2025-09-13T08:37:53.284Z] 💓 KEEPALIVE: Sent to Deepgram
+[2025-09-13T08:37:53.042Z] 🔇 Audio stream ended (timeout)
 📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"I can book you for 3 PM today."}...
 Message string: {"type":"ConversationText","role":"assistant","content":"I can book you for 3 PM today."}
-[2025-09-13T08:23:30.450Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"I can book you for 3 PM today."}
-[2025-09-13T08:23:30.450Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:53.752Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"I can book you for 3 PM today."}
+[2025-09-13T08:37:53.752Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "ConversationText",
   "role": "assistant",
   "content": "I can book you for 3 PM today."
 }
-[2025-09-13T08:23:30.450Z] === END PARSED JSON ===
-[2025-09-13T08:23:30.450Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:30.450Z] 💭 CONVERSATION_TEXT: I can book you for 3 PM today.
-[2025-09-13T08:23:30.450Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+[2025-09-13T08:37:53.752Z] === END PARSED JSON ===
+[2025-09-13T08:37:53.752Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:37:53.752Z] 💭 CONVERSATION_TEXT: I can book you for 3 PM today.
+[2025-09-13T08:37:53.752Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
 📝 TRANSCRIPT: Added AI: I can book you for 3 PM today.
 📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"I can book you for 3 PM today."}...
 Message string: {"type":"History","role":"assistant","content":"I can book you for 3 PM today."}
-[2025-09-13T08:23:30.459Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"I can book you for 3 PM today."}
-[2025-09-13T08:23:30.459Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:53.753Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"I can book you for 3 PM today."}
+[2025-09-13T08:37:53.753Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "History",
   "role": "assistant",
   "content": "I can book you for 3 PM today."
 }
-[2025-09-13T08:23:30.459Z] === END PARSED JSON ===
-[2025-09-13T08:23:30.459Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:30.459Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:30.459Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
+[2025-09-13T08:37:53.753Z] === END PARSED JSON ===
+[2025-09-13T08:37:53.753Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:37:53.753Z] 📜 HISTORY: Message logged
+[2025-09-13T08:37:53.753Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
 📝 TRANSCRIPT: Skipping duplicate AI: I can book you for 3 PM today.
-[2025-09-13T08:23:30.459Z] 📝 Added transcript: [AI] I can book you for 3 PM today.
-[2025-09-13T08:23:30.459Z] 🎵 Starting audio stream - feeding buffer
-[2025-09-13T08:23:31.638Z] 🔇 Audio stream ended (timeout)
-[2025-09-13T08:23:32.563Z] 💓 KEEPALIVE: Sent to Deepgram
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"Shall I confirm that?"}...
-Message string: {"type":"ConversationText","role":"assistant","content":"Shall I confirm that?"}
-[2025-09-13T08:23:33.617Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"Shall I confirm that?"}
-[2025-09-13T08:23:33.617Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:53.753Z] 📝 Added transcript: [AI] I can book you for 3 PM today.
+[2025-09-13T08:37:53.753Z] 🎵 Starting audio stream - feeding buffer
+[2025-09-13T08:37:54.052Z] 🔇 Audio stream ended (timeout)
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"Shall I confirm that appointment for your haircut, Elena?"}...
+Message string: {"type":"ConversationText","role":"assistant","content":"Shall I confirm that appointment for your haircut, Elena?"}
+[2025-09-13T08:37:55.913Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"Shall I confirm that appointment for your haircut, Elena?"}
+[2025-09-13T08:37:55.913Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "ConversationText",
   "role": "assistant",
-  "content": "Shall I confirm that?"
+  "content": "Shall I confirm that appointment for your haircut, Elena?"
 }
-[2025-09-13T08:23:33.617Z] === END PARSED JSON ===
-[2025-09-13T08:23:33.617Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:33.617Z] 💭 CONVERSATION_TEXT: Shall I confirm that?
-[2025-09-13T08:23:33.617Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Added AI: Shall I confirm that?
-📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"Shall I confirm that?"}...
-Message string: {"type":"History","role":"assistant","content":"Shall I confirm that?"}
-[2025-09-13T08:23:33.617Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"Shall I confirm that?"}
-[2025-09-13T08:23:33.617Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:55.913Z] === END PARSED JSON ===
+[2025-09-13T08:37:55.913Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:37:55.913Z] 💭 CONVERSATION_TEXT: Shall I confirm that appointment for your haircut, Elena?
+[2025-09-13T08:37:55.913Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: Shall I confirm that appointment for your haircut, Elena?
+📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"Shall I confirm that appointment for your haircut, Elena?"}...
+Message string: {"type":"History","role":"assistant","content":"Shall I confirm that appointment for your haircut, Elena?"}
+[2025-09-13T08:37:55.922Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"Shall I confirm that appointment for your haircut, Elena?"}
+[2025-09-13T08:37:55.922Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "History",
   "role": "assistant",
-  "content": "Shall I confirm that?"
+  "content": "Shall I confirm that appointment for your haircut, Elena?"
 }
-[2025-09-13T08:23:33.617Z] === END PARSED JSON ===
-[2025-09-13T08:23:33.617Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:33.617Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:33.617Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Skipping duplicate AI: Shall I confirm that?
-[2025-09-13T08:23:33.617Z] 📝 Added transcript: [AI] Shall I confirm that?
-[2025-09-13T08:23:33.617Z] 🎵 Starting audio stream - feeding buffer
+[2025-09-13T08:37:55.922Z] === END PARSED JSON ===
+[2025-09-13T08:37:55.922Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:37:55.922Z] 📜 HISTORY: Message logged
+[2025-09-13T08:37:55.922Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Skipping duplicate AI: Shall I confirm that appointment for your haircut, Elena?
+[2025-09-13T08:37:55.922Z] 📝 Added transcript: [AI] Shall I confirm that appointment for your haircut, Elena?
+[2025-09-13T08:37:55.922Z] 🎵 Starting audio stream - feeding buffer
 📨 Received Deepgram JSON message: {"type":"AgentAudioDone"}...
 Message string: {"type":"AgentAudioDone"}
-[2025-09-13T08:23:33.635Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
-[2025-09-13T08:23:33.635Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:55.978Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
+[2025-09-13T08:37:55.978Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "AgentAudioDone"
 }
-[2025-09-13T08:23:33.635Z] === END PARSED JSON ===
-[2025-09-13T08:23:33.635Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
-[2025-09-13T08:23:33.635Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
-[2025-09-13T08:23:33.635Z] 🔇 SILENCE: Started tracking
-[2025-09-13T08:23:33.635Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
-[2025-09-13T08:23:33.635Z] 🔇 SILENCE_CHECK: 1000ms of silence
-[2025-09-13T08:23:33.635Z] 🔇 SILENCE_CHECK: 2000ms of silence
+[2025-09-13T08:37:55.978Z] === END PARSED JSON ===
+[2025-09-13T08:37:55.978Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
+[2025-09-13T08:37:55.978Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
+[2025-09-13T08:37:55.978Z] 🔇 SILENCE: Started tracking
+[2025-09-13T08:37:55.978Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
+[2025-09-13T08:37:55.978Z] 🔇 SILENCE_CHECK: 1000ms of silence
+[2025-09-13T08:37:57.283Z] 💓 KEEPALIVE: Sent to Deepgram
+[2025-09-13T08:37:55.978Z] 🔇 SILENCE_CHECK: 2001ms of silence
+[2025-09-13T08:37:55.978Z] 🔇 SILENCE_CHECK: 3001ms of silence
 📨 Received Deepgram JSON message: {"type":"UserStartedSpeaking"}...
 Message string: {"type":"UserStartedSpeaking"}
-[2025-09-13T08:23:36.208Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
-[2025-09-13T08:23:36.208Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:37:59.918Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
+[2025-09-13T08:37:59.918Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "UserStartedSpeaking"
 }
-[2025-09-13T08:23:36.208Z] === END PARSED JSON ===
-[2025-09-13T08:23:36.208Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
-[2025-09-13T08:23:36.208Z] 🎤 USER_STARTED_SPEAKING: User began speaking
-[2025-09-13T08:23:36.208Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
-[2025-09-13T08:23:36.208Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
-[2025-09-13T08:23:36.563Z] 💓 KEEPALIVE: Sent to Deepgram
+[2025-09-13T08:37:59.918Z] === END PARSED JSON ===
+[2025-09-13T08:37:59.918Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
+[2025-09-13T08:37:59.918Z] 🎤 USER_STARTED_SPEAKING: User began speaking
+[2025-09-13T08:37:59.918Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
+[2025-09-13T08:37:59.918Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
 📨 Received Deepgram JSON message: {"type":"ConversationText","role":"user","content":"Yes."}...
 Message string: {"type":"ConversationText","role":"user","content":"Yes."}
-[2025-09-13T08:23:36.822Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":"Yes."}
-[2025-09-13T08:23:36.822Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:38:00.302Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":"Yes."}
+[2025-09-13T08:38:00.302Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "ConversationText",
   "role": "user",
   "content": "Yes."
 }
-[2025-09-13T08:23:36.822Z] === END PARSED JSON ===
-[2025-09-13T08:23:36.822Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:36.822Z] 💭 CONVERSATION_TEXT: Yes.
-[2025-09-13T08:23:36.822Z] 🔍 ConversationText role: 'user' -> Speaker: 'User'
+[2025-09-13T08:38:00.302Z] === END PARSED JSON ===
+[2025-09-13T08:38:00.302Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:38:00.302Z] 💭 CONVERSATION_TEXT: Yes.
+[2025-09-13T08:38:00.302Z] 🔍 ConversationText role: 'user' -> Speaker: 'User'
 📝 TRANSCRIPT: Added User: Yes.
 📨 Received Deepgram JSON message: {"type":"History","role":"user","content":"Yes."}...
 Message string: {"type":"History","role":"user","content":"Yes."}
-[2025-09-13T08:23:36.838Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":"Yes."}
-[2025-09-13T08:23:36.838Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:38:00.313Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":"Yes."}
+[2025-09-13T08:38:00.313Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "History",
   "role": "user",
   "content": "Yes."
 }
-[2025-09-13T08:23:36.838Z] === END PARSED JSON ===
-[2025-09-13T08:23:36.838Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:36.838Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:36.838Z] 🔍 History role: 'user' -> Speaker: 'User'
+[2025-09-13T08:38:00.313Z] === END PARSED JSON ===
+[2025-09-13T08:38:00.313Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:38:00.313Z] 📜 HISTORY: Message logged
+[2025-09-13T08:38:00.313Z] 🔍 History role: 'user' -> Speaker: 'User'
 📝 TRANSCRIPT: Skipping duplicate User: Yes.
-[2025-09-13T08:23:36.838Z] 📝 Added transcript: [User] Yes.
-📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_fmEASCa9FY1TT4ETQEIboF2N","name":"create_booking","arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"...
-Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_fmEASCa9FY1TT4ETQEIboF2N","name":"create_booking","arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","client_side":true}]}
-[2025-09-13T08:23:37.695Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_fmEASCa9FY1TT4ETQEIboF2N","name":"create_booking","arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","client_side":true}]}
-[2025-09-13T08:23:37.695Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:38:00.313Z] 📝 Added transcript: [User] Yes.
+📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_rg49uQaS2oHsEyQ1YaLzYCtL","name":"get_services","arguments":"{}","client_side":true}]}...
+Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_rg49uQaS2oHsEyQ1YaLzYCtL","name":"get_services","arguments":"{}","client_side":true}]}
+[2025-09-13T08:38:01.008Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_rg49uQaS2oHsEyQ1YaLzYCtL","name":"get_services","arguments":"{}","client_side":true}]}
+[2025-09-13T08:38:01.008Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "FunctionCallRequest",
   "functions": [
     {
-      "id": "call_fmEASCa9FY1TT4ETQEIboF2N",
-      "name": "create_booking",
-      "arguments": "{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}",
+      "id": "call_rg49uQaS2oHsEyQ1YaLzYCtL",
+      "name": "get_services",
+      "arguments": "{}",
       "client_side": true
     }
   ]
 }
-[2025-09-13T08:23:37.695Z] === END PARSED JSON ===
-[2025-09-13T08:23:37.695Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
-[2025-09-13T08:23:37.695Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
-[2025-09-13T08:23:37.695Z] ✅ SUCCESS: AI requesting function calls!
-[2025-09-13T08:23:37.695Z] 📋 Functions: [
+[2025-09-13T08:38:01.008Z] === END PARSED JSON ===
+[2025-09-13T08:38:01.008Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
+[2025-09-13T08:38:01.008Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
+[2025-09-13T08:38:01.008Z] ✅ SUCCESS: AI requesting function calls!
+[2025-09-13T08:38:01.008Z] 📋 Functions: [
   {
-    "id": "call_fmEASCa9FY1TT4ETQEIboF2N",
-    "name": "create_booking",
-    "arguments": "{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}",
+    "id": "call_rg49uQaS2oHsEyQ1YaLzYCtL",
+    "name": "get_services",
+    "arguments": "{}",
     "client_side": true
   }
 ]
-[2025-09-13T08:23:37.695Z] ⏸️ SILENCE: Pausing timer - Processing function calls
-[2025-09-13T08:23:37.695Z] ⏸️ KEEPALIVE: Paused for function processing
-[2025-09-13T08:23:37.695Z] 🔧 Processing function: create_booking
-[2025-09-13T08:23:37.695Z] 🔧 CALLING: handleFunctionCall for create_booking...
-📝 Session updated for call CA4e38b9cf500eb5ac036d7e88a52c87d0: { callerPhone: '+447468306825' }
-[2025-09-13T08:23:37.695Z] 🚀 STARTING handleFunctionCall
-[2025-09-13T08:23:37.695Z] 🔧 Function call received: {
-  "function_name": "create_booking",
-  "function_call_id": "call_fmEASCa9FY1TT4ETQEIboF2N",
-  "parameters": {
-    "customer_name": "Marco",
-    "date": "2025-09-13",
-    "service_id": "haircut",
-    "time": "15:00"
-  }
+[2025-09-13T08:38:01.008Z] ⏸️ SILENCE: Pausing timer - Processing function calls
+[2025-09-13T08:38:01.008Z] ⏸️ KEEPALIVE: Paused for function processing
+[2025-09-13T08:38:01.008Z] 🔧 Processing function: get_services
+[2025-09-13T08:38:01.008Z] 🔧 CALLING: handleFunctionCall for get_services...
+📝 Session updated for call CA9be095ec0bbc3c23c29d32b0d62636e7: { callerPhone: '+447469735254' }
+[2025-09-13T08:38:01.008Z] 🚀 STARTING handleFunctionCall
+[2025-09-13T08:38:01.008Z] 🔧 Function call received: {
+  "function_name": "get_services",
+  "function_call_id": "call_rg49uQaS2oHsEyQ1YaLzYCtL",
+  "parameters": {}
 }
-[2025-09-13T08:23:37.695Z] 📋 Function name: create_booking
-[2025-09-13T08:23:37.695Z] 📊 Parameters: {
-  "customer_name": "Marco",
-  "date": "2025-09-13",
-  "service_id": "haircut",
-  "time": "15:00"
-}
-[2025-09-13T08:23:37.695Z] 🏢 Business config exists: true
-[2025-09-13T08:23:37.695Z] 🌐 WebSocket state: 1
+[2025-09-13T08:38:01.008Z] 📋 Function name: get_services
+[2025-09-13T08:38:01.008Z] 📊 Parameters: {}
+[2025-09-13T08:38:01.008Z] 🏢 Business config exists: true
+[2025-09-13T08:38:01.008Z] 🌐 WebSocket state: 1
 🔧 Function call received: {
-  "function_name": "create_booking",
-  "function_call_id": "call_fmEASCa9FY1TT4ETQEIboF2N",
-  "parameters": {
-    "customer_name": "Marco",
-    "date": "2025-09-13",
-    "service_id": "haircut",
-    "time": "15:00"
+  "function_name": "get_services",
+  "function_call_id": "call_rg49uQaS2oHsEyQ1YaLzYCtL",
+  "parameters": {}
+}
+🔧 Processing get_services function call
+📊 Raw services from config: 2 services found
+📋 Mapped services result: [
+  {
+    "id": "4395775e-fa81-4a69-8425-e46c3853dea4",
+    "name": "haircut",
+    "duration": 30,
+    "price": 20,
+    "description": null
+  },
+  {
+    "id": "63555ab0-f0ac-48c3-a2b2-766356aeb8f4",
+    "name": "beard trim",
+    "duration": 15,
+    "price": 15,
+    "description": null
   }
-}
-✅ TRACKING: Added function call ID call_fmEASCa9FY1TT4ETQEIboF2N to processed set
-🎯 createBooking called with params: {
-  "customer_name": "Marco",
-  "date": "2025-09-13",
-  "service_id": "haircut",
-  "time": "15:00"
-}
-📋 Available services: [
-  { id: '4395775e-fa81-4a69-8425-e46c3853dea4', name: 'haircut' },
-  { id: '63555ab0-f0ac-48c3-a2b2-766356aeb8f4', name: 'beard trim' }
 ]
-📋 Booking - Found service by name 'haircut' -> ID: 4395775e-fa81-4a69-8425-e46c3853dea4
-✅ Booking - Service found: haircut (ID: 4395775e-fa81-4a69-8425-e46c3853dea4 )
-📝 Session updated for call CA4e38b9cf500eb5ac036d7e88a52c87d0: {
-  callerPhone: '+447468306825',
-  customerName: 'Marco',
-  lastBookingDate: '2025-09-13',
-  lastBookingTime: '15:00',
-  lastServiceId: 'haircut',
-  lastServiceName: 'haircut',
-  lastServiceDuration: 30
-}
-🕐 Creating appointment for 2025-09-13 at 15:00 in timezone: Europe/London
-📅 Parsed date: 2025-09-13 (Saturday)
-🕐 Appointment datetime (UK local): 15:00:00
-🕐 Business timezone: Europe/London
-🕐 Start time: 15:00:00
-🕐 End time: 15:30:00
-📅 Day of week: Saturday
-🔍 Checking slot availability before booking...
-✅ Sending create_booking response to Deepgram
-❌ Failed to check availability: 400
+✅ get_services processing complete
+✅ Sending get_services response to Deepgram
 ✅ Function response sent successfully to Deepgram
 🔄 Waiting for Deepgram to process the response...
-📨 Received Deepgram JSON message: {"type":"History","function_calls":[{"id":"call_fmEASCa9FY1TT4ETQEIboF2N","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"...
-Message string: {"type":"History","function_calls":[{"id":"call_fmEASCa9FY1TT4ETQEIboF2N","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","response":"{\"error\":\"Unable to verify slot availability. Please try again.\"}"}]}
-[2025-09-13T08:23:39.275Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","function_calls":[{"id":"call_fmEASCa9FY1TT4ETQEIboF2N","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","response":"{\"error\":\"Unable to verify slot availability. Please try again.\"}"}]}
-[2025-09-13T08:23:39.275Z] === PARSED DEEPGRAM JSON ===
+📨 Received Deepgram JSON message: {"type":"History","function_calls":[{"id":"call_rg49uQaS2oHsEyQ1YaLzYCtL","name":"get_services","client_side":true,"arguments":"{}","response":"[{\"id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"name...
+Message string: {"type":"History","function_calls":[{"id":"call_rg49uQaS2oHsEyQ1YaLzYCtL","name":"get_services","client_side":true,"arguments":"{}","response":"[{\"id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"name\":\"haircut\",\"duration\":30,\"price\":20,\"description\":null},{\"id\":\"63555ab0-f0ac-48c3-a2b2-766356aeb8f4\",\"name\":\"beard trim\",\"duration\":15,\"price\":15,\"description\":null}]"}]}
+[2025-09-13T08:38:01.157Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","function_calls":[{"id":"call_rg49uQaS2oHsEyQ1YaLzYCtL","name":"get_services","client_side":true,"arguments":"{}","response":"[{\"id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"name\":\"haircut\",\"duration\":30,\"price\":20,\"description\":null},{\"id\":\"63555ab0-f0ac-48c3-a2b2-766356aeb8f4\",\"name\":\"beard trim\",\"duration\":15,\"price\":15,\"description\":null}]"}]}
+[2025-09-13T08:38:01.157Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "History",
   "function_calls": [
     {
-      "id": "call_fmEASCa9FY1TT4ETQEIboF2N",
-      "name": "create_booking",
+      "id": "call_rg49uQaS2oHsEyQ1YaLzYCtL",
+      "name": "get_services",
       "client_side": true,
-      "arguments": "{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}",
-      "response": "{\"error\":\"Unable to verify slot availability. Please try again.\"}"
+      "arguments": "{}",
+      "response": "[{\"id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"name\":\"haircut\",\"duration\":30,\"price\":20,\"description\":null},{\"id\":\"63555ab0-f0ac-48c3-a2b2-766356aeb8f4\",\"name\":\"beard trim\",\"duration\":15,\"price\":15,\"description\":null}]"
     }
   ]
 }
-[2025-09-13T08:23:39.275Z] === END PARSED JSON ===
-[2025-09-13T08:23:39.275Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:39.275Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:37.695Z] ✅ COMPLETED: handleFunctionCall for create_booking
-[2025-09-13T08:23:40.131Z] ▶️ KEEPALIVE: Resumed after function processing
-[2025-09-13T08:23:37.695Z] ▶️ SILENCE: Resuming timer - Function processing completed
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"It seems there was a problem confirming your 3 PM haircut appointment."}...
-Message string: {"type":"ConversationText","role":"assistant","content":"It seems there was a problem confirming your 3 PM haircut appointment."}
-[2025-09-13T08:23:40.166Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"It seems there was a problem confirming your 3 PM haircut appointment."}
-[2025-09-13T08:23:40.166Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "assistant",
-  "content": "It seems there was a problem confirming your 3 PM haircut appointment."
-}
-[2025-09-13T08:23:40.166Z] === END PARSED JSON ===
-[2025-09-13T08:23:40.166Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:40.166Z] 💭 CONVERSATION_TEXT: It seems there was a problem confirming your 3 PM haircut appointment.
-[2025-09-13T08:23:40.166Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Added AI: It seems there was a problem confirming your 3 PM haircut appointment.
-📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"It seems there was a problem confirming your 3 PM haircut appointment."}...
-Message string: {"type":"History","role":"assistant","content":"It seems there was a problem confirming your 3 PM haircut appointment."}
-[2025-09-13T08:23:40.167Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"It seems there was a problem confirming your 3 PM haircut appointment."}
-[2025-09-13T08:23:40.167Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "assistant",
-  "content": "It seems there was a problem confirming your 3 PM haircut appointment."
-}
-[2025-09-13T08:23:40.167Z] === END PARSED JSON ===
-[2025-09-13T08:23:40.167Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:40.167Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:40.167Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Skipping duplicate AI: It seems there was a problem confirming your 3 PM haircut appointment.
-[2025-09-13T08:23:40.167Z] 📝 Added transcript: [AI] It seems there was a problem confirming your 3 PM haircut appointment.
-[2025-09-13T08:23:40.167Z] 🎵 Starting audio stream - feeding buffer
-[2025-09-13T08:23:40.563Z] 💓 KEEPALIVE: Sent to Deepgram
-📨 Received Deepgram JSON message: {"type":"UserStartedSpeaking"}...
-Message string: {"type":"UserStartedSpeaking"}
-[2025-09-13T08:23:41.548Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
-[2025-09-13T08:23:41.548Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "UserStartedSpeaking"
-}
-[2025-09-13T08:23:41.548Z] === END PARSED JSON ===
-[2025-09-13T08:23:41.548Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
-[2025-09-13T08:23:41.548Z] 🎤 USER_STARTED_SPEAKING: User began speaking
-[2025-09-13T08:23:41.548Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
-[2025-09-13T08:23:41.548Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
-📨 Received Deepgram JSON message: {"type":"AgentAudioDone"}...
-Message string: {"type":"AgentAudioDone"}
-[2025-09-13T08:23:41.666Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
-[2025-09-13T08:23:41.666Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "AgentAudioDone"
-}
-[2025-09-13T08:23:41.666Z] === END PARSED JSON ===
-[2025-09-13T08:23:41.666Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
-[2025-09-13T08:23:41.666Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE: Started tracking
-[2025-09-13T08:23:41.666Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE_CHECK: 1000ms of silence
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE_CHECK: 2000ms of silence
-[2025-09-13T08:23:44.563Z] 💓 KEEPALIVE: Sent to Deepgram
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE_CHECK: 3000ms of silence
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE_CHECK: 4000ms of silence
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"user","content":""}...
-Message string: {"type":"ConversationText","role":"user","content":""}
-[2025-09-13T08:23:46.467Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":""}
-[2025-09-13T08:23:46.467Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "user",
-  "content": ""
-}
-[2025-09-13T08:23:46.467Z] === END PARSED JSON ===
-[2025-09-13T08:23:46.467Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:46.467Z] 💭 CONVERSATION_TEXT: 
-📨 Received Deepgram JSON message: {"type":"History","role":"user","content":""}...
-Message string: {"type":"History","role":"user","content":""}
-[2025-09-13T08:23:46.478Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":""}
-[2025-09-13T08:23:46.478Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "user",
-  "content": ""
-}
-[2025-09-13T08:23:46.478Z] === END PARSED JSON ===
-[2025-09-13T08:23:46.478Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:46.478Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE_CHECK: 5000ms of silence
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"}...
-Message string: {"type":"ConversationText","role":"assistant","content":"Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"}
-[2025-09-13T08:23:47.611Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"}
-[2025-09-13T08:23:47.611Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "assistant",
-  "content": "Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"
-}
-[2025-09-13T08:23:47.611Z] === END PARSED JSON ===
-[2025-09-13T08:23:47.611Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:47.611Z] 💭 CONVERSATION_TEXT: Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?
-[2025-09-13T08:23:47.611Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Added AI: Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?
-📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"}...
-Message string: {"type":"History","role":"assistant","content":"Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"}
-[2025-09-13T08:23:47.611Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"}
-[2025-09-13T08:23:47.611Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "assistant",
-  "content": "Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?"
-}
-[2025-09-13T08:23:47.611Z] === END PARSED JSON ===
-[2025-09-13T08:23:47.611Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:47.611Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:47.611Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Skipping duplicate AI: Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?
-[2025-09-13T08:23:47.611Z] 📝 Added transcript: [AI] Would you like me to try booking the 3 PM haircut appointment again for you, or would you prefer a different time?
-[2025-09-13T08:23:47.612Z] 🎵 Starting audio stream - feeding buffer
-[2025-09-13T08:23:41.666Z] 🔇 SILENCE_CHECK: 6000ms of silence
-📨 Received Deepgram JSON message: {"type":"UserStartedSpeaking"}...
-Message string: {"type":"UserStartedSpeaking"}
-[2025-09-13T08:23:48.507Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
-[2025-09-13T08:23:48.507Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "UserStartedSpeaking"
-}
-[2025-09-13T08:23:48.507Z] === END PARSED JSON ===
-[2025-09-13T08:23:48.507Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
-[2025-09-13T08:23:48.507Z] 🎤 USER_STARTED_SPEAKING: User began speaking
-[2025-09-13T08:23:48.507Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
-[2025-09-13T08:23:48.507Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
-[2025-09-13T08:23:48.562Z] 💓 KEEPALIVE: Sent to Deepgram
-📨 Received Deepgram JSON message: {"type":"AgentAudioDone"}...
-Message string: {"type":"AgentAudioDone"}
-[2025-09-13T08:23:48.686Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
-[2025-09-13T08:23:48.686Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "AgentAudioDone"
-}
-[2025-09-13T08:23:48.686Z] === END PARSED JSON ===
-[2025-09-13T08:23:48.686Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
-[2025-09-13T08:23:48.686Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
-[2025-09-13T08:23:48.686Z] 🔇 SILENCE: Started tracking
-[2025-09-13T08:23:48.686Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"user","content":"Go on. Where you stop?"}...
-Message string: {"type":"ConversationText","role":"user","content":"Go on. Where you stop?"}
-[2025-09-13T08:23:49.130Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":"Go on. Where you stop?"}
-[2025-09-13T08:23:49.130Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "user",
-  "content": "Go on. Where you stop?"
-}
-[2025-09-13T08:23:49.130Z] === END PARSED JSON ===
-[2025-09-13T08:23:49.130Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-13T08:23:49.130Z] 💭 CONVERSATION_TEXT: Go on. Where you stop?
-[2025-09-13T08:23:49.130Z] 🔍 ConversationText role: 'user' -> Speaker: 'User'
-📝 TRANSCRIPT: Added User: Go on. Where you stop?
-📨 Received Deepgram JSON message: {"type":"History","role":"user","content":"Go on. Where you stop?"}...
-Message string: {"type":"History","role":"user","content":"Go on. Where you stop?"}
-[2025-09-13T08:23:49.138Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":"Go on. Where you stop?"}
-[2025-09-13T08:23:49.138Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "user",
-  "content": "Go on. Where you stop?"
-}
-[2025-09-13T08:23:49.138Z] === END PARSED JSON ===
-[2025-09-13T08:23:49.138Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:49.138Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:49.138Z] 🔍 History role: 'user' -> Speaker: 'User'
-📝 TRANSCRIPT: Skipping duplicate User: Go on. Where you stop?
-[2025-09-13T08:23:49.138Z] 📝 Added transcript: [User] Go on. Where you stop?
-[2025-09-13T08:23:48.686Z] 🔇 SILENCE_CHECK: 1000ms of silence
-📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_RuekpscaExjq85zd746ph5XJ","name":"create_booking","arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"...
-Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_RuekpscaExjq85zd746ph5XJ","name":"create_booking","arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","client_side":true}]}
-[2025-09-13T08:23:50.071Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_RuekpscaExjq85zd746ph5XJ","name":"create_booking","arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","client_side":true}]}
-[2025-09-13T08:23:50.071Z] === PARSED DEEPGRAM JSON ===
+[2025-09-13T08:38:01.157Z] === END PARSED JSON ===
+[2025-09-13T08:38:01.157Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:38:01.157Z] 📜 HISTORY: Message logged
+[2025-09-13T08:38:01.008Z] ✅ COMPLETED: handleFunctionCall for get_services
+[2025-09-13T08:38:02.009Z] ▶️ KEEPALIVE: Resumed after function processing
+[2025-09-13T08:38:01.008Z] ▶️ SILENCE: Resuming timer - Function processing completed
+📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_pdRdYJVliZzidY8yJ3JQpPVZ","name":"create_booking","arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa8...
+Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_pdRdYJVliZzidY8yJ3JQpPVZ","name":"create_booking","arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}","client_side":true}]}
+[2025-09-13T08:38:02.445Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_pdRdYJVliZzidY8yJ3JQpPVZ","name":"create_booking","arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}","client_side":true}]}
+[2025-09-13T08:38:02.445Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "FunctionCallRequest",
   "functions": [
     {
-      "id": "call_RuekpscaExjq85zd746ph5XJ",
+      "id": "call_pdRdYJVliZzidY8yJ3JQpPVZ",
       "name": "create_booking",
-      "arguments": "{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}",
+      "arguments": "{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}",
       "client_side": true
     }
   ]
 }
-[2025-09-13T08:23:50.071Z] === END PARSED JSON ===
-[2025-09-13T08:23:50.071Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
-[2025-09-13T08:23:50.071Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
-[2025-09-13T08:23:50.071Z] ✅ SUCCESS: AI requesting function calls!
-[2025-09-13T08:23:50.071Z] 📋 Functions: [
+[2025-09-13T08:38:02.445Z] === END PARSED JSON ===
+[2025-09-13T08:38:02.445Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
+[2025-09-13T08:38:02.445Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
+[2025-09-13T08:38:02.445Z] ✅ SUCCESS: AI requesting function calls!
+[2025-09-13T08:38:02.445Z] 📋 Functions: [
   {
-    "id": "call_RuekpscaExjq85zd746ph5XJ",
+    "id": "call_pdRdYJVliZzidY8yJ3JQpPVZ",
     "name": "create_booking",
-    "arguments": "{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}",
+    "arguments": "{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}",
     "client_side": true
   }
 ]
-[2025-09-13T08:23:50.071Z] ⏸️ SILENCE: Pausing timer - Processing function calls
-[2025-09-13T08:23:50.072Z] ⏸️ KEEPALIVE: Paused for function processing
-[2025-09-13T08:23:50.071Z] 🔧 Processing function: create_booking
-[2025-09-13T08:23:50.071Z] 🔧 CALLING: handleFunctionCall for create_booking...
-📝 Session updated for call CA4e38b9cf500eb5ac036d7e88a52c87d0: {
-  callerPhone: '+447468306825',
-  customerName: 'Marco',
-  lastBookingDate: '2025-09-13',
-  lastBookingTime: '15:00',
-  lastServiceId: 'haircut',
-  lastServiceName: 'haircut',
-  lastServiceDuration: 30
-}
-[2025-09-13T08:23:50.072Z] 🚀 STARTING handleFunctionCall
-[2025-09-13T08:23:50.072Z] 🔧 Function call received: {
+[2025-09-13T08:38:02.445Z] ⏸️ SILENCE: Pausing timer - Processing function calls
+[2025-09-13T08:38:02.445Z] ⏸️ KEEPALIVE: Paused for function processing
+[2025-09-13T08:38:02.445Z] 🔧 Processing function: create_booking
+[2025-09-13T08:38:02.445Z] 🔧 CALLING: handleFunctionCall for create_booking...
+📝 Session updated for call CA9be095ec0bbc3c23c29d32b0d62636e7: { callerPhone: '+447469735254' }
+[2025-09-13T08:38:02.445Z] 🚀 STARTING handleFunctionCall
+[2025-09-13T08:38:02.445Z] 🔧 Function call received: {
   "function_name": "create_booking",
-  "function_call_id": "call_RuekpscaExjq85zd746ph5XJ",
+  "function_call_id": "call_pdRdYJVliZzidY8yJ3JQpPVZ",
   "parameters": {
-    "customer_name": "Marco",
+    "customer_name": "Elena",
     "date": "2025-09-13",
-    "service_id": "haircut",
+    "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
     "time": "15:00"
   }
 }
-[2025-09-13T08:23:50.072Z] 📋 Function name: create_booking
-[2025-09-13T08:23:50.072Z] 📊 Parameters: {
-  "customer_name": "Marco",
+[2025-09-13T08:38:02.445Z] 📋 Function name: create_booking
+[2025-09-13T08:38:02.445Z] 📊 Parameters: {
+  "customer_name": "Elena",
   "date": "2025-09-13",
-  "service_id": "haircut",
+  "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
   "time": "15:00"
 }
-[2025-09-13T08:23:50.072Z] 🏢 Business config exists: true
-[2025-09-13T08:23:50.072Z] 🌐 WebSocket state: 1
+[2025-09-13T08:38:02.445Z] 🏢 Business config exists: true
+[2025-09-13T08:38:02.445Z] 🌐 WebSocket state: 1
 🔧 Function call received: {
   "function_name": "create_booking",
-  "function_call_id": "call_RuekpscaExjq85zd746ph5XJ",
+  "function_call_id": "call_pdRdYJVliZzidY8yJ3JQpPVZ",
   "parameters": {
-    "customer_name": "Marco",
+    "customer_name": "Elena",
     "date": "2025-09-13",
-    "service_id": "haircut",
+    "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
     "time": "15:00"
   }
 }
-✅ TRACKING: Added function call ID call_RuekpscaExjq85zd746ph5XJ to processed set
+✅ TRACKING: Added function call ID call_pdRdYJVliZzidY8yJ3JQpPVZ to processed set
 🎯 createBooking called with params: {
-  "customer_name": "Marco",
+  "customer_name": "Elena",
   "date": "2025-09-13",
-  "service_id": "haircut",
+  "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
   "time": "15:00"
 }
 📋 Available services: [
   { id: '4395775e-fa81-4a69-8425-e46c3853dea4', name: 'haircut' },
   { id: '63555ab0-f0ac-48c3-a2b2-766356aeb8f4', name: 'beard trim' }
 ]
-📋 Booking - Found service by name 'haircut' -> ID: 4395775e-fa81-4a69-8425-e46c3853dea4
 ✅ Booking - Service found: haircut (ID: 4395775e-fa81-4a69-8425-e46c3853dea4 )
-📝 Session updated for call CA4e38b9cf500eb5ac036d7e88a52c87d0: {
-  callerPhone: '+447468306825',
-  customerName: 'Marco',
+📝 Session updated for call CA9be095ec0bbc3c23c29d32b0d62636e7: {
+  callerPhone: '+447469735254',
+  customerName: 'Elena',
   lastBookingDate: '2025-09-13',
   lastBookingTime: '15:00',
-  lastServiceId: 'haircut',
+  lastServiceId: '4395775e-fa81-4a69-8425-e46c3853dea4',
   lastServiceName: 'haircut',
   lastServiceDuration: 30
 }
@@ -699,23 +603,238 @@ Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_RuekpscaE
 ✅ Sending create_booking response to Deepgram
 ✅ Function response sent successfully to Deepgram
 🔄 Waiting for Deepgram to process the response...
-📨 Received Deepgram JSON message: {"type":"History","function_calls":[{"id":"call_RuekpscaExjq85zd746ph5XJ","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"...
-Message string: {"type":"History","function_calls":[{"id":"call_RuekpscaExjq85zd746ph5XJ","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","response":"{\"error\":\"Unable to verify slot availability. Please try again.\"}"}]}
-[2025-09-13T08:23:51.112Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","function_calls":[{"id":"call_RuekpscaExjq85zd746ph5XJ","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}","response":"{\"error\":\"Unable to verify slot availability. Please try again.\"}"}]}
-[2025-09-13T08:23:51.112Z] === PARSED DEEPGRAM JSON ===
+📨 Received Deepgram JSON message: {"type":"History","function_calls":[{"id":"call_pdRdYJVliZzidY8yJ3JQpPVZ","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"...
+Message string: {"type":"History","function_calls":[{"id":"call_pdRdYJVliZzidY8yJ3JQpPVZ","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}","response":"{\"error\":\"Unable to verify slot availability. Please try again.\"}"}]}
+[2025-09-13T08:38:03.994Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","function_calls":[{"id":"call_pdRdYJVliZzidY8yJ3JQpPVZ","name":"create_booking","client_side":true,"arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}","response":"{\"error\":\"Unable to verify slot availability. Please try again.\"}"}]}
+[2025-09-13T08:38:03.994Z] === PARSED DEEPGRAM JSON ===
 {
   "type": "History",
   "function_calls": [
     {
-      "id": "call_RuekpscaExjq85zd746ph5XJ",
+      "id": "call_pdRdYJVliZzidY8yJ3JQpPVZ",
       "name": "create_booking",
       "client_side": true,
-      "arguments": "{\"customer_name\":\"Marco\",\"date\":\"2025-09-13\",\"service_id\":\"haircut\",\"time\":\"15:00\"}",
+      "arguments": "{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}",
       "response": "{\"error\":\"Unable to verify slot availability. Please try again.\"}"
     }
   ]
 }
-[2025-09-13T08:23:51.112Z] === END PARSED JSON ===
-[2025-09-13T08:23:51.112Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-13T08:23:51.112Z] 📜 HISTORY: Message logged
-[2025-09-13T08:23:50.071Z] ✅ COMPLETED: handleFunctionCall for create_booking
+[2025-09-13T08:38:03.994Z] === END PARSED JSON ===
+[2025-09-13T08:38:03.994Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:38:03.994Z] 📜 HISTORY: Message logged
+[2025-09-13T08:38:02.445Z] ✅ COMPLETED: handleFunctionCall for create_booking
+[2025-09-13T08:38:04.845Z] ▶️ KEEPALIVE: Resumed after function processing
+[2025-09-13T08:38:02.445Z] ▶️ SILENCE: Resuming timer - Function processing completed
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"It seems there was an issue confirming the 3 PM slot for your haircut today."}...
+Message string: {"type":"ConversationText","role":"assistant","content":"It seems there was an issue confirming the 3 PM slot for your haircut today."}
+[2025-09-13T08:38:05.027Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"It seems there was an issue confirming the 3 PM slot for your haircut today."}
+[2025-09-13T08:38:05.027Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "ConversationText",
+  "role": "assistant",
+  "content": "It seems there was an issue confirming the 3 PM slot for your haircut today."
+}
+[2025-09-13T08:38:05.027Z] === END PARSED JSON ===
+[2025-09-13T08:38:05.027Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:38:05.027Z] 💭 CONVERSATION_TEXT: It seems there was an issue confirming the 3 PM slot for your haircut today.
+[2025-09-13T08:38:05.027Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: It seems there was an issue confirming the 3 PM slot for your haircut today.
+📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"It seems there was an issue confirming the 3 PM slot for your haircut today."}...
+Message string: {"type":"History","role":"assistant","content":"It seems there was an issue confirming the 3 PM slot for your haircut today."}
+[2025-09-13T08:38:05.027Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"It seems there was an issue confirming the 3 PM slot for your haircut today."}
+[2025-09-13T08:38:05.027Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "History",
+  "role": "assistant",
+  "content": "It seems there was an issue confirming the 3 PM slot for your haircut today."
+}
+[2025-09-13T08:38:05.027Z] === END PARSED JSON ===
+[2025-09-13T08:38:05.027Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:38:05.027Z] 📜 HISTORY: Message logged
+[2025-09-13T08:38:05.027Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Skipping duplicate AI: It seems there was an issue confirming the 3 PM slot for your haircut today.
+[2025-09-13T08:38:05.027Z] 📝 Added transcript: [AI] It seems there was an issue confirming the 3 PM slot for your haircut today.
+[2025-09-13T08:38:05.027Z] 🎵 Starting audio stream - feeding buffer
+[2025-09-13T08:38:05.285Z] 💓 KEEPALIVE: Sent to Deepgram
+📨 Received Deepgram JSON message: {"type":"UserStartedSpeaking"}...
+Message string: {"type":"UserStartedSpeaking"}
+[2025-09-13T08:38:05.714Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
+[2025-09-13T08:38:05.714Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "UserStartedSpeaking"
+}
+[2025-09-13T08:38:05.714Z] === END PARSED JSON ===
+[2025-09-13T08:38:05.714Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
+[2025-09-13T08:38:05.714Z] 🎤 USER_STARTED_SPEAKING: User began speaking
+[2025-09-13T08:38:05.714Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
+[2025-09-13T08:38:05.714Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"user","content":"I said they're upset. No? They're upset? No."}...
+Message string: {"type":"ConversationText","role":"user","content":"I said they're upset. No? They're upset? No."}
+[2025-09-13T08:38:05.733Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":"I said they're upset. No? They're upset? No."}
+[2025-09-13T08:38:05.733Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "ConversationText",
+  "role": "user",
+  "content": "I said they're upset. No? They're upset? No."
+}
+[2025-09-13T08:38:05.733Z] === END PARSED JSON ===
+[2025-09-13T08:38:05.733Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:38:05.733Z] 💭 CONVERSATION_TEXT: I said they're upset. No? They're upset? No.
+[2025-09-13T08:38:05.733Z] 🔍 ConversationText role: 'user' -> Speaker: 'User'
+📝 TRANSCRIPT: Added User: I said they're upset. No? They're upset? No.
+📨 Received Deepgram JSON message: {"type":"History","role":"user","content":"I said they're upset. No? They're upset? No."}...
+Message string: {"type":"History","role":"user","content":"I said they're upset. No? They're upset? No."}
+[2025-09-13T08:38:05.733Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":"I said they're upset. No? They're upset? No."}
+[2025-09-13T08:38:05.733Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "History",
+  "role": "user",
+  "content": "I said they're upset. No? They're upset? No."
+}
+[2025-09-13T08:38:05.733Z] === END PARSED JSON ===
+[2025-09-13T08:38:05.733Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:38:05.733Z] 📜 HISTORY: Message logged
+[2025-09-13T08:38:05.733Z] 🔍 History role: 'user' -> Speaker: 'User'
+📝 TRANSCRIPT: Skipping duplicate User: I said they're upset. No? They're upset? No.
+[2025-09-13T08:38:05.733Z] 📝 Added transcript: [User] I said they're upset. No? They're upset? No.
+📨 Received Deepgram JSON message: {"type":"AgentAudioDone"}...
+Message string: {"type":"AgentAudioDone"}
+[2025-09-13T08:38:05.883Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
+[2025-09-13T08:38:05.883Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "AgentAudioDone"
+}
+[2025-09-13T08:38:05.883Z] === END PARSED JSON ===
+[2025-09-13T08:38:05.883Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
+[2025-09-13T08:38:05.883Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
+[2025-09-13T08:38:05.883Z] 🔇 SILENCE: Started tracking
+[2025-09-13T08:38:05.883Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
+📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"I understand you want the haircut booked at 3 PM today."}...
+Message string: {"type":"ConversationText","role":"assistant","content":"I understand you want the haircut booked at 3 PM today."}
+[2025-09-13T08:38:06.851Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"I understand you want the haircut booked at 3 PM today."}
+[2025-09-13T08:38:06.851Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "ConversationText",
+  "role": "assistant",
+  "content": "I understand you want the haircut booked at 3 PM today."
+}
+[2025-09-13T08:38:06.851Z] === END PARSED JSON ===
+[2025-09-13T08:38:06.851Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
+[2025-09-13T08:38:06.851Z] 💭 CONVERSATION_TEXT: I understand you want the haircut booked at 3 PM today.
+[2025-09-13T08:38:06.851Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: I understand you want the haircut booked at 3 PM today.
+📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"I understand you want the haircut booked at 3 PM today."}...
+Message string: {"type":"History","role":"assistant","content":"I understand you want the haircut booked at 3 PM today."}
+[2025-09-13T08:38:06.859Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"I understand you want the haircut booked at 3 PM today."}
+[2025-09-13T08:38:06.859Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "History",
+  "role": "assistant",
+  "content": "I understand you want the haircut booked at 3 PM today."
+}
+[2025-09-13T08:38:06.859Z] === END PARSED JSON ===
+[2025-09-13T08:38:06.859Z] 🎯 DEEPGRAM EVENT TYPE: History
+[2025-09-13T08:38:06.859Z] 📜 HISTORY: Message logged
+[2025-09-13T08:38:06.859Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Skipping duplicate AI: I understand you want the haircut booked at 3 PM today.
+[2025-09-13T08:38:06.859Z] 📝 Added transcript: [AI] I understand you want the haircut booked at 3 PM today.
+[2025-09-13T08:38:06.859Z] 🎵 Starting audio stream - feeding buffer
+[2025-09-13T08:38:05.883Z] 🔇 SILENCE_CHECK: 1000ms of silence
+[2025-09-13T08:38:05.883Z] 🔇 SILENCE_CHECK: 2000ms of silence
+📨 Received Deepgram JSON message: {"type":"FunctionCallRequest","functions":[{"id":"call_tH2EbiuLS1KvErVAVP4uiVt2","name":"create_booking","arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa8...
+Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_tH2EbiuLS1KvErVAVP4uiVt2","name":"create_booking","arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}","client_side":true}]}
+[2025-09-13T08:38:08.007Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"FunctionCallRequest","functions":[{"id":"call_tH2EbiuLS1KvErVAVP4uiVt2","name":"create_booking","arguments":"{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}","client_side":true}]}
+[2025-09-13T08:38:08.007Z] === PARSED DEEPGRAM JSON ===
+{
+  "type": "FunctionCallRequest",
+  "functions": [
+    {
+      "id": "call_tH2EbiuLS1KvErVAVP4uiVt2",
+      "name": "create_booking",
+      "arguments": "{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}",
+      "client_side": true
+    }
+  ]
+}
+[2025-09-13T08:38:08.007Z] === END PARSED JSON ===
+[2025-09-13T08:38:08.007Z] 🎯 DEEPGRAM EVENT TYPE: FunctionCallRequest
+[2025-09-13T08:38:08.007Z] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
+[2025-09-13T08:38:08.007Z] ✅ SUCCESS: AI requesting function calls!
+[2025-09-13T08:38:08.007Z] 📋 Functions: [
+  {
+    "id": "call_tH2EbiuLS1KvErVAVP4uiVt2",
+    "name": "create_booking",
+    "arguments": "{\"customer_name\":\"Elena\",\"date\":\"2025-09-13\",\"service_id\":\"4395775e-fa81-4a69-8425-e46c3853dea4\",\"time\":\"15:00\"}",
+    "client_side": true
+  }
+]
+[2025-09-13T08:38:08.007Z] ⏸️ SILENCE: Pausing timer - Processing function calls
+[2025-09-13T08:38:08.007Z] ⏸️ KEEPALIVE: Paused for function processing
+[2025-09-13T08:38:08.007Z] 🔧 Processing function: create_booking
+[2025-09-13T08:38:08.007Z] 🔧 CALLING: handleFunctionCall for create_booking...
+📝 Session updated for call CA9be095ec0bbc3c23c29d32b0d62636e7: {
+  callerPhone: '+447469735254',
+  customerName: 'Elena',
+  lastBookingDate: '2025-09-13',
+  lastBookingTime: '15:00',
+  lastServiceId: '4395775e-fa81-4a69-8425-e46c3853dea4',
+  lastServiceName: 'haircut',
+  lastServiceDuration: 30
+}
+[2025-09-13T08:38:08.008Z] 🚀 STARTING handleFunctionCall
+[2025-09-13T08:38:08.008Z] 🔧 Function call received: {
+  "function_name": "create_booking",
+  "function_call_id": "call_tH2EbiuLS1KvErVAVP4uiVt2",
+  "parameters": {
+    "customer_name": "Elena",
+    "date": "2025-09-13",
+    "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
+    "time": "15:00"
+  }
+}
+[2025-09-13T08:38:08.008Z] 📋 Function name: create_booking
+[2025-09-13T08:38:08.008Z] 📊 Parameters: {
+  "customer_name": "Elena",
+  "date": "2025-09-13",
+  "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
+  "time": "15:00"
+}
+[2025-09-13T08:38:08.008Z] 🏢 Business config exists: true
+[2025-09-13T08:38:08.008Z] 🌐 WebSocket state: 1
+🔧 Function call received: {
+  "function_name": "create_booking",
+  "function_call_id": "call_tH2EbiuLS1KvErVAVP4uiVt2",
+  "parameters": {
+    "customer_name": "Elena",
+    "date": "2025-09-13",
+    "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
+    "time": "15:00"
+  }
+}
+✅ TRACKING: Added function call ID call_tH2EbiuLS1KvErVAVP4uiVt2 to processed set
+🎯 createBooking called with params: {
+  "customer_name": "Elena",
+  "date": "2025-09-13",
+  "service_id": "4395775e-fa81-4a69-8425-e46c3853dea4",
+  "time": "15:00"
+}
+📋 Available services: [
+  { id: '4395775e-fa81-4a69-8425-e46c3853dea4', name: 'haircut' },
+  { id: '63555ab0-f0ac-48c3-a2b2-766356aeb8f4', name: 'beard trim' }
+]
+✅ Booking - Service found: haircut (ID: 4395775e-fa81-4a69-8425-e46c3853dea4 )
+📝 Session updated for call CA9be095ec0bbc3c23c29d32b0d62636e7: {
+  callerPhone: '+447469735254',
+  customerName: 'Elena',
+  lastBookingDate: '2025-09-13',
+  lastBookingTime: '15:00',
+  lastServiceId: '4395775e-fa81-4a69-8425-e46c3853dea4',
+  lastServiceName: 'haircut',
+  lastServiceDuration: 30
+}
+🕐 Creating appointment for 2025-09-13 at 15:00 in timezone: Europe/London
+📅 Parsed date: 2025-09-13 (Saturday)
+🕐 Appointment datetime (UK local): 15:00:00
+🕐 Business timezone: Europe/London
+🕐 Start time: 15:00:00
+🕐 End time: 15:30:00

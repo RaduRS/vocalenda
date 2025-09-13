@@ -1,0 +1,376 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@supabase/supabase-js';
+import { google } from 'googleapis';
+import { parseISODate, getDayOfWeekName, formatUKTime } from '@/lib/date-utils';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+/**
+ * GET /api/calendar/availability
+ * 
+ * Simple, clean endpoint that only checks Google Calendar for availability.
+ * Returns available time slots for a given date and service.
+ * 
+ * Query params:
+ * - businessId: Business UUID
+ * - serviceId: Service UUID  
+ * - date: Date in YYYY-MM-DD format
+ */
+export async function GET(request: NextRequest) {
+  try {
+    // Check for internal API call first
+    const internalSecret = request.headers.get('x-internal-secret');
+    const isInternalCall = internalSecret === process.env.INTERNAL_API_SECRET;
+    
+    // If not internal call, require authentication
+    if (!isInternalCall) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
+    const { searchParams } = new URL(request.url);
+    const businessId = searchParams.get('businessId');
+    const date = searchParams.get('date');
+    const serviceId = searchParams.get('serviceId');
+    
+    if (!businessId || !date || !serviceId) {
+      return NextResponse.json(
+        { error: 'Business ID, date, and service ID are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return NextResponse.json(
+        { error: 'Invalid date format. Use YYYY-MM-DD' },
+        { status: 400 }
+      );
+    }
+
+    // Get business details
+    const { data: business, error: businessError } = await supabase
+      .from('businesses')
+      .select('google_calendar_id, timezone, business_hours, google_access_token, google_refresh_token')
+      .eq('id', businessId)
+      .single();
+
+    if (businessError || !business) {
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+    }
+
+    if (!business.google_calendar_id || !business.google_access_token) {
+      return NextResponse.json(
+        { error: 'Google Calendar not connected' },
+        { status: 400 }
+      );
+    }
+
+    // Get service details
+    const { data: service, error: serviceError } = await supabase
+      .from('services')
+      .select('duration_minutes')
+      .eq('id', serviceId)
+      .eq('business_id', businessId)
+      .eq('is_active', true)
+      .single();
+
+    if (serviceError || !service) {
+      return NextResponse.json({ error: 'Service not found' }, { status: 404 });
+    }
+
+    // Parse business hours
+    const businessHours = business.business_hours as Record<string, { open: string; close: string; closed?: boolean }>;
+    if (!businessHours || typeof businessHours !== 'object') {
+      return NextResponse.json(
+        { error: 'Business hours not configured' },
+        { status: 500 }
+      );
+    }
+
+    const requestDate = parseISODate(date);
+    const dayOfWeek = getDayOfWeekName(requestDate).toLowerCase();
+    const dayHours = businessHours[dayOfWeek];
+    
+    if (!dayHours || dayHours.closed === true || !dayHours.open || !dayHours.close) {
+      return NextResponse.json(
+        { error: `Business is closed on ${dayOfWeek}s` },
+        { status: 400 }
+      );
+    }
+
+    // Set up Google Calendar API
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET
+    );
+
+    oauth2Client.setCredentials({
+      access_token: business.google_access_token,
+      refresh_token: business.google_refresh_token,
+    });
+
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    // Calculate day boundaries
+    const dayStart = new Date(requestDate);
+    const [startHour, startMinute] = dayHours.open.split(':').map(Number);
+    dayStart.setHours(startHour, startMinute, 0, 0);
+
+    const dayEnd = new Date(requestDate);
+    const [endHour, endMinute] = dayHours.close.split(':').map(Number);
+    dayEnd.setHours(endHour, endMinute, 0, 0);
+
+    // Get busy times from Google Calendar only
+    let busyTimes: Array<{ start?: string | null; end?: string | null }> = [];
+    try {
+      const response = await calendar.freebusy.query({
+        requestBody: {
+          timeMin: dayStart.toISOString(),
+          timeMax: dayEnd.toISOString(),
+          timeZone: business.timezone || 'Europe/London',
+          items: [{ id: business.google_calendar_id }]
+        }
+      });
+      busyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+    } catch (calendarError) {
+      console.error('Google Calendar API error:', calendarError);
+      return NextResponse.json(
+        { error: 'Failed to check calendar availability' },
+        { status: 500 }
+      );
+    }
+
+    // Convert busy times to proper format and sort
+    const sortedBusyTimes = busyTimes
+      .filter((busy): busy is { start: string; end: string } => 
+        busy.start != null && busy.end != null
+      )
+      .map(busy => ({
+        start: new Date(busy.start!),
+        end: new Date(busy.end!)
+      }))
+      .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+    // Merge overlapping busy times
+    const mergedBusyTimes: Array<{ start: Date; end: Date }> = [];
+    for (const busyTime of sortedBusyTimes) {
+      if (mergedBusyTimes.length === 0) {
+        mergedBusyTimes.push(busyTime);
+      } else {
+        const lastMerged = mergedBusyTimes[mergedBusyTimes.length - 1];
+        if (busyTime.start <= lastMerged.end) {
+          lastMerged.end = new Date(Math.max(lastMerged.end.getTime(), busyTime.end.getTime()));
+        } else {
+          mergedBusyTimes.push(busyTime);
+        }
+      }
+    }
+
+    // Generate available slots
+    const availableSlots: Array<{ start: Date; end: Date }> = [];
+    const serviceDurationMs = service.duration_minutes * 60000;
+    const slotInterval = 15; // 15-minute intervals
+    const slotIntervalMs = slotInterval * 60000;
+
+    let currentGapStart = new Date(dayStart);
+    
+    for (const busyTime of mergedBusyTimes) {
+      const gapEnd = new Date(Math.min(busyTime.start.getTime(), dayEnd.getTime()));
+      
+      // Generate slots within this gap
+      let slotStart = new Date(currentGapStart);
+      while (slotStart.getTime() + serviceDurationMs <= gapEnd.getTime()) {
+        const slotEnd = new Date(slotStart.getTime() + serviceDurationMs);
+        
+        availableSlots.push({
+          start: new Date(slotStart),
+          end: new Date(slotEnd)
+        });
+        
+        slotStart = new Date(slotStart.getTime() + slotIntervalMs);
+      }
+      
+      currentGapStart = new Date(Math.max(busyTime.end.getTime(), currentGapStart.getTime()));
+    }
+    
+    // Generate slots in the final gap
+    if (currentGapStart < dayEnd) {
+      let slotStart = new Date(currentGapStart);
+      while (slotStart.getTime() + serviceDurationMs <= dayEnd.getTime()) {
+        const slotEnd = new Date(slotStart.getTime() + serviceDurationMs);
+        
+        availableSlots.push({
+          start: new Date(slotStart),
+          end: new Date(slotEnd)
+        });
+        
+        slotStart = new Date(slotStart.getTime() + slotIntervalMs);
+      }
+    }
+
+    // Format slots for response
+    const formattedSlots = availableSlots.map(slot => ({
+      start: slot.start.toISOString(),
+      end: slot.end.toISOString(),
+      startTime: formatUKTime(slot.start),
+      endTime: formatUKTime(slot.end)
+    }));
+
+    return NextResponse.json({ 
+      slots: formattedSlots,
+      date,
+      businessId,
+      serviceId
+    });
+
+  } catch (error) {
+    console.error('Error getting calendar availability:', error);
+    return NextResponse.json(
+      { error: 'Failed to get calendar availability' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/calendar/availability
+ * 
+ * Check if a specific time slot is available.
+ * 
+ * Body:
+ * - businessId: Business UUID
+ * - serviceId: Service UUID
+ * - appointmentDate: Date in YYYY-MM-DD format
+ * - startTime: Time in HH:mm format
+ * - endTime: Time in HH:mm format
+ */
+export async function POST(request: NextRequest) {
+  try {
+    // Check for internal API call first
+    const internalSecret = request.headers.get('x-internal-secret');
+    const isInternalCall = internalSecret === process.env.INTERNAL_API_SECRET;
+    
+    // If not internal call, require authentication
+    if (!isInternalCall) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
+    const body = await request.json();
+    const { businessId, serviceId, appointmentDate, startTime, endTime } = body;
+
+    if (!businessId || !serviceId || !appointmentDate || !startTime || !endTime) {
+      return NextResponse.json(
+        { error: 'Missing required parameters' },
+        { status: 400 }
+      );
+    }
+
+    // Get business details
+    const { data: business, error: businessError } = await supabase
+      .from('businesses')
+      .select('google_calendar_id, timezone, google_access_token, google_refresh_token')
+      .eq('id', businessId)
+      .single();
+
+    if (businessError || !business) {
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+    }
+
+    if (!business.google_calendar_id || !business.google_access_token) {
+      return NextResponse.json(
+        { error: 'Google Calendar not connected' },
+        { status: 400 }
+      );
+    }
+
+    // Parse appointment datetime
+    const appointmentDate_parsed = parseISODate(appointmentDate);
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const startDateTime = new Date(appointmentDate_parsed);
+    startDateTime.setHours(startHour, startMinute, 0, 0);
+    
+    const endDateTime = new Date(appointmentDate_parsed);
+    endDateTime.setHours(endHour, endMinute, 0, 0);
+
+    // Set up Google Calendar API
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET
+    );
+
+    oauth2Client.setCredentials({
+      access_token: business.google_access_token,
+      refresh_token: business.google_refresh_token,
+    });
+
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    // Check Google Calendar for conflicts
+    try {
+      const response = await calendar.freebusy.query({
+        requestBody: {
+          timeMin: startDateTime.toISOString(),
+          timeMax: endDateTime.toISOString(),
+          timeZone: business.timezone || 'Europe/London',
+          items: [{ id: business.google_calendar_id }]
+        }
+      });
+
+      const busyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+      
+      // Check if the requested time slot conflicts with any busy time
+      const hasConflict = busyTimes.some(busy => {
+        if (!busy.start || !busy.end) return false;
+        
+        const busyStart = new Date(busy.start);
+        const busyEnd = new Date(busy.end);
+        
+        return (
+          (startDateTime >= busyStart && startDateTime < busyEnd) ||
+          (endDateTime > busyStart && endDateTime <= busyEnd) ||
+          (startDateTime <= busyStart && endDateTime >= busyEnd)
+        );
+      });
+
+      const isAvailable = !hasConflict;
+
+      return NextResponse.json({
+        available: isAvailable,
+        businessId,
+        serviceId,
+        appointmentDate,
+        startTime,
+        endTime,
+        message: isAvailable 
+          ? 'Slot is available' 
+          : 'Slot is not available - conflicts with existing appointment'
+      });
+
+    } catch (calendarError) {
+      console.error('Google Calendar API error:', calendarError);
+      return NextResponse.json(
+        { error: 'Failed to check calendar availability' },
+        { status: 500 }
+      );
+    }
+
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    return NextResponse.json(
+      { error: 'Internal server error while checking availability' },
+      { status: 500 }
+    );
+  }
+}
