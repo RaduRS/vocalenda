@@ -149,8 +149,8 @@ export async function GET(request: NextRequest) {
     const [endHour, endMinute] = dayHours.close.split(':').map(Number);
     dayEnd.setHours(endHour, endMinute, 0, 0);
 
-    // Get busy times from Google Calendar only
-    let busyTimes: Array<{ start?: string | null; end?: string | null }> = [];
+    // Get busy times from Google Calendar
+    let googleBusyTimes: Array<{ start?: string | null; end?: string | null }> = [];
     try {
       const response = await calendar.freebusy.query({
         requestBody: {
@@ -160,7 +160,8 @@ export async function GET(request: NextRequest) {
           items: [{ id: business.google_calendar_id }]
         }
       });
-      busyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+      googleBusyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+
     } catch (calendarError) {
       console.error('Google Calendar API error:', calendarError);
       return NextResponse.json(
@@ -169,16 +170,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Use only Google Calendar busy times since database syncs instantly
+    const allBusyTimes = googleBusyTimes;
+
     // Convert busy times to proper format and sort
-    const sortedBusyTimes = busyTimes
+    const sortedBusyTimes = allBusyTimes
       .filter((busy): busy is { start: string; end: string } => 
         busy.start != null && busy.end != null
       )
-      .map(busy => ({
-        start: new Date(busy.start!),
-        end: new Date(busy.end!)
+      .map((busy: { start: string; end: string }) => ({
+        start: new Date(busy.start),
+        end: new Date(busy.end)
       }))
-      .sort((a, b) => a.start.getTime() - b.start.getTime());
+      .sort((a: { start: Date; end: Date }, b: { start: Date; end: Date }) => a.start.getTime() - b.start.getTime());
+    
+
 
     // Merge overlapping busy times
     const mergedBusyTimes: Array<{ start: Date; end: Date }> = [];
@@ -201,6 +207,8 @@ export async function GET(request: NextRequest) {
     const slotInterval = 15; // 15-minute intervals
     const slotIntervalMs = slotInterval * 60000;
 
+
+
     let currentGapStart = new Date(dayStart);
     
     for (const busyTime of mergedBusyTimes) {
@@ -210,7 +218,6 @@ export async function GET(request: NextRequest) {
       let slotStart = new Date(currentGapStart);
       while (slotStart.getTime() + serviceDurationMs <= gapEnd.getTime()) {
         const slotEnd = new Date(slotStart.getTime() + serviceDurationMs);
-        
         availableSlots.push({
           start: new Date(slotStart),
           end: new Date(slotEnd)
@@ -362,6 +369,7 @@ export async function POST(request: NextRequest) {
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
     // Check Google Calendar for conflicts
+    let googleBusyTimes: Array<{ start?: string | null; end?: string | null }> = [];
     try {
       const response = await calendar.freebusy.query({
         requestBody: {
@@ -372,36 +380,7 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      const busyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
-      
-      // Check if the requested time slot conflicts with any busy time
-      const hasConflict = busyTimes.some(busy => {
-        if (!busy.start || !busy.end) return false;
-        
-        const busyStart = new Date(busy.start);
-        const busyEnd = new Date(busy.end);
-        
-        return (
-          (startDateTime >= busyStart && startDateTime < busyEnd) ||
-          (endDateTime > busyStart && endDateTime <= busyEnd) ||
-          (startDateTime <= busyStart && endDateTime >= busyEnd)
-        );
-      });
-
-      const isAvailable = !hasConflict;
-
-      return NextResponse.json({
-        available: isAvailable,
-        businessId,
-        serviceId,
-        appointmentDate,
-        startTime,
-        endTime,
-        message: isAvailable 
-          ? 'Slot is available' 
-          : 'Slot is not available - conflicts with existing appointment'
-      });
-
+      googleBusyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
     } catch (calendarError) {
       console.error('Google Calendar API error:', calendarError);
       return NextResponse.json(
@@ -409,6 +388,37 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Use only Google Calendar busy times since database syncs instantly
+    const allBusyTimes = googleBusyTimes;
+      
+    // Check if the requested time slot conflicts with any busy time
+    const hasConflict = allBusyTimes.some(busy => {
+      if (!busy.start || !busy.end) return false;
+      
+      const busyStart = new Date(busy.start);
+      const busyEnd = new Date(busy.end);
+      
+      return (
+        (startDateTime >= busyStart && startDateTime < busyEnd) ||
+        (endDateTime > busyStart && endDateTime <= busyEnd) ||
+        (startDateTime <= busyStart && endDateTime >= busyEnd)
+      );
+    });
+
+      const isAvailable = !hasConflict;
+
+    return NextResponse.json({
+      available: isAvailable,
+      businessId,
+      serviceId,
+      appointmentDate,
+      startTime,
+      endTime,
+      message: isAvailable 
+        ? 'Slot is available' 
+        : 'Slot is not available - conflicts with existing appointment'
+    });
 
   } catch (error) {
     console.error('Error checking availability:', error);
