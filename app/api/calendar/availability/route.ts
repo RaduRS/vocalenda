@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Get business details
     const { data: business, error: businessError } = await supabase
       .from('businesses')
-      .select('google_calendar_id, timezone, business_hours, google_access_token, google_refresh_token')
+      .select('google_calendar_id, timezone, business_hours')
       .eq('id', businessId)
       .single();
 
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
-    if (!business.google_calendar_id || !business.google_access_token) {
+    if (!business.google_calendar_id) {
       return NextResponse.json(
         { error: 'Google Calendar not connected' },
         { status: 400 }
@@ -105,15 +105,37 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Get Google Calendar tokens from business config
+    const { data: config, error: configError } = await supabase
+      .from('business_config')
+      .select('integration_settings')
+      .eq('business_id', businessId)
+      .single();
+
+    if (configError || !config?.integration_settings?.google) {
+      return NextResponse.json(
+        { error: 'Google Calendar tokens not found' },
+        { status: 400 }
+      );
+    }
+
+    const googleTokens = config.integration_settings.google;
+    if (!googleTokens.access_token) {
+      return NextResponse.json(
+        { error: 'Google Calendar access token not found' },
+        { status: 400 }
+      );
+    }
+
     // Set up Google Calendar API
     const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET
     );
 
     oauth2Client.setCredentials({
-      access_token: business.google_access_token,
-      refresh_token: business.google_refresh_token,
+      access_token: googleTokens.access_token,
+      refresh_token: googleTokens.refresh_token,
     });
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
@@ -278,7 +300,7 @@ export async function POST(request: NextRequest) {
     // Get business details
     const { data: business, error: businessError } = await supabase
       .from('businesses')
-      .select('google_calendar_id, timezone, google_access_token, google_refresh_token')
+      .select('google_calendar_id, timezone')
       .eq('id', businessId)
       .single();
 
@@ -286,9 +308,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
-    if (!business.google_calendar_id || !business.google_access_token) {
+    if (!business.google_calendar_id) {
       return NextResponse.json(
         { error: 'Google Calendar not connected' },
+        { status: 400 }
+      );
+    }
+
+    // Get Google Calendar tokens from business config
+    const { data: config, error: configError } = await supabase
+      .from('business_config')
+      .select('integration_settings')
+      .eq('business_id', businessId)
+      .single();
+
+    if (configError || !config?.integration_settings?.google) {
+      return NextResponse.json(
+        { error: 'Google Calendar tokens not found' },
+        { status: 400 }
+      );
+    }
+
+    const googleTokens = config.integration_settings.google;
+    if (!googleTokens.access_token) {
+      return NextResponse.json(
+        { error: 'Google Calendar access token not found' },
         { status: 400 }
       );
     }
@@ -306,13 +350,13 @@ export async function POST(request: NextRequest) {
 
     // Set up Google Calendar API
     const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET
     );
 
     oauth2Client.setCredentials({
-      access_token: business.google_access_token,
-      refresh_token: business.google_refresh_token,
+      access_token: googleTokens.access_token,
+      refresh_token: googleTokens.refresh_token,
     });
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
