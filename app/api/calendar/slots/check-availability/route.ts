@@ -94,7 +94,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse the appointment date and time
-    const appointmentDateTime = createUKDateTime(appointmentDate, startTime);
+    // Handle both ISO format (YYYY-MM-DD) and UK format (DD/MM/YYYY)
+    let appointmentDateTime;
+    try {
+      if (appointmentDate.includes('-') && appointmentDate.length === 10) {
+        // ISO format: YYYY-MM-DD
+        const [year, month, day] = appointmentDate.split('-');
+        const ukDate = `${day}/${month}/${year}`;
+        appointmentDateTime = createUKDateTime(ukDate, startTime);
+      } else {
+        // UK format: DD/MM/YYYY
+        appointmentDateTime = createUKDateTime(appointmentDate, startTime);
+      }
+    } catch (dateError) {
+      console.error('❌ Date parsing error:', dateError);
+      return NextResponse.json(
+        { error: 'Invalid date format. Expected YYYY-MM-DD or DD/MM/YYYY' },
+        { status: 400 }
+      );
+    }
+    
     const endDateTime = new Date(appointmentDateTime.getTime() + (service.duration_minutes * 60 * 1000));
 
     // Check if the time slot is available
