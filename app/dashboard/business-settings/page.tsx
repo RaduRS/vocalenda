@@ -35,6 +35,7 @@ import {
   PaymentMethod,
   paymentMethodLabels,
   defaultSMSConfiguration,
+  validatePhoneNumber,
 } from "@/lib/types";
 import { previewVoice } from "@/lib/voice-preview";
 
@@ -77,6 +78,7 @@ export default function BusinessSettings() {
     phone: "",
     email: "",
     website: "",
+    bypass_phone_number: "",
   });
 
   const [activeTab, setActiveTab] = useState<
@@ -102,6 +104,17 @@ export default function BusinessSettings() {
   };
 
   const handleSave = async () => {
+    // Validate bypass phone number
+    if (!businessData.bypass_phone_number || !businessData.bypass_phone_number.trim()) {
+      toast.error("Human handoff phone number is required");
+      return;
+    }
+    
+    if (!validatePhoneNumber(businessData.bypass_phone_number)) {
+      toast.error("Please enter a valid phone number (e.g., +1234567890)");
+      return;
+    }
+
     setSaving(true);
     try {
       const response = await fetch("/api/business/comprehensive", {

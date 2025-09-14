@@ -94,7 +94,7 @@ export interface ComprehensiveBusinessData {
   phone: string;
   email: string;
   website?: string;
-  bypass_phone_number?: string;
+  bypass_phone_number: string; // Required for human handoff
 }
 
 export type PaymentMethod =
@@ -129,6 +129,13 @@ export const validateService = (service: Service): boolean => {
 
 export const validateStaffMember = (staff: StaffMember): boolean => {
   return !!staff.name;
+};
+
+export const validatePhoneNumber = (phone: string): boolean => {
+  // Remove all non-digit characters except + at the start
+  const cleanPhone = phone.replace(/[^\d+]/g, '');
+  // Must start with + and have at least 10 digits total
+  return /^\+\d{10,15}$/.test(cleanPhone);
 };
 
 // Default values
@@ -247,8 +254,8 @@ export const setupWizardSteps: SetupWizardStep[] = [
     id: 4,
     title: "AI Configuration",
     description: "Configure your AI receptionist",
-    fields: ["ai_configuration", "customer_notes_enabled", "booking_policies"],
-    isValid: (data) => !!data.ai_configuration?.greeting,
+    fields: ["ai_configuration", "customer_notes_enabled", "booking_policies", "bypass_phone_number"],
+    isValid: (data) => !!(data.ai_configuration?.greeting && data.bypass_phone_number && validatePhoneNumber(data.bypass_phone_number)),
   },
   {
     id: 5,

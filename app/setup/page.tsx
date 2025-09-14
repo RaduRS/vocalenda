@@ -29,7 +29,8 @@ import {
   Holiday,
   validateBusinessHours,
   validateService,
-  validateStaffMember
+  validateStaffMember,
+  validatePhoneNumber
 } from '@/lib/types'
 import { getCurrentUKDate, formatISODate } from '@/lib/date-utils'
 import { previewVoice } from '@/lib/voice-preview'
@@ -45,6 +46,7 @@ export default function SetupWizard() {
   const [validationErrors, setValidationErrors] = useState<{
     slug?: string;
     phone?: string;
+    bypass_phone_number?: string;
   }>({});
   const [validating, setValidating] = useState<{
     slug?: boolean;
@@ -65,7 +67,8 @@ export default function SetupWizard() {
     staff_members: [],
     ai_configuration: defaultAIConfiguration,
     customer_notes_enabled: true,
-    booking_policies: defaultBookingPolicies
+    booking_policies: defaultBookingPolicies,
+    bypass_phone_number: ''
   });
 
   const currentStepConfig = setupWizardSteps.find(step => step.id === currentStep)!;
@@ -189,6 +192,17 @@ export default function SetupWizard() {
           toast.error(`Staff Member ${index + 1}: Please check name and email`);
         }
       });
+    }
+
+    // Validate bypass phone number
+    if (field === 'bypass_phone_number' && typeof value === 'string') {
+      if (!value.trim()) {
+        setValidationErrors(prev => ({ ...prev, bypass_phone_number: 'Human handoff phone number is required' }));
+      } else if (!validatePhoneNumber(value)) {
+        setValidationErrors(prev => ({ ...prev, bypass_phone_number: 'Please enter a valid phone number (e.g., +1234567890)' }));
+      } else {
+        setValidationErrors(prev => ({ ...prev, bypass_phone_number: undefined }));
+      }
     }
   };
 
@@ -912,6 +926,22 @@ export default function SetupWizard() {
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">Choose the voice for your AI receptionist and preview each option</p>
+              </div>
+
+              <div>
+                <Label htmlFor="bypass-phone">Human Handoff Phone Number *</Label>
+                <Input
+                  id="bypass-phone"
+                  type="tel"
+                  value={businessData.bypass_phone_number || ''}
+                  onChange={(e) => handleInputChange('bypass_phone_number', e.target.value)}
+                  placeholder="+1234567890"
+                  className="mt-1"
+                />
+                <p className="text-sm text-gray-500 mt-1">Phone number to transfer calls when human assistance is needed</p>
+                {validationErrors.bypass_phone_number && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.bypass_phone_number}</p>
+                )}
               </div>
 
               <div>
