@@ -113,8 +113,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the existing booking by exact customer name, date, and time
-    // Note: start_time is stored as just the time (e.g., "13:00:00") and appointment_date as date
+    // Note: start_time can be stored as "13:30" or "13:30:00" depending on how it was created
     const currentTimeWithSeconds = current_time.includes(':') && current_time.split(':').length === 2 ? `${current_time}:00` : current_time;
+    const currentTimeWithoutSeconds = current_time.includes(':') && current_time.split(':').length === 3 ? current_time.substring(0, 5) : current_time;
     
     const { data: existingBookings, error: findError } = await supabaseAdmin
       .from('appointments')
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
       `)
       .eq('business_id', business_id)
       .eq('appointment_date', current_date)
-      .eq('start_time', currentTimeWithSeconds)
+      .or(`start_time.eq.${currentTimeWithSeconds},start_time.eq.${currentTimeWithoutSeconds}`)
       .neq('status', 'cancelled');
 
     if (findError) {
