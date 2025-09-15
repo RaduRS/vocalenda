@@ -197,21 +197,42 @@ export async function POST(request: NextRequest) {
 
     // Handle date/time changes
     if (new_date || new_time) {
-      const finalDate = new_date || current_date;
-      const finalTime = new_time || current_time;
+      const finalDate = new_date || existingBooking.appointment_date;
+      const finalTime = new_time || existingBooking.start_time;
+      
+      console.log('🔧 Input values:', { finalDate, finalTime, serviceDuration });
+      
+      // Ensure time format is correct (HH:MM)
+      const normalizedTime = finalTime.includes(':') && finalTime.split(':').length === 2 ? finalTime : `${finalTime}:00`;
       
       // Create datetime for calendar operations
-      const startDateTime = createUKDateTime(finalDate, finalTime);
+      const startDateTime = createUKDateTime(finalDate, normalizedTime);
       const endDateTime = addMinutes(startDateTime, serviceDuration);
       
+      console.log('🔧 DateTime objects:', {
+        startDateTime: startDateTime.toISOString(),
+        endDateTime: endDateTime.toISOString(),
+        startDateTimeLocal: startDateTime.toString(),
+        endDateTimeLocal: endDateTime.toString()
+      });
+      
       // Store just the time part in start_time field (matching database schema)
-      const finalTimeWithSeconds = finalTime.includes(':') && finalTime.split(':').length === 2 ? `${finalTime}:00` : finalTime;
+      const finalTimeWithSeconds = normalizedTime.includes(':') && normalizedTime.split(':').length === 2 ? `${normalizedTime}:00` : normalizedTime;
+      const calculatedEndTime = formatISOTime(endDateTime);
+      
       newStartTime = startDateTime.toISOString(); // For calendar operations
       newEndTime = endDateTime.toISOString(); // For calendar operations
 
       updates.appointment_date = finalDate;
       updates.start_time = finalTimeWithSeconds; // Store just time, not datetime
-      updates.end_time = formatISOTime(endDateTime); // Store just time, not datetime
+      updates.end_time = calculatedEndTime; // Store just time, not datetime
+      
+      console.log('🔧 Final update values:', {
+        'updates.appointment_date': updates.appointment_date,
+        'updates.start_time': updates.start_time,
+        'updates.end_time': updates.end_time,
+        calculatedEndTime
+      });
     }
 
     // Check availability for new time slot (if time is changing)
