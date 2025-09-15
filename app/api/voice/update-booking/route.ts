@@ -246,6 +246,26 @@ export async function POST(request: NextRequest) {
       }
 
       // Check availability by querying Google Calendar directly
+      // Use UK local time for the availability check, not UTC
+      const finalDate = new_date || current_date;
+      const finalTime = new_time || current_time;
+      const normalizedTime = finalTime.includes(':') && finalTime.split(':').length === 2 ? finalTime : `${finalTime}:00`;
+      const finalTimeWithSeconds = normalizedTime.includes(':') && normalizedTime.split(':').length === 2 ? `${normalizedTime}:00` : normalizedTime;
+      
+      // Calculate end time in UK local time
+      const startDateTime = createUKDateTime(finalDate, normalizedTime);
+      const endDateTime = addMinutes(startDateTime, serviceDuration);
+      const endTimeFormatted = formatISOTime(endDateTime);
+      
+      console.log('🔧 Availability check params:', {
+        finalDate,
+        startTime: finalTimeWithSeconds,
+        endTime: endTimeFormatted,
+        originalNewTime: new_time,
+        normalizedTime,
+        serviceDuration
+      });
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/calendar/availability`,
         {
@@ -257,9 +277,9 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             businessId: business.id,
             serviceId: existingBooking.service_id,
-            appointmentDate: new_date || current_date,
-            startTime: formatISOTime(parseISO(newStartTime)),
-            endTime: formatISOTime(parseISO(newEndTime)),
+            appointmentDate: finalDate,
+            startTime: finalTimeWithSeconds,
+            endTime: endTimeFormatted,
           }),
         }
       );
