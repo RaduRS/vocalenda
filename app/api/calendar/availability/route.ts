@@ -318,7 +318,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { businessId, serviceId, appointmentDate, startTime, endTime } = body;
+    const { businessId, serviceId, appointmentDate, startTime, endTime, excludeBookingId } = body;
 
     if (!businessId || !serviceId || !appointmentDate || !startTime || !endTime) {
       return NextResponse.json(
@@ -434,6 +434,19 @@ export async function POST(request: NextRequest) {
 
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
+    // Get the Google Calendar event ID of the booking being excluded (if any)
+    let excludeEventId = null;
+    if (excludeBookingId) {
+      const { data: excludeBooking } = await supabase
+        .from('appointments')
+        .select('google_calendar_event_id')
+        .eq('id', excludeBookingId)
+        .single();
+      
+      excludeEventId = excludeBooking?.google_calendar_event_id;
+      console.log('🔄 Excluding booking from conflict check:', { excludeBookingId, excludeEventId });
+    }
+
     // Check Google Calendar for conflicts
     let googleBusyTimes: Array<{ start?: string | null; end?: string | null }> = [];
     try {
@@ -455,8 +468,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use only Google Calendar busy times since database syncs instantly
-    const allBusyTimes = googleBusyTimes;
+    // If we have an event to exclude, get its details and filter it out
+    let filteredBusyTimes = googleBusyTimes;
+    if (excludeEventId) {
+      try {
+        const excludeEvent = await calendar.events.get({
+          calendarId: business.google_calendar_id,
+          eventId: excludeEventId
+        });
+        
+        const excludeStart = excludeEvent.data.start?.dateTime;
+        const excludeEnd = excludeEvent.data.end?.dateTime;
+        
+        if (excludeStart && excludeEnd) {
+          // Filter out the excluded event from busy times
+          filteredBusyTimes = googleBusyTimes.filter(busy => {
+            return !(busy.start === excludeStart && busy.end === excludeEnd);
+          });
+          console.log('🔄 Filtered out excluded event:', { excludeStart, excludeEnd });
+        }
+      } catch (eventError) {
+        console.warn('Could not get excluded event details:', eventError);
+        // Continue with original busy times if we can't get the event
+      }
+    }
+
+    // Use filtered Google Calendar busy times
+    const allBusyTimes = filteredBusyTimes;
       
     // Check if the requested time slot conflicts with any busy time
     const hasConflict = allBusyTimes.some(busy => {

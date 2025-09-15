@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     // Find the existing booking by exact customer name, date, and time
     // Note: start_time is stored as just the time (e.g., "13:00:00") and appointment_date as date
-    const timeWithSeconds = time.includes(':') && time.split(':').length === 2 ? `${time}:00` : time;
+    const timeWithSeconds = time.includes(':') && time.split(':').length === 3 ? time.substring(0, 5) : time;
     
     const { data: existingBookings, error: findError } = await supabaseAdmin
       .from('appointments')

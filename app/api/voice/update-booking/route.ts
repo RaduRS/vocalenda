@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     // Find the existing booking by exact customer name, date, and time
     // Note: start_time can be stored as "13:30" or "13:30:00" depending on how it was created
-    const currentTimeWithSeconds = current_time.includes(':') && current_time.split(':').length === 2 ? `${current_time}:00` : current_time;
+    const currentTimeWithSeconds = current_time.includes(':') && current_time.split(':').length === 3 ? current_time.substring(0, 5) : current_time;
     const currentTimeWithoutSeconds = current_time.includes(':') && current_time.split(':').length === 3 ? current_time.substring(0, 5) : current_time;
     
     const { data: existingBookings, error: findError } = await supabaseAdmin
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
       console.log('🔧 Input values:', { finalDate, finalTime, serviceDuration });
       
       // Ensure time format is correct (HH:MM)
-      const normalizedTime = finalTime.includes(':') && finalTime.split(':').length === 2 ? finalTime : `${finalTime}:00`;
+      const normalizedTime = finalTime.includes(':') && finalTime.split(':').length === 3 ? finalTime.substring(0, 5) : finalTime;
       
       // Create datetime for calendar operations
       const startDateTime = createUKDateTime(finalDate, normalizedTime);
@@ -250,8 +250,8 @@ export async function POST(request: NextRequest) {
       // Use UK local time for the availability check, not UTC
       const finalDate = new_date || current_date;
       const finalTime = new_time || current_time;
-      const normalizedTime = finalTime.includes(':') && finalTime.split(':').length === 2 ? finalTime : `${finalTime}:00`;
-      const finalTimeWithSeconds = normalizedTime.includes(':') && normalizedTime.split(':').length === 2 ? `${normalizedTime}:00` : normalizedTime;
+      const normalizedTime = finalTime.includes(':') && finalTime.split(':').length === 3 ? finalTime.substring(0, 5) : finalTime;
+        const finalTimeWithSeconds = normalizedTime;
       
       // Calculate end time in UK local time
       const startDateTime = createUKDateTime(finalDate, normalizedTime);
@@ -281,6 +281,7 @@ export async function POST(request: NextRequest) {
             appointmentDate: finalDate,
             startTime: finalTimeWithSeconds,
             endTime: endTimeFormatted,
+            excludeBookingId: existingBooking.id, // Exclude current booking from conflict check
           }),
         }
       );
