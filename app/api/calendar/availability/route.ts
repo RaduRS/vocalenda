@@ -330,7 +330,7 @@ export async function POST(request: NextRequest) {
     // Get business details
     const { data: business, error: businessError } = await supabase
       .from('businesses')
-      .select('google_calendar_id, timezone')
+      .select('google_calendar_id, timezone, business_hours')
       .eq('id', businessId)
       .single();
 
@@ -367,6 +367,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate business hours are configured
+    if (!business?.business_hours) {
+      return NextResponse.json(
+        { error: 'Business hours not configured' },
+        { status: 400 }
+      );
+    }
+
+    const businessHours = business.business_hours;
+
     // Parse appointment datetime with proper timezone handling
     // Strip seconds from time strings if present (createUKDateTime expects HH:mm format)
     const startTimeFormatted = startTime.substring(0, 5); // "14:00:00" -> "14:00"
@@ -378,6 +388,38 @@ export async function POST(request: NextRequest) {
     
     const startDateTime = dayStart;
     const endDateTime = dayEnd;
+
+    // Check if the requested time is within business hours
+    const dayOfWeek = getDayOfWeekName(parseISODate(appointmentDate));
+    const dayHours = businessHours[dayOfWeek.toLowerCase()];
+    
+    if (!dayHours || dayHours.closed) {
+      return NextResponse.json({
+        available: false,
+        businessId,
+        serviceId,
+        appointmentDate,
+        startTime,
+        endTime,
+        message: `Business is closed on ${dayOfWeek}`
+      });
+    }
+
+    // Check if requested time is within business hours
+    const businessOpen = dayHours.open;
+    const businessClose = dayHours.close;
+    
+    if (startTimeFormatted < businessOpen || endTimeFormatted > businessClose) {
+      return NextResponse.json({
+        available: false,
+        businessId,
+        serviceId,
+        appointmentDate,
+        startTime,
+        endTime,
+        message: `Requested time is outside business hours (${businessOpen}-${businessClose})`
+      });
+    }
 
     // Set up Google Calendar API
     const oauth2Client = new google.auth.OAuth2(
