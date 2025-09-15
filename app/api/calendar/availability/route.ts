@@ -447,19 +447,24 @@ export async function POST(request: NextRequest) {
       console.log('🔄 Excluding booking from conflict check:', { excludeBookingId, excludeEventId });
     }
 
-    // Check Google Calendar for conflicts
+    // Check Google Calendar for conflicts - use same time range as GET method for consistency
+    // Query the entire business day, not just the specific slot
+    const businessDayStart = createUKDateTime(appointmentDate, dayHours.open);
+    const businessDayEnd = createUKDateTime(appointmentDate, dayHours.close);
+    
     let googleBusyTimes: Array<{ start?: string | null; end?: string | null }> = [];
     try {
       const response = await calendar.freebusy.query({
-        requestBody: {
-          timeMin: startDateTime.toISOString(),
-          timeMax: endDateTime.toISOString(),
-          timeZone: business.timezone || 'Europe/London',
-          items: [{ id: business.google_calendar_id }]
-        }
-      });
+          requestBody: {
+            timeMin: businessDayStart.toISOString(),
+            timeMax: businessDayEnd.toISOString(),
+            timeZone: business.timezone || 'Europe/London',
+            items: [{ id: business.google_calendar_id }]
+          }
+        });
 
       googleBusyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+      console.log('🔍 POST method - Google Calendar busy times:', JSON.stringify(googleBusyTimes, null, 2));
     } catch (calendarError) {
       console.error('Google Calendar API error:', calendarError);
       return NextResponse.json(
@@ -497,20 +502,40 @@ export async function POST(request: NextRequest) {
     const allBusyTimes = filteredBusyTimes;
       
     // Check if the requested time slot conflicts with any busy time
+    console.log('🔍 POST method - Checking conflicts for:', {
+      requestedStart: startDateTime.toISOString(),
+      requestedEnd: endDateTime.toISOString(),
+      requestedStartLocal: startDateTime.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+      requestedEndLocal: endDateTime.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+      busyTimesCount: allBusyTimes.length
+    });
+
     const hasConflict = allBusyTimes.some(busy => {
       if (!busy.start || !busy.end) return false;
       
       const busyStart = new Date(busy.start);
       const busyEnd = new Date(busy.end);
       
-      return (
+      const conflict = (
         (startDateTime >= busyStart && startDateTime < busyEnd) ||
         (endDateTime > busyStart && endDateTime <= busyEnd) ||
         (startDateTime <= busyStart && endDateTime >= busyEnd)
       );
+      
+      if (conflict) {
+        console.log('🔍 POST method - Found conflict with:', {
+          busyStart: busyStart.toISOString(),
+          busyEnd: busyEnd.toISOString(),
+          busyStartLocal: busyStart.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+          busyEndLocal: busyEnd.toLocaleString('en-GB', { timeZone: 'Europe/London' })
+        });
+      }
+      
+      return conflict;
     });
 
-      const isAvailable = !hasConflict;
+    const isAvailable = !hasConflict;
+    console.log('🔍 POST method - Final result:', { isAvailable, hasConflict });
 
     return NextResponse.json({
       available: isAvailable,
