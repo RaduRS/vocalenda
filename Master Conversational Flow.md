@@ -146,3 +146,54 @@ This unified flow handles all scenarios based on user intent, which is inferred 
 - **If the user indicates they are finished** (e.g., "No, that's all," "Goodbye"), the AI delivers the final farewell.
     - *AI:* "Thank you for calling [Business Name]. Have a great day!"
 - Immediately after the AI finishes speaking the farewell, your server-side logic terminates the call.
+
+---
+
+## **Part 4: AI Implementation Guide for Filler Phrases**
+
+**Important:** The booking APIs now return `fillerPhrase` and `sessionId` in their responses to support conversational flow during background operations.
+
+**A. Filler Phrase Usage Pattern:**
+
+When the AI needs to perform any booking operation (create, update, cancel, or availability check), it should:
+
+1. **Immediately speak a filler phrase** to fill the 5-8 second processing gap
+2. **Then call the appropriate API function** 
+3. **Process the API response** and continue the conversation
+
+**B. API Response Structure:**
+
+All booking APIs now include these additional fields when `sessionId` is provided:
+```json
+{
+  "success": true,
+  "fillerPhrase": "Perfect, let me check our availability for that time...",
+  "sessionId": "call_session_123",
+  // ... other response data
+}
+```
+
+**C. Implementation Example:**
+
+```
+User: "I'd like to cancel my appointment on Wednesday at 2 PM"
+AI: "I understand, let me cancel that for you..." [SPEAKS IMMEDIATELY]
+    [THEN calls cancelBooking API with sessionId]
+    [API returns with fillerPhrase and result]
+AI: "Your appointment has been cancelled. Is there anything else I can help you with?"
+```
+
+**D. Session Memory Integration:**
+
+- Always pass `sessionId` to booking APIs to enable filler phrase generation
+- The `sessionId` should be consistent throughout the entire call
+- APIs use session data to personalize filler phrases with customer name, service, date, and time
+
+**E. Filler Phrase Categories:**
+
+- **Availability checks:** "Let me check our availability...", "One moment while I pull up the schedule..."
+- **Booking creation:** "Perfect, securing that appointment for you...", "Great, I'm booking that in for you now..."
+- **Updates:** "No problem, updating that for you...", "Of course, making that change now..."
+- **Cancellations:** "I understand, let me cancel that for you...", "No problem at all, cancelling your appointment..."
+
+The AI should use these filler phrases to maintain natural conversation flow during all background operations.

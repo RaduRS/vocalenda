@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClient } from '@supabase/supabase-js';
 import { google } from 'googleapis';
-import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime } from '@/lib/date-utils';
+import { parseISODate, getDayOfWeekName, formatUKTime, createUKDateTime, formatConversationalTime } from '@/lib/date-utils';
 import { toZonedTime } from 'date-fns-tz';
+import { getFillerPhrase, FillerContext } from '@/lib/conversation-utils';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,13 +14,16 @@ const supabase = createClient(
 /**
  * GET /api/calendar/availability
  * 
- * Simple, clean endpoint that only checks Google Calendar for availability.
- * Returns available time slots for a given date and service.
+ * Master Conversational Flow Specification:
+ * Checks Google Calendar for availability and returns filler phrases for voice calls.
+ * Supports Core Rule D: "Filler" Conversation Strategy for 5-8 second gaps.
  * 
  * Query params:
  * - businessId: Business UUID
  * - serviceId: Service UUID  
  * - date: Date in YYYY-MM-DD format
+ * - customerName: Customer name (optional, for filler phrases)
+ * - sessionId: Session ID (optional, for same-call tracking)
  */
 export async function GET(request: NextRequest) {
   try {
@@ -39,6 +43,8 @@ export async function GET(request: NextRequest) {
     const businessId = searchParams.get('businessId');
     const date = searchParams.get('date');
     const serviceId = searchParams.get('serviceId');
+    const customerName = searchParams.get('customerName');
+    const sessionId = searchParams.get('sessionId');
     
     if (!businessId || !date || !serviceId) {
       return NextResponse.json(
@@ -73,10 +79,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get service details
+    // Get service details for filler phrases
     const { data: service, error: serviceError } = await supabase
       .from('services')
-      .select('duration_minutes')
+      .select('duration_minutes, name')
       .eq('id', serviceId)
       .eq('business_id', businessId)
       .eq('is_active', true)
@@ -84,6 +90,19 @@ export async function GET(request: NextRequest) {
 
     if (serviceError || !service) {
       return NextResponse.json({ error: 'Service not found' }, { status: 404 });
+    }
+
+    // Generate filler phrase for voice calls (Core Rule D)
+    let fillerPhrase = '';
+    if (isInternalCall && customerName) {
+      const fillerContext: FillerContext = {
+        customerName,
+        serviceName: service.name,
+        requestedDate: date,
+        requestedTime: '', // Will be filled when specific time is requested
+        operation: 'availability'
+      };
+      fillerPhrase = getFillerPhrase(fillerContext);
     }
 
     // Parse business hours
@@ -270,17 +289,25 @@ export async function GET(request: NextRequest) {
       return {
         start: slot.start.toISOString(),
         end: slot.end.toISOString(),
-        startTime: formatUKTime(startUK),
-        endTime: formatUKTime(endUK)
+        startTime: formatUKTime(startUK), // Keep 24-hour for internal processing
+        endTime: formatUKTime(endUK), // Keep 24-hour for internal processing
+        startTimeConversational: formatConversationalTime(startUK), // 12-hour for AI responses
+        endTimeConversational: formatConversationalTime(endUK) // 12-hour for AI responses
       };
     });
 
-    return NextResponse.json({ 
+    const response = { 
       slots: formattedSlots,
       date,
       businessId,
-      serviceId
-    });
+      serviceId,
+      ...(fillerPhrase && {
+        fillerPhrase,
+        sessionId
+      })
+    };
+
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('Error getting calendar availability:', error);
@@ -294,14 +321,18 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/calendar/availability
  * 
- * Check if a specific time slot is available.
+ * Master Conversational Flow Specification:
+ * Checks if a specific time slot is available for booking with filler phrase support.
+ * Supports Core Rule D: "Filler" Conversation Strategy for 5-8 second gaps.
  * 
- * Body:
+ * Body params:
  * - businessId: Business UUID
  * - serviceId: Service UUID
  * - appointmentDate: Date in YYYY-MM-DD format
  * - startTime: Time in HH:mm format
  * - endTime: Time in HH:mm format
+ * - customerName: Customer name (optional, for filler phrases)
+ * - sessionId: Session ID (optional, for same-call tracking)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -318,7 +349,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { businessId, serviceId, appointmentDate, startTime, endTime, excludeBookingId } = body;
+    const { businessId, serviceId, appointmentDate, startTime, endTime, excludeBookingId, customerName, sessionId } = body;
 
     if (!businessId || !serviceId || !appointmentDate || !startTime || !endTime) {
       return NextResponse.json(
@@ -377,10 +408,36 @@ export async function POST(request: NextRequest) {
 
     const businessHours = business.business_hours;
 
+    // Get service details for filler phrases
+    const { data: postService, error: postServiceError } = await supabase
+      .from('services')
+      .select('name')
+      .eq('id', serviceId)
+      .eq('business_id', businessId)
+      .eq('is_active', true)
+      .single();
+
+    if (postServiceError || !postService) {
+      return NextResponse.json({ error: 'Service not found' }, { status: 404 });
+    }
+
     // Parse appointment datetime with proper timezone handling
     // Strip seconds from time strings if present (createUKDateTime expects HH:mm format)
     const startTimeFormatted = startTime.substring(0, 5); // "14:00:00" -> "14:00"
     const endTimeFormatted = endTime.substring(0, 5); // "14:30:00" -> "14:30"
+
+    // Generate filler phrase for voice calls (Core Rule D)
+    let fillerPhrase = '';
+    if (isInternalCall && customerName) {
+      const fillerContext: FillerContext = {
+        customerName,
+        serviceName: postService.name,
+        requestedDate: appointmentDate,
+        requestedTime: startTimeFormatted,
+        operation: 'availability'
+      };
+      fillerPhrase = getFillerPhrase(fillerContext);
+    }
     
     // Create timezone-aware start and end times
     const dayStart = createUKDateTime(appointmentDate, startTimeFormatted);

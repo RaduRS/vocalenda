@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getCalendarService } from "@/lib/calendar";
 import { createTimezoneAwareISO, UK_TIMEZONE } from "@/lib/date-utils";
 import { parseISO } from "date-fns";
+import { getFillerPhrase, FillerContext } from "@/lib/conversation-utils";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +28,7 @@ export async function POST(request: NextRequest) {
       customerName,
       customerPhone,
       notes,
+      sessionId,
     } = await request.json();
 
     if (
@@ -74,6 +76,19 @@ export async function POST(request: NextRequest) {
 
     if (serviceError || !service) {
       return NextResponse.json({ error: "Service not found" }, { status: 404 });
+    }
+
+    // Generate filler phrase for voice calls (Core Rule D)
+    let fillerPhrase = '';
+    if (customerName && sessionId) {
+      const fillerContext: FillerContext = {
+        customerName,
+        serviceName: service.name,
+        requestedDate: appointmentDate,
+        requestedTime: startTime,
+        operation: 'booking'
+      };
+      fillerPhrase = getFillerPhrase(fillerContext);
     }
 
     // Get calendar service
@@ -267,6 +282,41 @@ ${notes ? `\nNotes: ${notes}` : ""}
       businessTimezone
     );
 
+    // Double availability check right before booking (Core Rule B: Race Condition Prevention)
+    const doubleCheckResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/calendar/availability`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.INTERNAL_API_SECRET!,
+        },
+        body: JSON.stringify({
+          businessId: business.id,
+          serviceId: serviceId,
+          appointmentDate: appointmentDate,
+          startTime: startTime,
+          endTime: endTime,
+          customerName,
+          sessionId,
+        }),
+      }
+    );
+
+    const doubleCheckResult = await doubleCheckResponse.json();
+    const isStillAvailable = doubleCheckResult.available === true;
+
+    if (!isStillAvailable) {
+      return NextResponse.json(
+        { 
+          error: "Time slot was just booked by someone else. Please select another time.",
+          fillerPhrase: fillerPhrase || undefined,
+          sessionId: sessionId || undefined
+        },
+        { status: 409 }
+      );
+    }
+
     const calendarEventId = await calendarService.createEvent(
       business.google_calendar_id,
       {
@@ -334,6 +384,8 @@ ${notes ? `\nNotes: ${notes}` : ""}
       success: true,
       appointmentId: appointment.id,
       calendarEventId,
+      ...(fillerPhrase && { fillerPhrase }),
+      ...(sessionId && { sessionId }),
     });
   } catch (error) {
     console.error("Error creating internal booking:", error);

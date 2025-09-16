@@ -4,6 +4,7 @@ import { getCalendarService } from '@/lib/calendar';
 import { findBookingByFuzzyName } from '@/lib/fuzzy-matching';
 import { createUKDateTime, formatISOTime, getCurrentUKDateTime } from '@/lib/date-utils';
 import { parseISO, addMinutes } from 'date-fns';
+import { getFillerPhrase, FillerContext } from '@/lib/conversation-utils';
 
 // Type for database appointment with joined tables
 type AppointmentWithRelations = {
@@ -59,7 +60,8 @@ export async function POST(request: NextRequest) {
       new_date,
       new_time,
       new_service_id,
-      caller_phone
+      caller_phone,
+      sessionId
     } = await request.json();
 
     console.log('📝 Update booking request:', {
@@ -110,6 +112,19 @@ export async function POST(request: NextRequest) {
         { error: 'Business not found' },
         { status: 404 }
       );
+    }
+
+    // Generate filler phrase for voice calls (Core Rule D)
+    let fillerPhrase = '';
+    if (customer_name && sessionId) {
+      const fillerContext: FillerContext = {
+        customerName: customer_name,
+        serviceName: '', // Will be filled after service lookup
+        requestedDate: new_date || current_date,
+        requestedTime: new_time || current_time,
+        operation: 'update'
+      };
+      fillerPhrase = getFillerPhrase(fillerContext);
     }
 
     // Find the existing booking by exact customer name, date, and time
@@ -297,6 +312,57 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Double availability check right before creating new booking (Core Rule B: Race Condition Prevention)
+    if (new_date || new_time) {
+      const finalDate = new_date || current_date;
+      const finalTime = new_time || current_time;
+      const finalTimeWithSeconds = finalTime.includes(':') && finalTime.split(':').length === 3 ? finalTime : `${finalTime}:00`;
+      
+      // Calculate end time for double check
+      const normalizedTime = finalTimeWithSeconds.split(':').slice(0, 2).join(':');
+      const serviceDuration = updates.service_id ? 
+        (await supabaseAdmin.from('services').select('duration_minutes').eq('id', updates.service_id).single()).data?.duration_minutes || 60 :
+        existingBooking.services?.duration_minutes || 60;
+      const startDateTime = createUKDateTime(finalDate, normalizedTime);
+      const endDateTime = addMinutes(startDateTime, serviceDuration);
+      const endTimeFormatted = formatISOTime(endDateTime);
+      
+      const doubleCheckResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/calendar/availability`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Internal-Secret': process.env.INTERNAL_API_SECRET!,
+          },
+          body: JSON.stringify({
+            businessId: business_id,
+            serviceId: updates.service_id || existingBooking.service_id,
+            appointmentDate: finalDate,
+            startTime: finalTimeWithSeconds,
+            endTime: endTimeFormatted,
+            excludeBookingId: existingBooking.id,
+            customerName: customer_name,
+            sessionId,
+          }),
+        }
+      );
+
+      const doubleCheckResult = await doubleCheckResponse.json();
+      const isStillAvailable = doubleCheckResult.available === true;
+
+      if (!isStillAvailable) {
+        return NextResponse.json(
+          { 
+            error: `The time slot ${finalDate} at ${finalTime} was just booked by someone else. Please select another time.`,
+            fillerPhrase: fillerPhrase || undefined,
+            sessionId: sessionId || undefined
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     // Create new booking with updated details
     const newBookingData = {
       business_id: business_id,
@@ -418,7 +484,9 @@ export async function POST(request: NextRequest) {
         start_time: newBooking.start_time,
         end_time: newBooking.end_time,
         status: newBooking.status
-      }
+      },
+      ...(fillerPhrase && { fillerPhrase }),
+      ...(sessionId && { sessionId })
     });
 
   } catch (error) {

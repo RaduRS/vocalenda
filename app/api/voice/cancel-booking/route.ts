@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
 import { findBookingByFuzzyName, extractCustomerPhone } from '@/lib/fuzzy-matching';
 import { getCurrentUKDateTime } from '@/lib/date-utils';
+import { getFillerPhrase, FillerContext } from '@/lib/conversation-utils';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,7 +33,8 @@ export async function POST(request: NextRequest) {
       date,
       time,
       reason,
-      caller_phone
+      caller_phone,
+      sessionId
     } = await request.json();
 
     console.log('❌ Cancel booking request:', {
@@ -74,6 +76,16 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Generate filler phrase for conversational response (Core Rule D: Filler Strategy)
+    // This phrase should be spoken by the AI immediately while background processing occurs
+    const fillerPhrase = (customer_name && sessionId) ? getFillerPhrase({
+      customerName: customer_name,
+      serviceName: '', // Will be filled after finding the booking
+      requestedDate: date,
+      requestedTime: time,
+      operation: 'cancel'
+    }) : undefined;
 
     // Find the existing booking by exact customer name, date, and time
     // Note: start_time is stored as just the time (e.g., "13:00:00") and appointment_date as date
@@ -178,7 +190,9 @@ export async function POST(request: NextRequest) {
             start_time: existingBooking.start_time,
             end_time: existingBooking.end_time,
             status: 'cancelled'
-          }
+          },
+          ...(fillerPhrase && { fillerPhrase }),
+          ...(sessionId && { sessionId })
         },
         { status: 200 }
       );
@@ -217,7 +231,9 @@ export async function POST(request: NextRequest) {
         end_time: cancelledBooking.end_time,
         status: cancelledBooking.status,
         cancellation_reason: reason
-      }
+      },
+      ...(fillerPhrase && { fillerPhrase }),
+      ...(sessionId && { sessionId })
     });
 
   } catch (error) {
