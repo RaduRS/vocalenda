@@ -44,7 +44,7 @@ const supabaseAdmin = createClient(
 export async function POST(request: NextRequest) {
   try {
     // Verify internal API secret
-    const internalSecret = request.headers.get('X-Internal-Secret');
+    const internalSecret = request.headers.get('x-internal-secret');
     if (internalSecret !== process.env.INTERNAL_API_SECRET) {
       return NextResponse.json(
         { error: 'Unauthorized' },
