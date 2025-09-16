@@ -60,10 +60,10 @@ export async function POST(request: NextRequest) {
       caller_phone
     });
 
-    // Validate required parameters
-    if (!business_id || !customer_name) {
+    // Validate required parameters - either customer_name or caller_phone is required
+    if (!business_id || (!customer_name && !caller_phone)) {
       return NextResponse.json(
-        { error: 'Missing required parameters: business_id, customer_name' },
+        { error: 'Missing required parameters: business_id and either customer_name or caller_phone' },
         { status: 400 }
       );
     }
@@ -152,14 +152,27 @@ export async function POST(request: NextRequest) {
       status: apt.status
     }));
 
-    // Find customer bookings using fuzzy matching
-    const matchedBooking = findBookingByFuzzyName(bookingRecords, customer_name);
+    // Find customer bookings using fuzzy matching or phone lookup
+    let matchedBooking;
+    let searchMethod;
+    
+    if (customer_name) {
+      // Use fuzzy name matching
+      matchedBooking = findBookingByFuzzyName(bookingRecords, customer_name);
+      searchMethod = `customer name: ${customer_name}`;
+    } else if (caller_phone) {
+      // Use phone number matching
+      matchedBooking = bookingRecords.find(booking => 
+        booking.customers?.phone === caller_phone
+      );
+      searchMethod = `phone number: ${caller_phone}`;
+    }
 
     if (!matchedBooking) {
-      console.log('❌ No bookings found for customer:', customer_name);
+      console.log('❌ No bookings found for:', searchMethod);
       return NextResponse.json({
         success: false,
-        message: `No bookings found for customer: ${customer_name}`,
+        message: `No bookings found for ${searchMethod}`,
         bookings: []
       });
     }
@@ -193,7 +206,7 @@ export async function POST(request: NextRequest) {
       status: apt.status
     }));
 
-    console.log(`✅ Found ${formattedBookings.length} future bookings for ${customer_name}`);
+    console.log(`✅ Found ${formattedBookings.length} future bookings for ${searchMethod}`);
 
     return NextResponse.json({
       success: true,
