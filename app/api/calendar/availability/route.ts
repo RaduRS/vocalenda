@@ -579,11 +579,55 @@ export async function POST(request: NextRequest) {
       console.log('🔍 No event to exclude (excludeEventId is null)');
     }
 
-    // Use filtered Google Calendar busy times and apply same logic as GET method
+    // STEP 1: Check database appointments for conflicts
+    console.log('🔍 POST method - Checking database appointments...');
+    const { data: dbAppointments, error: dbError } = await supabase
+      .from('appointments')
+      .select('id, appointment_date, start_time, end_time, google_calendar_event_id')
+      .eq('business_id', businessId)
+      .eq('appointment_date', appointmentDate)
+      .neq('status', 'cancelled');
+
+    if (dbError) {
+      console.error('❌ Error fetching database appointments:', dbError);
+    }
+
+    // Convert database appointments to busy times format, excluding the booking being updated
+    const dbBusyTimes: Array<{ start: Date; end: Date }> = [];
+    if (dbAppointments) {
+      for (const apt of dbAppointments) {
+        // Skip the appointment being excluded
+        if (excludeBookingId && apt.id === excludeBookingId) {
+          console.log('🔄 Excluding database appointment from conflict check:', {
+            appointmentId: apt.id,
+            date: apt.appointment_date,
+            startTime: apt.start_time,
+            endTime: apt.end_time
+          });
+          continue;
+        }
+
+        try {
+          const aptStart = createUKDateTime(apt.appointment_date, apt.start_time);
+          const aptEnd = createUKDateTime(apt.appointment_date, apt.end_time);
+          dbBusyTimes.push({ start: aptStart, end: aptEnd });
+        } catch (dateError) {
+          console.error('❌ Error parsing appointment time:', dateError, apt);
+        }
+      }
+    }
+
+    console.log('📊 Database appointments found:', {
+      total: dbAppointments?.length || 0,
+      conflicts: dbBusyTimes.length,
+      excluded: excludeBookingId ? 1 : 0
+    });
+
+    // STEP 2: Use filtered Google Calendar busy times and apply same logic as GET method
     const allBusyTimes = filteredBusyTimes;
 
-    // Convert busy times to proper format and sort (same as GET method)
-    const sortedBusyTimes = allBusyTimes
+    // Convert Google Calendar busy times to proper format and sort (same as GET method)
+    const calendarBusyTimes = allBusyTimes
       .filter((busy): busy is { start: string; end: string } => 
         busy.start != null && busy.end != null
       )
@@ -593,9 +637,13 @@ export async function POST(request: NextRequest) {
        }))
       .sort((a: { start: Date; end: Date }, b: { start: Date; end: Date }) => a.start.getTime() - b.start.getTime());
 
+    // STEP 3: Combine database and Google Calendar busy times
+    const combinedBusyTimes = [...dbBusyTimes, ...calendarBusyTimes]
+      .sort((a: { start: Date; end: Date }, b: { start: Date; end: Date }) => a.start.getTime() - b.start.getTime());
+
     // Merge overlapping busy times (same as GET method)
     const mergedBusyTimes: Array<{ start: Date; end: Date }> = [];
-    for (const busyTime of sortedBusyTimes) {
+    for (const busyTime of combinedBusyTimes) {
       if (mergedBusyTimes.length === 0) {
         mergedBusyTimes.push(busyTime);
       } else {
@@ -614,7 +662,9 @@ export async function POST(request: NextRequest) {
       requestedEnd: endDateTime.toISOString(),
       requestedStartLocal: startDateTime.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
       requestedEndLocal: endDateTime.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
-      originalBusyTimesCount: allBusyTimes.length,
+      databaseBusyTimesCount: dbBusyTimes.length,
+      googleCalendarBusyTimesCount: calendarBusyTimes.length,
+      combinedBusyTimesCount: combinedBusyTimes.length,
       mergedBusyTimesCount: mergedBusyTimes.length,
       excludeBookingId,
       excludeEventId,
