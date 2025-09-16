@@ -188,8 +188,51 @@ export async function GET(request: NextRequest) {
       // Continue with empty busy times array - this will allow the booking but log the error
     }
 
-    // Use only Google Calendar busy times since database syncs instantly
-    const allBusyTimes = googleBusyTimes;
+    // Get database appointments for the day to ensure consistency
+    const { data: dbAppointments, error: dbError } = await supabase
+      .from('appointments')
+      .select('appointment_date, start_time, end_time, status')
+      .eq('business_id', businessId)
+      .eq('appointment_date', date)
+      .in('status', ['confirmed', 'pending']);
+
+    if (dbError) {
+      console.error('❌ Error fetching database appointments:', dbError);
+    }
+
+    // Convert database appointments to busy times format
+    const dbBusyTimes: Array<{ start: string; end: string }> = [];
+    if (dbAppointments) {
+      for (const apt of dbAppointments) {
+        try {
+          const aptStart = createUKDateTime(apt.appointment_date, apt.start_time);
+          const aptEnd = createUKDateTime(apt.appointment_date, apt.end_time);
+          
+          // Filter out invalid appointments (end time before start time)
+          if (aptEnd <= aptStart) {
+            console.warn('⚠️ GET method - Invalid appointment found (end <= start):', {
+              date: apt.appointment_date,
+              start: apt.start_time,
+              end: apt.end_time
+            });
+            continue;
+          }
+          
+          dbBusyTimes.push({
+            start: aptStart.toISOString(),
+            end: aptEnd.toISOString()
+          });
+        } catch (error) {
+          console.error('❌ Error processing database appointment:', error, apt);
+        }
+      }
+    }
+
+    console.log('📊 GET method - Database busy times count:', dbBusyTimes.length);
+    console.log('📊 GET method - Google Calendar busy times count:', googleBusyTimes.length);
+
+    // Combine Google Calendar and database busy times
+    const allBusyTimes = [...googleBusyTimes, ...dbBusyTimes];
 
     // Convert busy times to proper format and sort
     const sortedBusyTimes = allBusyTimes
