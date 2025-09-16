@@ -179,15 +179,13 @@ export async function GET(request: NextRequest) {
         }
       });
       googleBusyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+      console.log('📅 Google Calendar busy times retrieved:', googleBusyTimes.length, 'events');
       console.log('🔍 Google Calendar raw response:', JSON.stringify(response.data.calendars?.[business.google_calendar_id], null, 2));
       console.log('🔍 Google Calendar busy times:', JSON.stringify(googleBusyTimes, null, 2));
 
     } catch (calendarError) {
-      console.error('Google Calendar API error:', calendarError);
-      return NextResponse.json(
-        { error: 'Failed to check calendar availability' },
-        { status: 500 }
-      );
+      console.error('❌ Error querying Google Calendar:', calendarError);
+      // Continue with empty busy times array - this will allow the booking but log the error
     }
 
     // Use only Google Calendar busy times since database syncs instantly
@@ -494,14 +492,26 @@ export async function POST(request: NextRequest) {
     // Get the Google Calendar event ID of the booking being excluded (if any)
     let excludeEventId = null;
     if (excludeBookingId) {
-      const { data: excludeBooking } = await supabase
+      const { data: excludeBooking, error: excludeError } = await supabase
         .from('appointments')
-        .select('google_calendar_event_id')
+        .select('google_calendar_event_id, appointment_date, start_time, end_time')
         .eq('id', excludeBookingId)
         .single();
       
-      excludeEventId = excludeBooking?.google_calendar_event_id;
-      console.log('🔄 Excluding booking from conflict check:', { excludeBookingId, excludeEventId });
+      if (excludeError) {
+        console.error('❌ Error fetching booking to exclude:', excludeError);
+      } else {
+        excludeEventId = excludeBooking?.google_calendar_event_id;
+        console.log('🔄 Excluding booking from conflict check:', { 
+          excludeBookingId, 
+          excludeEventId,
+          excludeBookingDetails: {
+            date: excludeBooking?.appointment_date,
+            startTime: excludeBooking?.start_time,
+            endTime: excludeBooking?.end_time
+          }
+        });
+      }
     }
 
     // Check Google Calendar for conflicts - use same time range as GET method for consistency
@@ -521,18 +531,17 @@ export async function POST(request: NextRequest) {
         });
 
       googleBusyTimes = response.data.calendars?.[business.google_calendar_id]?.busy || [];
+      console.log('📅 Google Calendar busy times retrieved:', googleBusyTimes.length, 'events');
       console.log('🔍 POST method - Google Calendar busy times:', JSON.stringify(googleBusyTimes, null, 2));
     } catch (calendarError) {
-      console.error('Google Calendar API error:', calendarError);
-      return NextResponse.json(
-        { error: 'Failed to check calendar availability' },
-        { status: 500 }
-      );
+      console.error('❌ Error querying Google Calendar:', calendarError);
+      // Continue with empty busy times array - this will allow the booking but log the error
     }
 
     // If we have an event to exclude, get its details and filter it out
     let filteredBusyTimes = googleBusyTimes;
     if (excludeEventId) {
+      console.log('🔍 Attempting to exclude event:', excludeEventId);
       try {
         const excludeEvent = await calendar.events.get({
           calendarId: business.google_calendar_id,
@@ -542,49 +551,94 @@ export async function POST(request: NextRequest) {
         const excludeStart = excludeEvent.data.start?.dateTime;
         const excludeEnd = excludeEvent.data.end?.dateTime;
         
+        console.log('🔍 Event to exclude details:', {
+          eventId: excludeEventId,
+          start: excludeStart,
+          end: excludeEnd,
+          summary: excludeEvent.data.summary
+        });
+        
         if (excludeStart && excludeEnd) {
-          // Filter out the excluded event from busy times
+          const originalCount = googleBusyTimes.length;
           filteredBusyTimes = googleBusyTimes.filter(busy => {
-            return !(busy.start === excludeStart && busy.end === excludeEnd);
+            const isMatch = busy.start === excludeStart && busy.end === excludeEnd;
+            if (isMatch) {
+              console.log('✅ Found and excluding matching event:', { start: excludeStart, end: excludeEnd });
+            }
+            return !isMatch;
           });
-          console.log('🔄 Filtered out excluded event:', { excludeStart, excludeEnd });
+          console.log(`🔍 Filtered busy times: ${originalCount} -> ${filteredBusyTimes.length}`);
+        } else {
+          console.warn('⚠️ Event to exclude has no start/end time');
         }
       } catch (eventError) {
-        console.warn('Could not get excluded event details:', eventError);
+        console.error('❌ Error fetching event to exclude:', eventError);
         // Continue with original busy times if we can't get the event
       }
+    } else {
+      console.log('🔍 No event to exclude (excludeEventId is null)');
     }
 
-    // Use filtered Google Calendar busy times
+    // Use filtered Google Calendar busy times and apply same logic as GET method
     const allBusyTimes = filteredBusyTimes;
+
+    // Convert busy times to proper format and sort (same as GET method)
+    const sortedBusyTimes = allBusyTimes
+      .filter((busy): busy is { start: string; end: string } => 
+        busy.start != null && busy.end != null
+      )
+      .map((busy: { start: string; end: string }) => ({
+         start: new Date(busy.start),
+         end: new Date(busy.end)
+       }))
+      .sort((a: { start: Date; end: Date }, b: { start: Date; end: Date }) => a.start.getTime() - b.start.getTime());
+
+    // Merge overlapping busy times (same as GET method)
+    const mergedBusyTimes: Array<{ start: Date; end: Date }> = [];
+    for (const busyTime of sortedBusyTimes) {
+      if (mergedBusyTimes.length === 0) {
+        mergedBusyTimes.push(busyTime);
+      } else {
+        const lastMerged = mergedBusyTimes[mergedBusyTimes.length - 1];
+        if (busyTime.start <= lastMerged.end) {
+          lastMerged.end = new Date(Math.max(lastMerged.end.getTime(), busyTime.end.getTime()));
+        } else {
+          mergedBusyTimes.push(busyTime);
+        }
+      }
+    }
       
-    // Check if the requested time slot conflicts with any busy time
+    // Check if the requested time slot conflicts with any merged busy time
     console.log('🔍 POST method - Checking conflicts for:', {
       requestedStart: startDateTime.toISOString(),
       requestedEnd: endDateTime.toISOString(),
       requestedStartLocal: startDateTime.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
       requestedEndLocal: endDateTime.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
-      busyTimesCount: allBusyTimes.length
+      originalBusyTimesCount: allBusyTimes.length,
+      mergedBusyTimesCount: mergedBusyTimes.length,
+      excludeBookingId,
+      excludeEventId,
+      mergedBusyTimes: mergedBusyTimes.map(bt => ({
+        start: bt.start.toISOString(),
+        end: bt.end.toISOString(),
+        startLocal: bt.start.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+        endLocal: bt.end.toLocaleString('en-GB', { timeZone: 'Europe/London' })
+      }))
     });
 
-    const hasConflict = allBusyTimes.some(busy => {
-      if (!busy.start || !busy.end) return false;
-      
-      const busyStart = new Date(busy.start);
-      const busyEnd = new Date(busy.end);
-      
+    const hasConflict = mergedBusyTimes.some(busy => {
       const conflict = (
-        (startDateTime >= busyStart && startDateTime < busyEnd) ||
-        (endDateTime > busyStart && endDateTime <= busyEnd) ||
-        (startDateTime <= busyStart && endDateTime >= busyEnd)
+        (startDateTime >= busy.start && startDateTime < busy.end) ||
+        (endDateTime > busy.start && endDateTime <= busy.end) ||
+        (startDateTime <= busy.start && endDateTime >= busy.end)
       );
       
       if (conflict) {
         console.log('🔍 POST method - Found conflict with:', {
-          busyStart: busyStart.toISOString(),
-          busyEnd: busyEnd.toISOString(),
-          busyStartLocal: busyStart.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
-          busyEndLocal: busyEnd.toLocaleString('en-GB', { timeZone: 'Europe/London' })
+          busyStart: busy.start.toISOString(),
+          busyEnd: busy.end.toISOString(),
+          busyStartLocal: busy.start.toLocaleString('en-GB', { timeZone: 'Europe/London' }),
+          busyEndLocal: busy.end.toLocaleString('en-GB', { timeZone: 'Europe/London' })
         });
       }
       

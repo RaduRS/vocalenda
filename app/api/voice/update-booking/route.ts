@@ -327,6 +327,19 @@ export async function POST(request: NextRequest) {
       const endDateTime = addMinutes(startDateTime, serviceDuration);
       const endTimeFormatted = formatISOTime(endDateTime);
       
+      const doubleCheckPayload = {
+        businessId: business_id,
+        serviceId: updates.service_id || existingBooking.service_id,
+        appointmentDate: finalDate,
+        startTime: finalTimeWithSeconds,
+        endTime: endTimeFormatted,
+        excludeBookingId: existingBooking.id,
+        customerName: customer_name,
+        sessionId,
+      };
+      
+      console.log('🔄 Double-checking availability with payload:', doubleCheckPayload);
+      
       const doubleCheckResponse = await fetch(
         `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/calendar/availability`,
         {
@@ -335,23 +348,24 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'application/json',
             'x-internal-secret': process.env.INTERNAL_API_SECRET!,
           },
-          body: JSON.stringify({
-            businessId: business_id,
-            serviceId: updates.service_id || existingBooking.service_id,
-            appointmentDate: finalDate,
-            startTime: finalTimeWithSeconds,
-            endTime: endTimeFormatted,
-            excludeBookingId: existingBooking.id,
-            customerName: customer_name,
-            sessionId,
-          }),
+          body: JSON.stringify(doubleCheckPayload),
         }
       );
 
       const doubleCheckResult = await doubleCheckResponse.json();
       const isStillAvailable = doubleCheckResult.available === true;
+      
+      console.log('🔄 Double-check availability result:', {
+        status: doubleCheckResponse.status,
+        result: doubleCheckResult,
+        isStillAvailable
+      });
 
       if (!isStillAvailable) {
+        console.error('❌ Slot no longer available during update:', {
+          requestedSlot: `${finalDate} at ${finalTime}`,
+          doubleCheckResult
+        });
         return NextResponse.json(
           { 
             error: `The time slot ${finalDate} at ${finalTime} was just booked by someone else. Please select another time.`,
