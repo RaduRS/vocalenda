@@ -610,6 +610,19 @@ export async function POST(request: NextRequest) {
         try {
           const aptStart = createUKDateTime(apt.appointment_date, apt.start_time);
           const aptEnd = createUKDateTime(apt.appointment_date, apt.end_time);
+          
+          // Filter out appointments with invalid time ranges (end_time before start_time)
+          if (aptEnd <= aptStart) {
+            console.warn('🚨 Filtered out invalid appointment:', {
+              appointmentId: apt.id,
+              date: apt.appointment_date,
+              start: apt.start_time,
+              end: apt.end_time,
+              reason: 'end_time before or equal to start_time'
+            });
+            continue;
+          }
+          
           dbBusyTimes.push({ start: aptStart, end: aptEnd });
         } catch (dateError) {
           console.error('❌ Error parsing appointment time:', dateError, apt);
