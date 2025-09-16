@@ -1082,7 +1082,8 @@ export async function updateBooking(businessConfig, params, callSid = null) {
         targetBooking = [...bookings].reverse().find(b => 
           b.type === 'create' && 
           b.serviceId === new_service_id && 
-          b.appointmentId
+          b.appointmentId &&
+          !b.updatedTo // Skip bookings that have already been updated
         );
       }
       
@@ -1090,7 +1091,8 @@ export async function updateBooking(businessConfig, params, callSid = null) {
       if (!targetBooking) {
         targetBooking = [...bookings].reverse().find(b => 
           b.type === 'create' && 
-          b.appointmentId
+          b.appointmentId &&
+          !b.updatedTo // Skip bookings that have already been updated
         );
       }
       
@@ -1283,37 +1285,38 @@ export async function updateBooking(businessConfig, params, callSid = null) {
       if (bookings.length > 0) {
         const lastBooking = bookings[bookings.length - 1];
         if (lastBooking.type === 'update') {
-          lastBooking.finalDate = result.booking.date;
+          lastBooking.finalDate = result.booking.appointment_date;
           lastBooking.finalTime = result.booking.start_time;
           lastBooking.appointmentId = result.booking.id;
           lastBooking.serviceName = result.booking.service_name;
         }
       }
       
+      // Mark any existing bookings with the same original date/time as updated
+      // This prevents the AI from trying to update the same booking again
+      for (const booking of bookings) {
+        if (booking.type === 'create' && 
+            booking.date === currentDateToUse && 
+            booking.time === currentTimeToUse) {
+          booking.updatedTo = {
+            date: result.booking.appointment_date,
+            time: result.booking.start_time,
+            appointmentId: result.booking.id
+          };
+          console.log(`🔄 Marked original booking as updated:`, {
+            originalDate: booking.date,
+            originalTime: booking.time,
+            newDate: result.booking.appointment_date,
+            newTime: result.booking.start_time
+          });
+        }
+      }
+      
       setCallSession(callSid, { bookings: bookings });
     }
 
-    // Send SMS confirmation for the updated booking
-    try {
-      if (result.booking && callerPhone) {
-        await sendSMSConfirmation({
-          businessId: businessConfig.business.id,
-          customerName: customerNameToUse,
-          customerPhone: callerPhone,
-          appointmentDate: result.booking.date,
-          appointmentTime: result.booking.start_time,
-          serviceName: result.booking.service_name,
-          serviceDuration: result.booking.duration_minutes,
-          appointmentId: result.booking.id,
-        }, businessConfig);
-        console.log("📱 SMS confirmation sent for updated booking");
-      } else {
-        console.log("⚠️ SMS not sent - missing booking result or caller phone");
-      }
-    } catch (smsError) {
-      console.error("❌ Failed to send SMS for updated booking:", smsError);
-      // Don't fail the entire operation if SMS fails
-    }
+    // SMS will be sent at the end of the call, not immediately
+    console.log("📝 Updated booking will receive SMS confirmation at call end");
 
     return {
       success: true,
@@ -1451,6 +1454,8 @@ export async function cancelBooking(businessConfig, params, callSid = null) {
  * @returns {Object} Result of call termination or error
  */
 export async function endCall(callSid, params, businessConfig = null) {
+  let smsSuccess = false; // Declare at function level to avoid scope issues
+  
   try {
     console.log(
       "📞 endCall called with params:",
@@ -1616,13 +1621,22 @@ export async function endCall(callSid, params, businessConfig = null) {
             businessConfig
           );
           console.log("✅ Consolidated SMS confirmation sent successfully");
+          smsSuccess = true;
+        } else {
+          // No bookings to send SMS for, consider it successful
+          smsSuccess = true;
         }
       } catch (smsError) {
         console.error("❌ Failed to send consolidated SMS confirmation:", smsError);
-        // Don't fail the call ending if SMS fails
+        // Don't fail the call ending if SMS fails, but don't clear session yet
+        // This allows for potential retry in server.js disconnect handler
       }
     } else if (session.bookingCancelled) {
       console.log("🚫 Skipping SMS confirmation - booking was cancelled in this call");
+      smsSuccess = true; // No SMS needed for cancelled bookings
+    } else {
+      // No bookings at all, consider SMS successful
+      smsSuccess = true;
     }
 
     // Initialize Twilio client
@@ -1641,8 +1655,13 @@ export async function endCall(callSid, params, businessConfig = null) {
 
     console.log(`✅ Call ended successfully:`, call.status);
 
-    // Clear call session when call ends
-    clearCallSession(callSid);
+    // Only clear call session if SMS was successful or not needed
+    if (smsSuccess) {
+      clearCallSession(callSid);
+      console.log(`🧹 Session cleared for call ${callSid} after successful SMS handling`);
+    } else {
+      console.log(`⚠️ Session retained for call ${callSid} due to SMS failure - may retry`);
+    }
 
     return {
       success: true,
@@ -1818,7 +1837,7 @@ async function sendSMSConfirmation(params, businessConfig) {
  * @param {Object} businessConfig - Business configuration
  * @returns {Promise<void>}
  */
-async function sendConsolidatedSMSConfirmation(params, businessConfig) {
+export async function sendConsolidatedSMSConfirmation(params, businessConfig) {
   const { businessId, customerPhone, customerName, bookings } = params;
 
   // Get the template from dashboard configuration
