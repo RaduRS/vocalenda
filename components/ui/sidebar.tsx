@@ -93,7 +93,7 @@ export default function Sidebar({
     const fetchBusinessData = async () => {
       try {
         const response = await fetch("/api/dashboard", {
-          cache: 'force-cache'
+          cache: 'no-store'
         });
         if (response.ok) {
           const data = await response.json();
@@ -205,7 +205,7 @@ export default function Sidebar({
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.firstName || user?.username || "User"}
+                {user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress || "User"}
               </p>
               <p className="text-xs text-gray-500 truncate">
                 {business?.name || "Loading business..."}
@@ -330,7 +330,7 @@ export default function Sidebar({
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {user?.firstName || user?.username || "User"}
+                      {user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress || "User"}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
                       {business?.name || "Loading business..."}

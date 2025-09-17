@@ -58,7 +58,7 @@ const fetchDashboardData = async (weekOffset: number = 0): Promise<DashboardData
   const url = weekOffset !== 0 ? `/api/dashboard?weekOffset=${weekOffset}` : '/api/dashboard';
   const response = await fetch(url, {
     headers: {
-      'Cache-Control': 'max-age=30, stale-while-revalidate=60',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
     },
   });
   
@@ -83,7 +83,7 @@ export const useDashboard = (weekOffset: number = 0) => {
   return useQuery({
     queryKey: ['dashboard', weekOffset],
     queryFn: () => fetchDashboardData(weekOffset),
-    staleTime: 5 * 60 * 1000, // 5 minutes - dashboard stats don't change frequently
-    // Use global defaults for better performance and consistency
+    staleTime: 0, // Always fetch fresh data to prevent cross-user data leaks
+    gcTime: 0, // Don't cache data between sessions
   });
 };

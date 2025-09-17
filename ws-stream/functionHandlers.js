@@ -183,9 +183,9 @@ export async function handleFunctionCall(
     functionCallData?.function_name
   );
   console.log(
-    `[${timestamp}] 📊 Parameters:`,
-    JSON.stringify(functionCallData?.parameters, null, 2)
-  );
+      `[${timestamp}] 📊 Parameters:`,
+      JSON.stringify(functionCallData?.params, null, 2)
+    );
   console.log(`[${timestamp}] 🏢 Business config exists:`, !!businessConfig);
   console.log(`[${timestamp}] 🌐 WebSocket state:`, deepgramWs?.readyState);
 
@@ -194,7 +194,9 @@ export async function handleFunctionCall(
       "🔧 Function call received:",
       JSON.stringify(functionCallData, null, 2)
     );
-    const { function_name, parameters, function_call_id } = functionCallData;
+    const { function_name, function_call_id } = functionCallData;
+    // Handle both 'params' and 'parameters' properties
+    const params = functionCallData.params || functionCallData.parameters || {};
 
     // Check for duplicate create_booking requests
     if (function_name === "create_booking" && function_call_id) {
@@ -262,35 +264,58 @@ export async function handleFunctionCall(
         break;
 
       case "get_available_slots":
-        result = await getAvailableSlots(businessConfig, parameters, callSid);
+        result = await getAvailableSlots(businessConfig, params, callSid);
         break;
 
       case "create_booking":
-        result = await createBooking(businessConfig, parameters, callSid);
+        result = await createBooking(businessConfig, params, callSid);
         break;
 
       case "update_booking":
-        result = await updateBooking(businessConfig, parameters, callSid);
+        result = await updateBooking(businessConfig, params, callSid);
         break;
 
       case "cancel_booking":
-        result = await cancelBooking(businessConfig, parameters, callSid);
+        result = await cancelBooking(businessConfig, params, callSid);
         break;
 
       case "end_call":
-        result = await endCall(callSid, parameters, businessConfig);
+        result = await endCall(callSid, params, businessConfig);
         break;
 
       case "get_day_of_week":
         try {
-          console.log("📅 Getting day of week for:", parameters.date);
-          const parsedDate = parseUKDate(parameters.date);
+          // Handle both 'params' and 'parameters' properties, and ensure we have the date
+          const functionParams = params || functionCallData.parameters || {};
+          const dateValue = functionParams.date;
+          
+          console.log("📅 Function call data:", JSON.stringify(functionCallData, null, 2));
+          console.log("📅 Extracted params:", JSON.stringify(functionParams, null, 2));
+          console.log("📅 Getting day of week for:", dateValue);
+          console.log("📅 Date type:", typeof dateValue);
+          console.log("📅 Date value:", JSON.stringify(dateValue));
+          
+          if (!dateValue) {
+            result = {
+              error: "No date provided. Please specify a date in DD/MM/YYYY format (e.g., 18/09/2025).",
+              debug_info: {
+                received_params: functionParams,
+                function_call_data: functionCallData
+              }
+            };
+            break;
+          }
+          
+          // Try to parse the date
+          const parsedDate = parseUKDate(dateValue);
+          console.log("📅 Parsed date successfully:", parsedDate);
+          
           const dayName = getDayOfWeekName(parsedDate);
           const dayNumber = getDayOfWeekNumber(parsedDate);
 
-          console.log(`✅ ${parameters.date} is a ${dayName}`);
+          console.log(`✅ ${dateValue} is a ${dayName}`);
           result = {
-            date: parameters.date,
+            date: dateValue,
             day_of_week: dayName,
             day_number: dayNumber,
             formatted: `${dayName}, ${parsedDate.toLocaleDateString("en-GB", {
@@ -301,8 +326,66 @@ export async function handleFunctionCall(
           };
         } catch (error) {
           console.error("❌ Error getting day of week:", error);
+          console.error("❌ Error details:", error.message);
+          console.error("❌ Error stack:", error.stack);
+          
+          // Try alternative parsing approaches
+          console.log("🔄 Attempting alternative date parsing...");
+          try {
+            const functionParams = params || functionCallData.parameters || {};
+            const dateValue = functionParams.date;
+            
+            if (!dateValue) {
+              throw new Error("No date value available for alternative parsing");
+            }
+            
+            // Try direct Date parsing
+            const directParse = new Date(dateValue);
+            console.log("📅 Direct Date() parsing result:", directParse);
+            console.log("📅 Direct Date() is valid:", !isNaN(directParse.getTime()));
+            
+            // Try manual parsing for DD/MM/YYYY
+            const parts = dateValue.split('/');
+            if (parts.length === 3) {
+              const day = parseInt(parts[0], 10);
+              const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+              const year = parseInt(parts[2], 10);
+              const manualDate = new Date(year, month, day);
+              console.log("📅 Manual parsing result:", manualDate);
+              console.log("📅 Manual parsing is valid:", !isNaN(manualDate.getTime()));
+              
+              if (!isNaN(manualDate.getTime())) {
+                const dayName = getDayOfWeekName(manualDate);
+                const dayNumber = getDayOfWeekNumber(manualDate);
+                console.log(`✅ Manual parsing success: ${dateValue} is a ${dayName}`);
+                result = {
+                  date: dateValue,
+                  day_of_week: dayName,
+                  day_number: dayNumber,
+                  formatted: `${dayName}, ${manualDate.toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}`,
+                };
+                break;
+              }
+            }
+          } catch (altError) {
+            console.error("❌ Alternative parsing also failed:", altError);
+          }
+          
+          const functionParams = params || functionCallData.parameters || {};
+          const dateValue = functionParams.date;
+          
           result = {
-            error: "Invalid date format. Please use DD/MM/YYYY format.",
+            error: `Invalid date format: "${dateValue || 'undefined'}". Please use DD/MM/YYYY format (e.g., 16/09/2025).`,
+            debug_info: {
+              received_date: dateValue,
+              date_type: typeof dateValue,
+              error_message: error.message,
+              function_call_data: functionCallData
+            }
           };
         }
         break;
@@ -405,7 +488,7 @@ export async function handleFunctionCall(
         break;
 
       case "transfer_to_human":
-        result = await transferToHuman(businessConfig, parameters, callSid);
+        result = await transferToHuman(businessConfig, params, callSid);
         break;
 
       case "lookup_customer":
@@ -1320,7 +1403,7 @@ export async function updateBooking(businessConfig, params, callSid = null) {
 
     return {
       success: true,
-      message: `Booking updated successfully for ${customer_name}`,
+      message: `Booking updated successfully for ${customerNameToUse}`,
       booking: result.booking,
     };
   } catch (error) {
@@ -1597,6 +1680,35 @@ export async function endCall(callSid, params, businessConfig = null) {
                 resultingDate: finalBooking.date,
                 resultingTime: finalBooking.time
               });
+            } else if (updates.length > 0) {
+              // If there's no create booking but there are updates, create finalBooking from the first update
+              // This handles the case where we're updating an existing appointment that wasn't created in this call
+              const firstUpdate = updates[0];
+              finalBooking = {
+                appointmentId: firstUpdate.appointmentId,
+                serviceName: firstUpdate.serviceName,
+                date: firstUpdate.finalDate || firstUpdate.newDate,
+                time: firstUpdate.finalTime || firstUpdate.newTime,
+                type: 'update'
+              };
+              
+              console.log(`📝 Created finalBooking from update for existing appointment ${appointmentId}:`, {
+                date: finalBooking.date,
+                time: finalBooking.time,
+                serviceName: finalBooking.serviceName
+              });
+              
+              // Apply any remaining updates
+              for (let i = 1; i < updates.length; i++) {
+                const laterUpdate = updates[i];
+                if (laterUpdate.finalDate) finalBooking.date = laterUpdate.finalDate;
+                if (laterUpdate.finalTime) finalBooking.time = laterUpdate.finalTime;
+                if (laterUpdate.newDate && !laterUpdate.finalDate) finalBooking.date = laterUpdate.newDate;
+                if (laterUpdate.newTime && !laterUpdate.finalTime) finalBooking.time = laterUpdate.newTime;
+                if (laterUpdate.serviceName) finalBooking.serviceName = laterUpdate.serviceName;
+                if (laterUpdate.appointmentId) finalBooking.appointmentId = laterUpdate.appointmentId;
+              }
+              break; // Exit the loop since we've processed all updates
             }
           }
           
@@ -1611,16 +1723,24 @@ export async function endCall(callSid, params, businessConfig = null) {
             finalBookings.map(b => b.appointmentId)
           );
           
+          // Get customer name from session or fallback to first booking's customer name
+          const customerName = session.customerName || 
+                              (finalBookings.length > 0 ? finalBookings[0].customerName : null) ||
+                              "Valued Customer";
+          
           await sendConsolidatedSMSConfirmation(
             {
               businessId: businessConfig.business.id,
               customerPhone: session.callerPhone,
-              customerName: session.customerName,
+              customerName: customerName,
               bookings: finalBookings,
             },
             businessConfig
           );
           console.log("✅ Consolidated SMS confirmation sent successfully");
+          
+          // Mark SMS as sent in session to prevent duplicates
+          setCallSession(callSid, { smsConfirmationSent: true });
           smsSuccess = true;
         } else {
           // No bookings to send SMS for, consider it successful
