@@ -78,6 +78,42 @@ export function usePrefetch() {
           staleTime: 2 * 60 * 1000, // 2 minutes
         });
         break;
+      case '/dashboard/integrations':
+        // Prefetch both dashboard data and Google integration status
+        queryClient.prefetchQuery({
+          queryKey: ['user', user.id, 'integrations-dashboard'],
+          queryFn: async () => {
+            const response = await fetch('/api/dashboard', {
+              headers: {
+                'Cache-Control': 'max-age=30, stale-while-revalidate=60',
+              },
+            });
+            if (!response.ok) throw new Error('Failed to fetch dashboard data');
+            return response.json();
+          },
+          staleTime: 30 * 1000, // 30 seconds
+        });
+        queryClient.prefetchQuery({
+          queryKey: ['user', user.id, 'google-integration-status'],
+          queryFn: async () => {
+            const response = await fetch('/api/integrations/google/status');
+            if (!response.ok) throw new Error('Failed to fetch Google integration status');
+            return response.json();
+          },
+          staleTime: 60 * 1000, // 1 minute
+        });
+        break;
+      case '/dashboard/business-settings':
+        queryClient.prefetchQuery({
+          queryKey: ['user', user.id, 'business-comprehensive'],
+          queryFn: async () => {
+            const response = await fetch('/api/business/comprehensive');
+            if (!response.ok) throw new Error('Failed to fetch business data');
+            return response.json();
+          },
+          staleTime: 5 * 60 * 1000, // 5 minutes - business settings change less frequently
+        });
+        break;
     }
   };
 
