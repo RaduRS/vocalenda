@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   DashboardSkeleton,
@@ -42,14 +42,14 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     let timeoutId: NodeJS.Timeout;
     
     if (isNavigating) {
-      // Fallback timeout in case useEffect doesn't catch the route change
+      // Reduced timeout for faster navigation feedback
       timeoutId = setTimeout(() => {
         if (isNavigating) {
           setIsNavigating(false);
           setTargetRoute(null);
           setCurrentSkeleton(null);
         }
-      }, 1000);
+      }, 500); // Reduced from 1000ms to 500ms
     }
     
     return () => {
@@ -59,7 +59,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     };
   }, [isNavigating]);
 
-  const navigateWithSkeleton = (href: string) => {
+  const navigateWithSkeleton = useCallback((href: string) => {
     // Don't navigate if already on the target route
     if (pathname === href) {
       return;
@@ -72,15 +72,17 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     
     // Navigate immediately
     router.push(href);
-  };
+  }, [pathname, router]);
+
+  const contextValue = useMemo(() => ({
+    isNavigating,
+    targetRoute,
+    currentSkeleton,
+    navigateWithSkeleton
+  }), [isNavigating, targetRoute, currentSkeleton, navigateWithSkeleton]);
 
   return (
-    <NavigationContext.Provider value={{
-      isNavigating,
-      targetRoute,
-      currentSkeleton,
-      navigateWithSkeleton
-    }}>
+    <NavigationContext.Provider value={contextValue}>
       {children}
     </NavigationContext.Provider>
   );

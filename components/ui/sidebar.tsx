@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import Image from "next/image";
 import {
   LayoutDashboard,
@@ -43,7 +43,7 @@ interface SidebarButtonProps {
   onMobileClick?: () => void;
 }
 
-function SidebarButton({
+const SidebarButton = memo(function SidebarButton({
   href,
   icon: Icon,
   label,
@@ -53,21 +53,21 @@ function SidebarButton({
   const { navigateWithSkeleton } = useNavigation();
   const { prefetchRoute } = usePrefetch();
   
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     // Use navigateWithSkeleton for instant skeleton loading
     navigateWithSkeleton(href);
     
     if (onMobileClick) {
       onMobileClick();
     }
-  };
+  }, [navigateWithSkeleton, href, onMobileClick]);
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     // Prefetch data on hover for instant loading
     if (!isActive) {
       prefetchRoute(href);
     }
-  };
+  }, [isActive, prefetchRoute, href]);
 
   return (
     <Button
@@ -90,7 +90,7 @@ function SidebarButton({
       <span className="font-medium text-sm">{label}</span>
     </Button>
   );
-}
+});
 
 
 
