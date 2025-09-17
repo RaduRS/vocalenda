@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { BusinessSettingsSkeleton } from "@/components/ui/skeleton-loading";
+import { useBusinessSettings } from "@/hooks/useBusinessSettings";
 import {
   Clock,
   MapPin,
@@ -40,8 +41,7 @@ import {
 import { previewVoice } from "@/lib/voice-preview";
 
 export default function BusinessSettings() {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { businessData: hookBusinessData, isLoading, updateBusiness, isUpdating } = useBusinessSettings();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [businessData, setBusinessData] = useState<ComprehensiveBusinessData>({
     name: "",
@@ -85,23 +85,12 @@ export default function BusinessSettings() {
     "basic" | "hours" | "services" | "staff" | "holidays" | "ai" | "sms"
   >("basic");
 
+  // Update local state when hook data changes
   useEffect(() => {
-    fetchBusinessData();
-  }, []);
-
-  const fetchBusinessData = async () => {
-    try {
-      const response = await fetch("/api/business/comprehensive");
-      if (response.ok) {
-        const data = await response.json();
-        setBusinessData(data);
-      }
-    } catch {
-      toast.error("Failed to load business data");
-    } finally {
-      setLoading(false);
+    if (hookBusinessData) {
+      setBusinessData(hookBusinessData as ComprehensiveBusinessData);
     }
-  };
+  }, [hookBusinessData]);
 
   const handleSave = async () => {
     // Validate bypass phone number
@@ -115,25 +104,11 @@ export default function BusinessSettings() {
       return;
     }
 
-    setSaving(true);
     try {
-      const response = await fetch("/api/business/comprehensive", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(businessData),
-      });
-
-      if (response.ok) {
-        toast.success("Business settings updated successfully!");
-      } else {
-        throw new Error("Failed to update business settings");
-      }
+      updateBusiness(businessData);
+      toast.success("Business settings updated successfully!");
     } catch {
       toast.error("Failed to save business settings");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -269,7 +244,7 @@ export default function BusinessSettings() {
     }));
   };
 
-  if (loading) {
+  if (isLoading) {
     return <BusinessSettingsSkeleton />;
   }
 
@@ -289,10 +264,10 @@ export default function BusinessSettings() {
             </div>
             <Button
               onClick={handleSave}
-              disabled={saving}
+              disabled={isUpdating}
               className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 w-full sm:w-auto"
             >
-              {saving ? (
+              {isUpdating ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Saving...

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IntegrationsSkeleton } from "@/components/ui/skeleton-loading";
+import { useIntegrations } from "@/hooks/useIntegrations";
 import {
   Dialog,
   DialogContent,
@@ -30,8 +31,7 @@ interface Business {
 function Integrations() {
   const { user } = useUser();
   const router = useRouter();
-  const [business, setBusiness] = useState<Business | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { dashboardData, googleStatus, isLoading, refetch } = useIntegrations();
   const [refreshing, setRefreshing] = useState(false);
   const [connectingCalendar, setConnectingCalendar] = useState(false);
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
@@ -39,68 +39,30 @@ function Integrations() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const fetchBusinessData = useCallback(async (bypassCache = false) => {
-    try {
-      const response = await fetch('/api/dashboard', {
-        next: { revalidate: bypassCache ? 0 : 30 },
-        headers: {
-          'Cache-Control': bypassCache ? 'no-cache' : 'max-age=30, stale-while-revalidate=60',
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setBusiness(data.business);
-
-        if (!data.business) {
-          router.push("/setup");
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch business data:", error);
-    }
-  }, [router]);
+  // Get business data from dashboard data
+  const business = dashboardData?.business || null;
 
   const checkGoogleCalendarStatus = useCallback(async () => {
     try {
       setRefreshing(true);
-      const response = await fetch('/api/integrations/google/status');
-      if (!response.ok) {
-        throw new Error('Failed to fetch Google Calendar status');
-      }
-      
-      const data = await response.json();
-      setBusiness(prev => prev ? {
-        ...prev,
-        google_calendar_connected: data.google_calendar_connected,
-        google_calendar_id: data.google_calendar_id
-      } : null);
+      await refetch();
     } catch (error) {
       console.error('Error checking Google Calendar status:', error);
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [refetch]);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        await fetchBusinessData();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      loadData();
+    if (dashboardData && !business) {
+      router.push("/setup");
     }
-  }, [user, fetchBusinessData]);
+  }, [dashboardData, business, router]);
 
   // Enhanced focus and visibility change listeners for OAuth detection
   useEffect(() => {
     const handleFocus = () => {
-      if (user && !loading) {
+      if (user && !isLoading) {
         // Check if we have recent OAuth activity
         const lastActivity = sessionStorage.getItem('lastOAuthActivity');
         const now = Date.now();
@@ -118,7 +80,7 @@ function Integrations() {
     };
     
     const handleVisibilityChange = () => {
-      if (!document.hidden && user && !loading) {
+      if (!document.hidden && user && !isLoading) {
         const lastActivity = sessionStorage.getItem('lastOAuthActivity');
         const now = Date.now();
         
@@ -139,11 +101,11 @@ function Integrations() {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user, loading, checkGoogleCalendarStatus]);
+  }, [user, isLoading, checkGoogleCalendarStatus]);
 
   // OAuth success detection and page refresh
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !isLoading) {
       // Check for OAuth success in sessionStorage
       const oauthSuccess = sessionStorage.getItem('oauthSuccess');
       if (oauthSuccess) {
@@ -190,7 +152,7 @@ function Integrations() {
         sessionStorage.removeItem('lastOAuthActivity');
       }
     }
-  }, [user, loading, checkGoogleCalendarStatus]);
+  }, [user, isLoading, checkGoogleCalendarStatus]);
 
   
   // Listen for OAuth success messages from popup
@@ -201,11 +163,8 @@ function Integrations() {
       if (event.data.type === 'OAUTH_SUCCESS' && event.data.service === 'google_calendar') {
         console.log('Received OAuth success message, updating state...');
         
-        // Immediately update state
-        setBusiness(prev => prev ? { ...prev, google_calendar_connected: true } : null);
-        
         // Force refresh from server
-        fetchBusinessData(true);
+        checkGoogleCalendarStatus();
         
         // Clean up
         sessionStorage.removeItem('lastOAuthActivity');
@@ -214,7 +173,7 @@ function Integrations() {
     
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [fetchBusinessData]);
+  }, [checkGoogleCalendarStatus]);
 
   const handleConnectCalendar = useCallback(async () => {
     setConnectingCalendar(true);
@@ -297,7 +256,7 @@ function Integrations() {
     }
   }, [business?.id, checkGoogleCalendarStatus]);
 
-  if (loading) {
+  if (isLoading) {
     return <IntegrationsSkeleton />;
   }
 
@@ -357,13 +316,13 @@ function Integrations() {
                   </h3>
                 </div>
                 <p className="text-brand-primary-2">
-                  {business.google_calendar_connected
+                  {googleStatus?.isConnected
                     ? "Your calendar is synced! Customers can only book when you're available, and new appointments automatically appear in your Google Calendar."
                     : "Connect your Google Calendar so customers can only book when you're free. All appointments will automatically sync to your calendar."}
                 </p>
               </div>
               <div className="flex-shrink-0">
-                {business.google_calendar_connected ? (
+                {googleStatus?.isConnected ? (
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center text-brand-secondary-1">
                       <svg
