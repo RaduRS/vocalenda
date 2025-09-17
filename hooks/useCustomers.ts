@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useUserScopedCustomers } from './useUserScopedQuery';
 
 export interface Customer {
   id: string;
@@ -24,30 +24,6 @@ export interface CustomersData {
   stats: CustomerStats;
 }
 
-const fetchCustomers = async (): Promise<CustomersData> => {
-  const response = await fetch('/api/customers');
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch customers');
-  }
-  
-  const data = await response.json();
-  return {
-    customers: data.customers || [],
-    stats: data.stats || {
-      totalCustomers: 0,
-      phoneContacts: 0,
-      emailContacts: 0,
-      localCustomers: 0
-    }
-  };
-};
-
 export const useCustomers = () => {
-  return useQuery({
-    queryKey: ['customers'],
-    queryFn: fetchCustomers,
-    staleTime: 15 * 60 * 1000, // 15 minutes - customers change less frequently
-    // Use global defaults for better performance and consistency
-  });
+  return useUserScopedCustomers();
 };

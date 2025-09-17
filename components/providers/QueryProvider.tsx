@@ -10,8 +10,8 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 60 * 1000, // 5 minutes - reduced for fresher data
-            gcTime: 15 * 60 * 1000, // 15 minutes - reduced cache time
+            staleTime: 2 * 60 * 1000, // 2 minutes - balanced for performance and freshness
+            gcTime: 10 * 60 * 1000, // 10 minutes - reasonable cache time
             retry: (failureCount, error: unknown) => {
               // Don't retry on 4xx errors
               const errorWithStatus = error as { status?: number };
@@ -20,12 +20,19 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
               }
               return failureCount < 2; // Reduce retry attempts for faster failure
             },
-            refetchOnWindowFocus: true, // Enable for OAuth returns
+            refetchOnWindowFocus: false, // Disable to prevent unnecessary refetches
             refetchOnReconnect: false, // Prevent unnecessary refetches
-            refetchOnMount: true, // Always fetch fresh data on mount for better UX
+            refetchOnMount: false, // Use cached data when available for better performance
+            // Enable background refetching for better UX
+            refetchInterval: false, // Disable automatic refetching
+            refetchIntervalInBackground: false,
+            // Network mode optimizations
+            networkMode: 'online', // Only run queries when online
           },
           mutations: {
             retry: 1, // Limit mutation retries
+            // Network mode for mutations
+            networkMode: 'online',
           },
         },
       })

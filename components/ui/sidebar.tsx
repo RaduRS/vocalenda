@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { useNavigation } from "@/contexts/NavigationContext";
+import { usePrefetch } from "@/hooks/usePrefetch";
 
 interface SidebarProps {
   className?: string;
@@ -49,32 +50,45 @@ function SidebarButton({
   isActive,
   onMobileClick,
 }: SidebarButtonProps) {
+  const { navigateWithSkeleton } = useNavigation();
+  const { prefetchRoute } = usePrefetch();
+  
   const handleClick = () => {
+    // Use navigateWithSkeleton for instant skeleton loading
+    navigateWithSkeleton(href);
+    
     if (onMobileClick) {
       onMobileClick();
     }
   };
 
+  const handleMouseEnter = () => {
+    // Prefetch data on hover for instant loading
+    if (!isActive) {
+      prefetchRoute(href);
+    }
+  };
+
   return (
-    <Link href={href} onClick={handleClick} className="block">
-      <Button
-        variant={isActive ? "default" : "ghost"}
+    <Button
+      variant={isActive ? "default" : "ghost"}
+      className={cn(
+        "w-full justify-start h-12 px-4 text-left transition-colors duration-150",
+        isActive
+          ? "bg-brand-primary-1 text-white shadow-md"
+          : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
+      )}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+    >
+      <Icon
         className={cn(
-          "w-full justify-start h-12 px-4 text-left transition-colors duration-150",
-          isActive
-            ? "bg-brand-primary-1 text-white shadow-md"
-            : "text-gray-700 hover:bg-gray-100 hover:text-brand-primary-1"
+          "mr-3 h-5 w-5",
+          isActive ? "text-white" : "text-gray-500"
         )}
-      >
-        <Icon
-          className={cn(
-            "mr-3 h-5 w-5",
-            isActive ? "text-white" : "text-gray-500"
-          )}
-        />
-        <span className="font-medium text-sm">{label}</span>
-      </Button>
-    </Link>
+      />
+      <span className="font-medium text-sm">{label}</span>
+    </Button>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useUserScopedAppointments } from './useUserScopedQuery';
 
 interface Customer {
   id: string;
@@ -38,23 +38,8 @@ interface AppointmentsResponse {
   stats: AppointmentStats;
 }
 
-const fetchAppointments = async (): Promise<AppointmentsResponse> => {
-  const response = await fetch('/api/appointments');
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch appointments: ${response.status} ${response.statusText}`);
-  }
-  
-  return response.json();
-};
-
 export const useAppointments = () => {
-  return useQuery({
-    queryKey: ['appointments'],
-    queryFn: fetchAppointments,
-    staleTime: 5 * 60 * 1000, // 5 minutes - balance between freshness and performance
-    // Use global defaults for gcTime, retry, and refetch settings for consistency
-  });
+  return useUserScopedAppointments();
 };
 
 export type { Appointment, AppointmentStats, Customer, Service };
