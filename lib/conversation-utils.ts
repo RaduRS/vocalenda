@@ -173,6 +173,7 @@ function formatDateForSpeech(dateString: string): string {
     return formatted;
   } catch (error) {
     // Fallback to original string if parsing fails
+    console.error('Error formatting date for speech:', error);
     return dateString;
   }
 }

@@ -7,6 +7,7 @@ import Navbar from "@/components/ui/navbar";
 import DashboardLayout from "@/components/ui/dashboard-layout";
 import { ClientOnlyComponents } from "@/components/ClientComponents";
 import QueryProvider from "@/components/providers/QueryProvider";
+import { NavigationProvider } from "@/contexts/NavigationContext";
 
 import "./globals.css";
 
@@ -132,12 +133,14 @@ export default function RootLayout({
 
         <body className={`${inter.variable} ${poppins.variable} antialiased`}>
           <QueryProvider>
-            <Navbar />
-            <ClientOnlyComponents />
-            <DashboardLayout>
-              {children}
-            </DashboardLayout>
-            <CookieBanner />
+            <NavigationProvider>
+              <Navbar />
+              <ClientOnlyComponents />
+              <DashboardLayout>
+                {children}
+              </DashboardLayout>
+              <CookieBanner />
+            </NavigationProvider>
           </QueryProvider>
         </body>
       </html>

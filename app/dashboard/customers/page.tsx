@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, Plus, Phone, Mail, MapPin, User } from "lucide-react";
 import { format } from "date-fns";
-import { useCustomers } from "@/hooks/useCustomers";
+import { useCustomers, type Customer } from "@/hooks/useCustomers";
 import { CustomersSkeleton } from "@/components/ui/skeleton-loading";
 
 // Customer interface imported from useCustomers hook
@@ -150,7 +150,7 @@ function Customers() {
 
               </div>
               <div className="space-y-4">
-                {customers.map((customer) => (
+                {customers.map((customer: Customer) => (
                   <div key={customer.id} className="border rounded-lg p-4 hover:bg-gray-50">
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4">
                       <div className="flex items-start space-x-3 flex-1 min-w-0">

@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { getCalendarService } from '@/lib/calendar';
 import { findBookingByFuzzyName, extractCustomerPhone } from '@/lib/fuzzy-matching';
 import { getCurrentUKDateTime } from '@/lib/date-utils';
-import { getFillerPhrase, FillerContext } from '@/lib/conversation-utils';
+import { getFillerPhrase } from '@/lib/conversation-utils';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

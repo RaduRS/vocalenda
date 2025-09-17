@@ -390,7 +390,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { businessId, serviceId, appointmentDate, startTime, endTime, excludeBookingId, customerName, sessionId } = body;
+    const { businessId, serviceId, appointmentDate, startTime, endTime, excludeBookingId } = body;
 
     if (!businessId || !serviceId || !appointmentDate || !startTime || !endTime) {
       return NextResponse.json(
@@ -467,19 +467,6 @@ export async function POST(request: NextRequest) {
     const startTimeFormatted = startTime.substring(0, 5); // "14:00:00" -> "14:00"
     const endTimeFormatted = endTime.substring(0, 5); // "14:30:00" -> "14:30"
 
-    // Generate filler phrase for voice calls (Core Rule D)
-    let fillerPhrase = '';
-    if (isInternalCall && customerName) {
-      const fillerContext: FillerContext = {
-        customerName,
-        serviceName: postService.name,
-        requestedDate: appointmentDate,
-        requestedTime: startTimeFormatted,
-        operation: 'availability'
-      };
-      fillerPhrase = getFillerPhrase(fillerContext);
-    }
-    
     // Create timezone-aware start and end times
     const dayStart = createUKDateTime(appointmentDate, startTimeFormatted);
     const dayEnd = createUKDateTime(appointmentDate, endTimeFormatted);

@@ -161,7 +161,7 @@ function Dashboard() {
   }
 
   // Process call status data for chart
-  const callStatusData = data.recentCalls?.reduce((acc, call) => {
+  const callStatusData = data.recentCalls?.reduce((acc: Record<string, number>, call: RecentCall) => {
     acc[call.status] = (acc[call.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>) || {};
@@ -292,21 +292,21 @@ function Dashboard() {
               <div className="h-48 sm:h-56 md:h-64">
                 <Line
                   data={{
-                    labels: data?.stats?.weeklyActivity?.map(day => {
+                    labels: data?.stats?.weeklyActivity?.map((day: { date: string; appointments: number; calls: number }) => {
                       const date = parseISO(day.date);
                       return format(date, 'EEE');
                     }) || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [
                       {
                         label: 'Appointments',
-                        data: data.stats?.weeklyActivity?.map(day => day.appointments) || [0, 0, 0, 0, 0, 0, 0],
+                        data: data.stats?.weeklyActivity?.map((day: { date: string; appointments: number; calls: number }) => day.appointments) || [0, 0, 0, 0, 0, 0, 0],
                         borderColor: 'rgb(147, 51, 234)',
                         backgroundColor: 'rgba(147, 51, 234, 0.1)',
                         tension: 0.4,
                       },
                       {
                         label: 'Calls',
-                        data: data.stats?.weeklyActivity?.map(day => day.calls) || [0, 0, 0, 0, 0, 0, 0],
+                        data: data.stats?.weeklyActivity?.map((day: { date: string; appointments: number; calls: number }) => day.calls) || [0, 0, 0, 0, 0, 0, 0],
                         borderColor: 'rgb(59, 130, 246)',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,

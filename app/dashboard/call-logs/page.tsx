@@ -16,7 +16,7 @@ import {
   UserIcon,
 } from "lucide-react";
 // RefreshCw import removed as it's no longer used
-import { useCallLogs } from "@/hooks/useCallLogs";
+import { useCallLogs, type CallLog } from "@/hooks/useCallLogs";
 import { CallLogsSkeleton } from "@/components/ui/skeleton-loading";
 
 // CallLog interface is now imported from the hook
@@ -129,7 +129,7 @@ export default function CallLogsPage() {
     ];
     const csvContent = [
       headers.join(","),
-      ...callLogs.map((call) => {
+      ...callLogs.map((call: CallLog) => {
         // Clean transcript for CSV (remove quotes and newlines)
         const cleanTranscript = call.transcript 
           ? call.transcript.replace(/"/g, '""').replace(/\n/g, ' ').replace(/\r/g, ' ')
@@ -221,7 +221,7 @@ export default function CallLogsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {callLogs.map((call) => (
+                {callLogs.map((call: CallLog) => (
                   <div
                     key={call.id}
                     className="border rounded-lg overflow-hidden"

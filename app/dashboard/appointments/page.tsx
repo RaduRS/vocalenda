@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Users } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import { useAppointments } from "@/hooks/useAppointments";
+import { useAppointments, type Appointment } from "@/hooks/useAppointments";
 import { AppointmentsSkeleton } from "@/components/ui/skeleton-loading";
 
 function Appointments() {
@@ -161,7 +161,7 @@ function Appointments() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {appointments.map((appointment) => (
+                    {appointments.map((appointment: Appointment) => (
                       <tr key={appointment.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
