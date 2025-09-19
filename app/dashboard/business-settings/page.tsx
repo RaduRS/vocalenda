@@ -1045,11 +1045,11 @@ export default function BusinessSettings() {
                       </Label>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      (businessData.ai_configuration.greeting || "").length > 1000
+                      (businessData.ai_configuration.greeting || "").length > 100
                         ? "bg-red-100 text-red-700"
                         : "bg-gray-100 text-gray-600"
                     }`}>
-                      {(businessData.ai_configuration.greeting || "").length}/1000
+                      {(businessData.ai_configuration.greeting || "").length}/100
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600">
@@ -1062,7 +1062,7 @@ export default function BusinessSettings() {
                   <Textarea
                     value={businessData.ai_configuration.greeting}
                     onChange={(e) => {
-                      if (e.target.value.length <= 1000) {
+                      if (e.target.value.length <= 100) {
                         handleInputChange("ai_configuration", {
                           ...businessData.ai_configuration,
                           greeting: e.target.value,
