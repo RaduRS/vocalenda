@@ -120,7 +120,6 @@ CREATE OR REPLACE FUNCTION update_ai_configuration(
     p_allowed_topics TEXT[] DEFAULT NULL,
     p_restricted_topics TEXT[] DEFAULT NULL,
     p_ai_prompt TEXT DEFAULT NULL,
-    p_greeting_message TEXT DEFAULT NULL,
     p_booking_rules JSONB DEFAULT NULL,
     p_faq_data JSONB DEFAULT NULL
 )
@@ -128,7 +127,7 @@ RETURNS BOOLEAN AS $$
 BEGIN
     INSERT INTO business_config (
         business_id, ai_response_mode, allowed_ai_topics, 
-        restricted_ai_topics, ai_prompt, greeting_message, 
+        restricted_ai_topics, ai_prompt, 
         booking_rules, faq_data
     )
     VALUES (
@@ -137,7 +136,6 @@ BEGIN
         p_allowed_topics,
         p_restricted_topics,
         p_ai_prompt,
-        p_greeting_message,
         p_booking_rules,
         p_faq_data
     )
@@ -146,7 +144,6 @@ BEGIN
         allowed_ai_topics = COALESCE(p_allowed_topics, business_config.allowed_ai_topics),
         restricted_ai_topics = COALESCE(p_restricted_topics, business_config.restricted_ai_topics),
         ai_prompt = COALESCE(p_ai_prompt, business_config.ai_prompt),
-        greeting_message = COALESCE(p_greeting_message, business_config.greeting_message),
         booking_rules = COALESCE(p_booking_rules, business_config.booking_rules),
         faq_data = COALESCE(p_faq_data, business_config.faq_data),
         updated_at = NOW();

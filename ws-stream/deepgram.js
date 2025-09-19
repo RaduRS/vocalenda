@@ -220,11 +220,11 @@ export async function initializeDeepgram(businessConfig, callContext) {
                 },
               },
               greeting: await replaceGreetingVariables(
-                businessConfig.config?.greeting_message ||
+              businessConfig.business?.ai_greeting ||
                 "Thank you for calling, how can I help you today?",
-                businessConfig,
-                callContext.callerPhone
-              ),
+              businessConfig,
+              callContext.callerPhone
+            ),
             },
           };
 

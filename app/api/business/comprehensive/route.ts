@@ -102,7 +102,7 @@ export async function GET() {
         is_active: staff.is_active
       })) || [],
       ai_configuration: {
-        greeting: (Array.isArray(business.business_config) ? business.business_config[0]?.greeting_message : business.business_config?.greeting_message) || business.ai_greeting || '',
+        greeting: business.ai_greeting || '',
         key_information: business.key_information || '',
         response_mode: ((Array.isArray(business.business_config) ? business.business_config[0]?.ai_response_mode : business.business_config?.ai_response_mode) || 'flexible') as 'flexible' | 'restricted',
         allowed_topics: (Array.isArray(business.business_config) ? business.business_config[0]?.allowed_ai_topics : business.business_config?.allowed_ai_topics) || [],
@@ -194,7 +194,6 @@ export async function PUT(request: NextRequest) {
         allowed_ai_topics: businessData.ai_configuration.allowed_topics,
         restricted_ai_topics: businessData.ai_configuration.restricted_topics,
         ai_prompt: businessData.ai_configuration.custom_prompt,
-        greeting_message: businessData.ai_configuration.greeting,
         ai_voice: businessData.ai_configuration.voice || 'aura-2-thalia-en',
         sms_enabled: businessData.sms_configuration?.enabled || false,
         sms_confirmation_template: businessData.sms_configuration?.confirmation_message || null,

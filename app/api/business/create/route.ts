@@ -131,8 +131,7 @@ export async function POST(request: NextRequest) {
           ai_response_mode: ai_configuration.response_mode || 'flexible',
           allowed_ai_topics: ai_configuration.allowed_topics || [],
           restricted_ai_topics: ai_configuration.restricted_topics || [],
-          ai_prompt: ai_configuration.custom_prompt,
-          greeting_message: ai_configuration.greeting
+          ai_prompt: ai_configuration.custom_prompt
         });
 
       if (configError) {

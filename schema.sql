@@ -143,7 +143,6 @@ CREATE TABLE business_config (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE UNIQUE,
     ai_prompt TEXT, -- Custom AI instructions
-    greeting_message TEXT,
     booking_rules JSONB, -- Booking constraints and rules
     faq_data JSONB, -- Frequently asked questions
     integration_settings JSONB, -- API keys, webhooks, etc.

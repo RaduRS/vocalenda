@@ -97,7 +97,6 @@ export type Database = {
           id: string
           business_id: string
           ai_prompt: string | null
-          greeting_message: string | null
           booking_rules: Json | null
           faq_data: Json | null
           integration_settings: Json | null
@@ -117,7 +116,6 @@ export type Database = {
           id?: string
           business_id: string
           ai_prompt?: string | null
-          greeting_message?: string | null
           booking_rules?: Json | null
           faq_data?: Json | null
           integration_settings?: Json | null
@@ -137,7 +135,6 @@ export type Database = {
           id?: string
           business_id?: string
           ai_prompt?: string | null
-          greeting_message?: string | null
           booking_rules?: Json | null
           faq_data?: Json | null
           integration_settings?: Json | null
@@ -657,7 +654,6 @@ export type Database = {
           p_allowed_topics?: string[]
           p_restricted_topics?: string[]
           p_ai_prompt?: string
-          p_greeting_message?: string
           p_booking_rules?: Json
           p_faq_data?: Json
           p_ai_voice?: string
