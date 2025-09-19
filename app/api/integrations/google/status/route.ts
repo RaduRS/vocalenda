@@ -75,7 +75,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      google_calendar_connected: googleCalendarConnected,
+      isConnected: googleCalendarConnected,
       google_calendar_id: business?.google_calendar_id || null
     });
 

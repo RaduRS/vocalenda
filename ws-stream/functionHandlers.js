@@ -14,6 +14,7 @@ import {
 } from "./dateUtils.js";
 import { isWithinBusinessHours } from "./utils.js";
 import { db } from "./database.js";
+import { isGoogleCalendarConnected } from "./businessConfig.js";
 
 const config = getConfig();
 
@@ -1437,7 +1438,7 @@ export async function updateBooking(businessConfig, params, callSid = null) {
     // Get business config early to avoid initialization errors
     const business = businessConfig.business;
 
-    if (!business?.google_calendar_id) {
+    if (!isGoogleCalendarConnected(businessConfig)) {
       console.error("❌ No Google Calendar connected for business");
       return { error: "Calendar not connected" };
     }
@@ -1717,7 +1718,7 @@ export async function cancelBooking(businessConfig, params, callSid = null) {
     const { customer_name, date, time, reason } = params;
     const business = businessConfig.business;
 
-    if (!business?.google_calendar_id) {
+    if (!isGoogleCalendarConnected(businessConfig)) {
       console.error("❌ No Google Calendar connected for business");
       return { error: "Calendar not connected" };
     }

@@ -2,7 +2,7 @@ import WebSocket, { WebSocketServer } from "ws";
 import express from "express";
 import { createServer } from "http";
 import { validateConfig } from "./config.js";
-import { loadBusinessConfig } from "./businessConfig.js";
+import { loadBusinessConfig, isGoogleCalendarConnected } from "./businessConfig.js";
 import {
   initializeDeepgram,
   handleDeepgramMessage,
@@ -86,7 +86,7 @@ wss.on("connection", async (ws) => {
           }
 
           // Check if Google Calendar is connected
-          if (!businessConfig.business?.google_calendar_id) {
+          if (!isGoogleCalendarConnected(businessConfig)) {
             console.log(`📅 No Google Calendar connected for business ${businessId}`);
             console.log(`📞 Rejecting call ${callSid} - Google Calendar required`);
             
