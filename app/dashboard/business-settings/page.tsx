@@ -1035,27 +1035,41 @@ export default function BusinessSettings() {
 
                 {/* AI Instructions Section */}
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Settings className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Settings className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
+                      </div>
+                      <Label className="text-base sm:text-lg font-semibold text-gray-900">
+                        AI Instructions
+                      </Label>
                     </div>
-                    <Label className="text-base sm:text-lg font-semibold text-gray-900">
-                      AI Instructions
-                    </Label>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      (businessData.ai_configuration.greeting || "").length > 1000
+                        ? "bg-red-100 text-red-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}>
+                      {(businessData.ai_configuration.greeting || "").length}/1000
+                    </span>
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600">
                     Provide specific instructions for how the AI assistant
                     should behave when handling customer calls
                   </p>
+                  <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                    <strong>Available variables:</strong> {'{customer_name}'}, {'{business_name}'}
+                  </p>
                   <Textarea
                     value={businessData.ai_configuration.greeting}
-                    onChange={(e) =>
-                      handleInputChange("ai_configuration", {
-                        ...businessData.ai_configuration,
-                        greeting: e.target.value,
-                      })
-                    }
-                    placeholder="e.g., Always be polite and professional, ask for customer preferences, suggest popular services..."
+                    onChange={(e) => {
+                      if (e.target.value.length <= 1000) {
+                        handleInputChange("ai_configuration", {
+                          ...businessData.ai_configuration,
+                          greeting: e.target.value,
+                        })
+                      }
+                    }}
+                    placeholder="e.g., Hi {customer_name}! This is {business_name}. How can I help you today?"
                     className="min-h-[100px] sm:min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none text-sm"
                     rows={4}
                   />
