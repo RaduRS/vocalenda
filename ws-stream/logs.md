@@ -1,196 +1,227 @@
-25-09-16T17:20:55.039Z] 📊 Has slots: true
-[2025-09-16T17:20:55.039Z] 📊 Slots count: 30
-✅ Available time slots: [
-  '09:00', '09:15', '09:30', '09:45',
-  '10:00', '10:15', '10:30', '10:45',
-  '11:00', '11:15', '11:30', '11:45',
-  '12:30', '12:45', '13:00', '13:15',
-  '13:30', '13:45', '14:00', '14:15',
-  '14:30', '14:45', '15:00', '15:15',
-  '15:30', '15:45', '16:00', '16:15',
-  '16:30', '16:45'
-]
-📝 Session updated for call CAe24f058cf689d1e30db625beb8a3e0a1: {
+
+[11:15:05] 🔧 CALLING: handleFunctionCall for get_available_slots with ID call_HApqMpP8ahVbVPZWgGmmEk3B...
+📝 Session updated for call CA64027220f93187f4b6359ae1b2e32020: {
   callerPhone: '+447468306825',
-  lastCheckedDate: '2025-09-18',
-  lastCheckedTimestamp: '2025-09-16T17:20:56.390Z'
+  lastCheckedDate: '2025-09-24',
+  lastCheckedTimestamp: '11:14:35',
+  customerName: 'Marco',
+  lastBookingDate: '2025-09-24',
+  lastBookingTime: '12:45',
+  lastServiceId: '754eb430-291c-42b7-8f26-2d8a99828ee5',
+  lastServiceName: 'beard trim',
+  lastServiceDuration: 15,
+  bookings: [
+    {
+      bookingReference: 'BK861431X7',
+      customerName: 'Marco',
+      date: '2025-09-24',
+      time: '10:00',
+      serviceId: '89f199c8-c4ee-4f42-91a7-1f8bd70cff4a',
+      serviceName: 'haircut',
+      serviceDuration: 30,
+      appointmentId: '0bdf0582-2242-4b31-a10f-b8454cc73ac1',
+      type: 'create'
+    },
+    {
+      bookingReference: 'BK8935476R',
+      customerName: 'Marco',
+      date: '2025-09-24',
+      time: '12:45',
+      serviceId: '754eb430-291c-42b7-8f26-2d8a99828ee5',
+      serviceName: 'beard trim',
+      serviceDuration: 15,
+      appointmentId: '9552f6d3-a1b8-4fa1-8fc0-617b99fc822c',
+      type: 'create'
+    }
+  ],
+  lastAppointmentId: '9552f6d3-a1b8-4fa1-8fc0-617b99fc822c'
 }
-📅 Stored checked date in session: 2025-09-18
+[11:15:05] 🚀 FUNCTION: get_available_slots
+🕐 Current UK time: 11:15, Current date: 2025-09-19
+📅 Validating request for date: 2025-09-23, time: not specified
+✅ FUNCTION_CALL_VALIDATION: get_available_slots passed all checks - proceeding with API call
+[11:15:05] 🗓️ GET_SLOTS: 2025-09-23 service:89f199c8-c4ee-4f42-91a7-1f8bd70cff4a
+📅 Business open on Tuesday
+📋 Using service: haircut (Duration: 30 minutes)
+🔍 Including customer context for availability check: +447468306825
+[11:15:05] 📡 API: 200 - 23 slots
+✅ Available time slots: [
+  '09:00', '09:15', '09:30',
+  '10:30', '11:15', '11:30',
+  '11:45', '12:00', '12:15',
+  '12:30', '12:45', '13:00',
+  '13:15', '13:30', '14:30',
+  '14:45', '15:00', '15:15',
+  '15:30', '15:45', '16:00',
+  '16:15', '16:30'
+]
+✅ Available slots (12-hour): [
+  '9:00 AM',  '9:15 AM',  '9:30 AM',
+  '10:30 AM', '11:15 AM', '11:30 AM',
+  '11:45 AM', '12:00 PM', '12:15 PM',
+  '12:30 PM', '12:45 PM', '1:00 PM',
+  '1:15 PM',  '1:30 PM',  '2:30 PM',
+  '2:45 PM',  '3:00 PM',  '3:15 PM',
+  '3:30 PM',  '3:45 PM',  '4:00 PM',
+  '4:15 PM',  '4:30 PM'
+]
+📝 Session updated for call CA64027220f93187f4b6359ae1b2e32020: {
+  callerPhone: '+447468306825',
+  lastCheckedDate: '2025-09-23',
+  lastCheckedTimestamp: '11:15:07',
+  customerName: 'Marco',
+  lastBookingDate: '2025-09-24',
+  lastBookingTime: '12:45',
+  lastServiceId: '754eb430-291c-42b7-8f26-2d8a99828ee5',
+  lastServiceName: 'beard trim',
+  lastServiceDuration: 15,
+  bookings: [
+    {
+      bookingReference: 'BK861431X7',
+      customerName: 'Marco',
+      date: '2025-09-24',
+      time: '10:00',
+      serviceId: '89f199c8-c4ee-4f42-91a7-1f8bd70cff4a',
+      serviceName: 'haircut',
+      serviceDuration: 30,
+      appointmentId: '0bdf0582-2242-4b31-a10f-b8454cc73ac1',
+      type: 'create'
+    },
+    {
+      bookingReference: 'BK8935476R',
+      customerName: 'Marco',
+      date: '2025-09-24',
+      time: '12:45',
+      serviceId: '754eb430-291c-42b7-8f26-2d8a99828ee5',
+      serviceName: 'beard trim',
+      serviceDuration: 15,
+      appointmentId: '9552f6d3-a1b8-4fa1-8fc0-617b99fc822c',
+      type: 'create'
+    }
+  ],
+  lastAppointmentId: '9552f6d3-a1b8-4fa1-8fc0-617b99fc822c'
+}
+📅 Stored checked date in session: 2025-09-23
 ✅ Sending get_available_slots response to Deepgram
 ✅ Function response sent successfully to Deepgram
 🔄 Waiting for Deepgram to process the response...
-
-
-epgram JSON message: {"type":"ConversationText","role":"assistant","content":"However, I can offer you 11:45 AM or 12:30 PM."}...
-Message string: {"type":"ConversationText","role":"assistant","content":"However, I can offer you 11:45 AM or 12:30 PM."}
-[2025-09-16T17:21:06.207Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"However, I can offer you 11:45 AM or 12:30 PM."}
-[2025-09-16T17:21:06.207Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "assistant",
-  "content": "However, I can offer you 11:45 AM or 12:30 PM."
-}
-[2025-09-16T17:21:06.207Z] === END PARSED JSON ===
-[2025-09-16T17:21:06.207Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-16T17:21:06.207Z] 💭 CONVERSATION_TEXT: However, I can offer you 11:45 AM or 12:30 PM.
-[2025-09-16T17:21:06.207Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Added AI: However, I can offer you 11:45 AM or 12:30 PM.
-📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"However, I can offer you 11:45 AM or 12:30 PM."}...
-Message string: {"type":"History","role":"assistant","content":"However, I can offer you 11:45 AM or 12:30 PM."}
-[2025-09-16T17:21:06.208Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"However, I can offer you 11:45 AM or 12:30 PM."}
-[2025-09-16T17:21:06.208Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "assistant",
-  "content": "However, I can offer you 11:45 AM or 12:30 PM."
-}
-[2025-09-16T17:21:06.208Z] === END PARSED JSON ===
-[2025-09-16T17:21:06.208Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-16T17:21:06.208Z] 📜 HISTORY: Message logged
-[2025-09-16T17:21:06.208Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Skipping duplicate AI: However, I can offer you 11:45 AM or 12:30 PM.
-[2025-09-16T17:21:06.208Z] 📝 Added transcript: [AI] However, I can offer you 11:45 AM or 12:30 PM.
-[2025-09-16T17:21:06.208Z] 🎵 Starting audio stream - feeding buffer
-[2025-09-16T17:21:06.231Z] 💓 KEEPALIVE: Sent to Deepgram
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 7003ms of silence
-[2025-09-16T17:21:06.655Z] 🔇 Audio stream ended (timeout)
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 8003ms of silence
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 9003ms of silence
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 10004ms of silence
-[2025-09-16T17:21:10.231Z] 💓 KEEPALIVE: Sent to Deepgram
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 11005ms of silence
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 12006ms of silence
-[2025-09-16T17:20:59.373Z] 🔇 SILENCE_CHECK: 13006ms of silence
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"Which time works better for you?"}...
-Message string: {"type":"ConversationText","role":"assistant","content":"Which time works better for you?"}
-[2025-09-16T17:21:12.730Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"Which time works better for you?"}
-[2025-09-16T17:21:12.730Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "assistant",
-  "content": "Which time works better for you?"
-}
-[2025-09-16T17:21:12.730Z] === END PARSED JSON ===
-[2025-09-16T17:21:12.730Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-16T17:21:12.730Z] 💭 CONVERSATION_TEXT: Which time works better for you?
-[2025-09-16T17:21:12.730Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Added AI: Which time works better for you?
-📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"Which time works better for you?"}...
-Message string: {"type":"History","role":"assistant","content":"Which time works better for you?"}
-[2025-09-16T17:21:12.748Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"Which time works better for you?"}
-[2025-09-16T17:21:12.748Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "assistant",
-  "content": "Which time works better for you?"
-}
-[2025-09-16T17:21:12.748Z] === END PARSED JSON ===
-[2025-09-16T17:21:12.748Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-16T17:21:12.748Z] 📜 HISTORY: Message logged
-[2025-09-16T17:21:12.748Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Skipping duplicate AI: Which time works better for you?
-[2025-09-16T17:21:12.748Z] 📝 Added transcript: [AI] Which time works better for you?
-[2025-09-16T17:21:12.748Z] 🎵 Starting audio stream - feeding buffer
-📨 Received Deepgram JSON message: {"type":"AgentAudioDone"}...
-Message string: {"type":"AgentAudioDone"}
-[2025-09-16T17:21:12.760Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"AgentAudioDone"}
-[2025-09-16T17:21:12.760Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "AgentAudioDone"
-}
-[2025-09-16T17:21:12.760Z] === END PARSED JSON ===
-[2025-09-16T17:21:12.760Z] 🎯 DEEPGRAM EVENT TYPE: AgentAudioDone
-[2025-09-16T17:21:12.760Z] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
-[2025-09-16T17:21:12.760Z] 🔇 SILENCE: Started tracking
-[2025-09-16T17:21:12.760Z] ✅ Agent speech ended. Pacer will now send silence until next utterance.
-[2025-09-16T17:21:12.760Z] 🔇 SILENCE_CHECK: 1001ms of silence
-[2025-09-16T17:21:14.233Z] 💓 KEEPALIVE: Sent to Deepgram
-[2025-09-16T17:21:12.760Z] 🔇 SILENCE_CHECK: 2001ms of silence
-[2025-09-16T17:21:12.760Z] 🔇 SILENCE_CHECK: 3001ms of silence
-📨 Received Deepgram JSON message: {"type":"UserStartedSpeaking"}...
-Message string: {"type":"UserStartedSpeaking"}
-[2025-09-16T17:21:15.773Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"UserStartedSpeaking"}
-[2025-09-16T17:21:15.773Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "UserStartedSpeaking"
-}
-[2025-09-16T17:21:15.773Z] === END PARSED JSON ===
-[2025-09-16T17:21:15.773Z] 🎯 DEEPGRAM EVENT TYPE: UserStartedSpeaking
-[2025-09-16T17:21:15.773Z] 🎤 USER_STARTED_SPEAKING: User began speaking
-[2025-09-16T17:21:15.773Z] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
-[2025-09-16T17:21:15.773Z] 🔄 SILENCE_RESET: User speaking, silence tracking reset
-[2025-09-16T17:21:18.233Z] 💓 KEEPALIVE: Sent to Deepgram
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"user","content":"Let's go with twelve forty five."}...
-Message string: {"type":"ConversationText","role":"user","content":"Let's go with twelve forty five."}
-[2025-09-16T17:21:18.766Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"user","content":"Let's go with twelve forty five."}
-[2025-09-16T17:21:18.766Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "user",
-  "content": "Let's go with twelve forty five."
-}
-[2025-09-16T17:21:18.766Z] === END PARSED JSON ===
-[2025-09-16T17:21:18.766Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-16T17:21:18.766Z] 💭 CONVERSATION_TEXT: Let's go with twelve forty five.
-[2025-09-16T17:21:18.766Z] 🔍 ConversationText role: 'user' -> Speaker: 'User'
-📝 TRANSCRIPT: Added User: Let's go with twelve forty five.
-📨 Received Deepgram JSON message: {"type":"History","role":"user","content":"Let's go with twelve forty five."}...
-Message string: {"type":"History","role":"user","content":"Let's go with twelve forty five."}
-[2025-09-16T17:21:18.774Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"user","content":"Let's go with twelve forty five."}
-[2025-09-16T17:21:18.774Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "user",
-  "content": "Let's go with twelve forty five."
-}
-[2025-09-16T17:21:18.774Z] === END PARSED JSON ===
-[2025-09-16T17:21:18.774Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-16T17:21:18.774Z] 📜 HISTORY: Message logged
-[2025-09-16T17:21:18.774Z] 🔍 History role: 'user' -> Speaker: 'User'
-📝 TRANSCRIPT: Skipping duplicate User: Let's go with twelve forty five.
-[2025-09-16T17:21:18.774Z] 📝 Added transcript: [User] Let's go with twelve forty five.
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"12:45 PM isn't available, but 12:30 PM is."}...
-Message string: {"type":"ConversationText","role":"assistant","content":"12:45 PM isn't available, but 12:30 PM is."}
-[2025-09-16T17:21:19.686Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"12:45 PM isn't available, but 12:30 PM is."}
-[2025-09-16T17:21:19.686Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "assistant",
-  "content": "12:45 PM isn't available, but 12:30 PM is."
-}
-[2025-09-16T17:21:19.686Z] === END PARSED JSON ===
-[2025-09-16T17:21:19.686Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-16T17:21:19.686Z] 💭 CONVERSATION_TEXT: 12:45 PM isn't available, but 12:30 PM is.
-[2025-09-16T17:21:19.686Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Added AI: 12:45 PM isn't available, but 12:30 PM is.
-📨 Received Deepgram JSON message: {"type":"History","role":"assistant","content":"12:45 PM isn't available, but 12:30 PM is."}...
-Message string: {"type":"History","role":"assistant","content":"12:45 PM isn't available, but 12:30 PM is."}
-[2025-09-16T17:21:19.686Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"History","role":"assistant","content":"12:45 PM isn't available, but 12:30 PM is."}
-[2025-09-16T17:21:19.686Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "History",
-  "role": "assistant",
-  "content": "12:45 PM isn't available, but 12:30 PM is."
-}
-[2025-09-16T17:21:19.686Z] === END PARSED JSON ===
-[2025-09-16T17:21:19.686Z] 🎯 DEEPGRAM EVENT TYPE: History
-[2025-09-16T17:21:19.686Z] 📜 HISTORY: Message logged
-[2025-09-16T17:21:19.686Z] 🔍 History role: 'assistant' -> Speaker: 'AI'
-📝 TRANSCRIPT: Skipping duplicate AI: 12:45 PM isn't available, but 12:30 PM is.
-[2025-09-16T17:21:19.686Z] 📝 Added transcript: [AI] 12:45 PM isn't available, but 12:30 PM is.
-[2025-09-16T17:21:19.686Z] 🎵 Starting audio stream - feeding buffer
-[2025-09-16T17:21:21.615Z] 🔇 Audio stream ended (timeout)
-[2025-09-16T17:21:22.233Z] 💓 KEEPALIVE: Sent to Deepgram
-📨 Received Deepgram JSON message: {"type":"ConversationText","role":"assistant","content":"Would you like me to book your beard trim for 12:30 PM on Thursday, the 18th?"}...
-Message string: {"type":"ConversationText","role":"assistant","content":"Would you like me to book your beard trim for 12:30 PM on Thursday, the 18th?"}
-[2025-09-16T17:21:24.448Z] 📨 JSON MESSAGE FROM DEEPGRAM: {"type":"ConversationText","role":"assistant","content":"Would you like me to book your beard trim for 12:30 PM on Thursday, the 18th?"}
-[2025-09-16T17:21:24.448Z] === PARSED DEEPGRAM JSON ===
-{
-  "type": "ConversationText",
-  "role": "assistant",
-  "content": "Would you like me to book your beard trim for 12:30 PM on Thursday, the 18th?"
-}
-[2025-09-16T17:21:24.448Z] === END PARSED JSON ===
-[2025-09-16T17:21:24.448Z] 🎯 DEEPGRAM EVENT TYPE: ConversationText
-[2025-09-16T17:21:24.448Z] 💭 CONVERSATION_TEXT: Would you like me to book your beard trim for 12:30 PM on Thursday, the 18th?
-[2025-09-16T17:21:24.448Z] 🔍 ConversationText role: 'assistant' -> Speaker: 'AI'
+📨 Message string: {"type":"History","function_calls":[{"id":"call_HApqMpP8ahVbVPZWgGmmEk3B","name":"get_available_slots","client_side":true,"arguments":"{\"date\":\"2025-09-23\",\"service_id\":\"89f199c8-c4ee-4f42-91a7-1f8bd70cff4a\"}","response":"{\"available_slots\":[\"09:00\",\"09:15\",\"09:30\",\"10:30\",\"11:15\",\"11:30\",\"11:45\",\"12:00\",\"12:15\",\"12:30\",\"12:45\",\"13:00\",\"13:15\",\"13:30\",\"14:30\",\"14:45\",\"15:00\",\"15:15\",\"15:30\",\"15:45\",\"16:00\",\"16:15\",\"16:30\"],\"available_slots_12hour\":[\"9:00 AM\",\"9:15 AM\",\"9:30 AM\",\"10:30 AM\",\"11:15 AM\",\"11:30 AM\",\"11:45 AM\",\"12:00 PM\",\"12:15 PM\",\"12:30 PM\",\"12:45 PM\",\"1:00 PM\",\"1:15 PM\",\"1:30 PM\",\"2:30 PM\",\"2:45 PM\",\"3:00 PM\",\"3:15 PM\",\"3:30 PM\",\"3:45 PM\",\"4:00 PM\",\"4:15 PM\",\"4:30 PM\"],\"conversion_map\":{\"9:00 AM\":\"09:00\",\"9:15 AM\":\"09:15\",\"9:30 AM\":\"09:30\",\"10:30 AM\":\"10:30\",\"11:15 AM\":\"11:15\",\"11:30 AM\":\"11:30\",\"11:45 AM\":\"11:45\",\"12:00 PM\":\"12:00\",\"12:15 PM\":\"12:15\",\"12:30 PM\":\"12:30\",\"12:45 PM\":\"12:45\",\"1:00 PM\":\"13:00\",\"1:15 PM\":\"13:15\",\"1:30 PM\":\"13:30\",\"2:30 PM\":\"14:30\",\"2:45 PM\":\"14:45\",\"3:00 PM\":\"15:00\",\"3:15 PM\":\"15:15\",\"3:30 PM\":\"15:30\",\"3:45 PM\":\"15:45\",\"4:00 PM\":\"16:00\",\"4:15 PM\":\"16:15\",\"4:30 PM\":\"16:30\"}}"}]}
+[11:15:07] 🎯 DEEPGRAM: History
+[11:15:07] 📜 HISTORY: Message logged
+[11:15:05] ✅ COMPLETED: handleFunctionCall for get_available_slots with ID call_HApqMpP8ahVbVPZWgGmmEk3B (took 2260ms)
+[11:15:08] ▶️ KEEPALIVE: Resumed after function processing
+[11:15:05] ▶️ SILENCE: Resuming timer - Function processing completed
+📨 Message string: {"type":"ConversationText","role":"assistant","content":"For Tuesday, the 23rd, I see these available slots for your haircut: 9 AM, 9:15 AM, 9:30 AM, 10:30 AM, and several times later in the day."}
+[11:15:08] 🎯 DEEPGRAM: ConversationText
+[11:15:08] 💭 CONVERSATION_TEXT: For Tuesday, the 23rd, I see these available slots for your haircut: 9 AM, 9:15 AM, 9:30 AM, 10:30 AM, and several times later in the day.
+📨 Message string: {"type":"History","role":"assistant","content":"For Tuesday, the 23rd, I see these available slots for your haircut: 9 AM, 9:15 AM, 9:30 AM, 10:30 AM, and several times later in the day."}
+[11:15:08] 🎯 DEEPGRAM: History
+[11:15:08] 📜 HISTORY: Message logged
+[11:15:08] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: For Tuesday, the 23rd, I see these available slots for your haircut: 9 AM, 9:15 AM, 9:30 AM, 10:30 AM, and several times later in the day.
+[11:15:08] 🎵 Starting audio stream - feeding buffer
+[11:15:10] 💓 KEEPALIVE: Sent to Deepgram
+[11:15:14] 💓 KEEPALIVE: Sent to Deepgram
+[11:15:14] 🔇 Audio stream ended (timeout)
+📨 Message string: {"type":"UserStartedSpeaking"}
+[11:15:16] 🎯 DEEPGRAM: UserStartedSpeaking
+[11:15:16] 🎤 USER_STARTED_SPEAKING: User began speaking
+[11:15:16] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
+[11:15:16] 🔄 BARGE_IN: Cleared local audio buffer and stopped streaming
+[11:15:16] 🔄 SILENCE_RESET: User speaking, silence tracking reset
+📨 Message string: {"type":"AgentAudioDone"}
+[11:15:16] 🎯 DEEPGRAM: AgentAudioDone
+[11:15:16] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
+[11:15:16] 🔇 SILENCE: Started tracking
+[11:15:16] ✅ Agent speech ended. Pacer will now send silence until next utterance.
+[11:15:16] 🔇 SILENCE_CHECK: 1000ms of silence
+[11:15:18] 💓 KEEPALIVE: Sent to Deepgram
+[11:15:16] 🔇 SILENCE_CHECK: 2001ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 3002ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 4002ms of silence
+📨 Message string: {"type":"ConversationText","role":"user","content":"I just said the ten. Can you move it to ten? So from Wednesday at ten to Tuesday at ten."}
+[11:15:21] 🎯 DEEPGRAM: ConversationText
+[11:15:21] 💭 CONVERSATION_TEXT: I just said the ten. Can you move it to ten? So from Wednesday at ten to Tuesday at ten.
+📨 Message string: {"type":"History","role":"user","content":"I just said the ten. Can you move it to ten? So from Wednesday at ten to Tuesday at ten."}
+[11:15:21] 🎯 DEEPGRAM: History
+[11:15:21] 📜 HISTORY: Message logged
+[11:15:21] 🔍 History role: 'user' -> Speaker: 'User'
+📝 TRANSCRIPT: Added User: I just said the ten. Can you move it to ten? So from Wednesday at ten to Tuesday at ten.
+[11:15:16] 🔇 SILENCE_CHECK: 5002ms of silence
+[11:15:22] 💓 KEEPALIVE: Sent to Deepgram
+📨 Message string: {"type":"ConversationText","role":"assistant","content":"10 AM on Tuesday is not available, but I see 9:45 AM or 10:30 AM are open."}
+[11:15:22] 🎯 DEEPGRAM: ConversationText
+[11:15:22] 💭 CONVERSATION_TEXT: 10 AM on Tuesday is not available, but I see 9:45 AM or 10:30 AM are open.
+📨 Message string: {"type":"History","role":"assistant","content":"10 AM on Tuesday is not available, but I see 9:45 AM or 10:30 AM are open."}
+[11:15:22] 🎯 DEEPGRAM: History
+[11:15:22] 📜 HISTORY: Message logged
+[11:15:22] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: 10 AM on Tuesday is not available, but I see 9:45 AM or 10:30 AM are open.
+[11:15:22] 🎵 Starting audio stream - feeding buffer
+[11:15:16] 🔇 SILENCE_CHECK: 6002ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 7002ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 8002ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 9002ms of silence
+[11:15:25] 🔇 Audio stream ended (timeout)
+[11:15:26] 💓 KEEPALIVE: Sent to Deepgram
+[11:15:16] 🔇 SILENCE_CHECK: 10003ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 11003ms of silence
+[11:15:16] 🔇 SILENCE_CHECK: 12003ms of silence
+📨 Message string: {"type":"ConversationText","role":"assistant","content":"Would you like one of those times for your haircut instead?"}
+[11:15:29] 🎯 DEEPGRAM: ConversationText
+[11:15:29] 💭 CONVERSATION_TEXT: Would you like one of those times for your haircut instead?
+📨 Message string: {"type":"History","role":"assistant","content":"Would you like one of those times for your haircut instead?"}
+[11:15:29] 🎯 DEEPGRAM: History
+[11:15:29] 📜 HISTORY: Message logged
+[11:15:29] 🔍 History role: 'assistant' -> Speaker: 'AI'
+📝 TRANSCRIPT: Added AI: Would you like one of those times for your haircut instead?
+[11:15:29] 🎵 Starting audio stream - feeding buffer
+📨 Message string: {"type":"AgentAudioDone"}
+[11:15:29] 🎯 DEEPGRAM: AgentAudioDone
+[11:15:29] 🔇 AGENT_AUDIO_DONE: AI finished sending audio
+[11:15:29] 🔇 SILENCE: Started tracking
+[11:15:29] ✅ Agent speech ended. Pacer will now send silence until next utterance.
+[11:15:30] 💓 KEEPALIVE: Sent to Deepgram
+[11:15:29] 🔇 SILENCE_CHECK: 1000ms of silence
+📨 Message string: {"type":"UserStartedSpeaking"}
+[11:15:30] 🎯 DEEPGRAM: UserStartedSpeaking
+[11:15:30] 🎤 USER_STARTED_SPEAKING: User began speaking
+[11:15:30] 🔄 BARGE_IN: Cleared Twilio audio queue for user speech
+[11:15:30] 🔄 BARGE_IN: Cleared local audio buffer and stopped streaming
+[11:15:30] 🔄 SILENCE_RESET: User speaking, silence tracking reset
+[11:15:34] 💓 KEEPALIVE: Sent to Deepgram
+📨 Message string: {"type":"ConversationText","role":"user","content":"Nine forty five. Can you book my haircut on nine forty five on Tuesday?"}
+[11:15:36] 🎯 DEEPGRAM: ConversationText
+[11:15:36] 💭 CONVERSATION_TEXT: Nine forty five. Can you book my haircut on nine forty five on Tuesday?
+📨 Message string: {"type":"History","role":"user","content":"Nine forty five. Can you book my haircut on nine forty five on Tuesday?"}
+[11:15:36] 🎯 DEEPGRAM: History
+[11:15:36] 📜 HISTORY: Message logged
+[11:15:36] 🔍 History role: 'user' -> Speaker: 'User'
+📝 TRANSCRIPT: Added User: Nine forty five. Can you book my haircut on nine forty five on Tuesday?
+📨 Message string: {"type":"FunctionCallRequest","functions":[{"id":"call_YJjd21tkR4RsaqDrpOb2L9Dk","name":"update_booking","arguments":"{\"booking_reference\":\"BK861431X7\",\"new_date\":\"2025-09-23\",\"new_time\":\"09:45\"}","client_side":true}]}
+[11:15:37] 🎯 DEEPGRAM: FunctionCallRequest
+[11:15:37] 🚨🚨 FUNCTION_CALL_REQUEST DETECTED! 🚨🚨
+[11:15:37] ✅ SUCCESS: AI requesting function calls!
+[11:15:37] 🕐 TIMING: Function call request received at 11:15:37
+[11:15:37] 📊 FUNCTION COUNT: 1 functions in request
+[11:15:37] 📋 Functions: [
+  {
+    "id": "call_YJjd21tkR4RsaqDrpOb2L9Dk",
+    "name": "update_booking",
+    "arguments": "{\"booking_reference\":\"BK861431X7\",\"new_date\":\"2025-09-23\",\"new_time\":\"09:45\"}",
+    "client_side": true
+  }
+]
+[11:15:37] 🔍 FUNCTION 1:
+[11:15:37]   - Name: update_booking
+[11:15:37]   - ID: call_YJjd21tkR4RsaqDrpOb2L9Dk
+[11:15:37]   - Arguments: {"booking_reference":"BK861431X7","new_date":"2025-09-23","new_time":"09:45"}
+[11:15:37] ⏸️ SILENCE: Pausing timer - Processing function calls
+[11:15:37] ⏸️ KEEPALIVE: Paused for function processing
+[11:15:37] 🔧 Processing function: update_booking
+[11:15:37] 🆔 Function ID: call_YJjd21tkR4RsaqDrpOb2L9Dk
+[11:15:37] 📝 Function arguments: {"booking_reference":"BK861431X7","new_date":"2025-09-23","new_time":"09:45"}
+[11:15:37] 📦 Created function call data: {
+  "function_name": "update_booking",
+  "function_call_id": "call_YJjd21tkR4RsaqDrpOb2L9Dk",
+  "parameters": {
