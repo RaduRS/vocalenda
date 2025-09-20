@@ -147,7 +147,7 @@ export function RoadmapSection() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <SignUpButton>
                   <button className="bg-blue-600 text-white hover:bg-blue-700 font-medium px-6 py-3 rounded-lg transition-colors cursor-pointer">
-                    Join Early Access
+                    Sign Up
                   </button>
                 </SignUpButton>
                 <button 

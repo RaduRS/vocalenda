@@ -58,4 +58,4 @@ Vocalenda is an automated voice booking platform that transforms how businesses 
 - Dashboard Data: /api/dashboard
 - Voice Webhooks: /api/voice/*
 
-Last Updated: January 2025
+Last Updated: September 2025

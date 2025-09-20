@@ -13,45 +13,45 @@ interface FAQItem {
 const faqItems: FAQItem[] = [
   {
     id: "setup-time",
-    question: "How quickly can I get Vocalenda set up for my business?",
+    question: "How long does it take to set up an AI receptionist?",
     answer:
-      "Most businesses are up and running within 24-48 hours. Our setup process includes account configuration and Google Calendar integration. I'll personally help you if needed to ensure everything works perfectly for your specific needs.",
+      "You can get your AI receptionist up and running within 24-48 hours. The setup process includes configuring your 24/7 call answering rules and integrating your calendar. We provide full support to ensure everything works perfectly for your specific business needs.",
   },
   {
     id: "complex-requests",
-    question: "What happens if the AI can't handle a complex request?",
+    question: "What if a caller has a question the AI can't answer?",
     answer:
-      "Our AI is designed to handle 95%+ of booking scenarios, but when it encounters something complex, it gracefully transfers the call to your team or takes a detailed message. You'll receive immediate notifications and can customize escalation rules based on your preferences.",
+      "Our AI receptionist is trained to handle most common customer inquiries and booking requests. If it encounters a complex or unexpected question, it can gracefully transfer the call to a human or take a detailed message. You'll receive instant alerts, and you can customize how your AI phone answering service escalates these calls.",
   },
   {
     id: "data-security",
-    question: "Is my customer data secure and private?",
+    question: "Is using an AI phone answering service secure?",
     answer:
-      "Absolutely. We use enterprise-grade encryption for all data. Customer information is never shared, and all conversations are processed securely. All data is stored in compliance with GDPR requirements.",
+      "Absolutely. We use enterprise-grade encryption to secure all data. As a UK-based service, our platform is fully GDPR compliant, ensuring your customer data is always handled privately and securely.",
   },
   {
     id: "integrations",
-    question: "Can Vocalenda integrate with my existing calendar system?",
+    question: "Can this AI receptionist integrate with my calendar?",
     answer:
-      "Yes! We currently integrate with Google Calendar for real-time availability checking and automatic appointment booking. The integration is plug-and-play with no technical expertise required.",
+      "Yes. Our AI receptionist integrates directly with Google Calendar for real-time availability checks and automated appointment scheduling. This ensures your voice appointment scheduler never double-books and always has your latest availability.",
   },
   {
     id: "business-types",
-    question: "What types of businesses benefit most from AI voice booking?",
+    question: "Which businesses benefit from a 24/7 call answering service?",
     answer:
-      "Currently focusing on barbershops, hair salons, nail salons, spas & wellness centers, and massage therapists. More business types will be added in the future. Particularly effective for businesses that receive high call volumes or want to capture bookings outside business hours.",
+      "Any business that relies on appointments can benefit from an automated receptionist. We specialize in services for barbershops, hair and nail salons, spas, and wellness centers, but our platform is effective for any business looking to capture bookings 24/7, especially outside of standard business hours.",
   },
   {
     id: "pricing",
-    question: "How much does Vocalenda cost and what's included?",
+    question: "How much does an AI receptionist cost in the UK?",
     answer:
-      "£139/month includes everything: 500 minutes of AI calls + unlimited SMS confirmations + dedicated phone number. No hidden fees, no surprises. Plus a £399 setup fee for initial configuration and phone number setup. You can optionally redirect your existing business calls to the new AI number.",
+      "Our complete AI receptionist service is £139/month. This includes 500 minutes of AI call handling, unlimited SMS confirmations, and a dedicated UK phone number. There is a one-time £399 setup fee for configuration and number porting or setup. No hidden fees.",
   },
   {
     id: "customization",
-    question: "Can I customize how the AI speaks and what it says?",
+    question: "Can I customize my virtual receptionist's voice and script?",
     answer:
-      "Yes! You can customize the AI's personality, tone, speaking style, and specific responses. Set business rules and the AI learns your preferences to maintain consistency with your brand voice. Voice options are coming soon.",
+      "Yes. You can customize your virtual receptionist's script, tone, and responses to perfectly match your brand's voice. We are also adding a selection of different voice styles to choose from, giving you full control over your customer's call experience.",
   },
 ];
 

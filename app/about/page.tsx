@@ -49,7 +49,7 @@ export default function AboutPage() {
                 and provide excellent customer service. The goal was simple: help businesses never miss an opportunity while reducing their workload.
               </p>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Today, Vocalenda serves businesses across the UK and beyond, from small local salons to growing wellness centers. 
+                Vocalenda is launching soon to serve businesses across the UK and beyond, from small local salons to growing wellness centers. 
                 Every feature we build is designed with real business needs in mind, because I believe technology should work for you, not the other way around.
               </p>
             </div>
@@ -120,8 +120,8 @@ export default function AboutPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3">
-                <Link href="/setup">
-                  Get Started Today
+                <Link href="/sign-up">
+                  Sign Up
                 </Link>
               </Button>
               <Button asChild variant="outline" className="px-8 py-3">

@@ -51,7 +51,7 @@ export default function Home() {
       name: "Vocalenda",
       alternateName: "Vocalenda Voice Booking",
       description:
-        "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+        "AI receptionist and 24/7 call answering service for UK businesses. Multi-tenant voice booking platform with virtual receptionist that never misses a call. Dedicated phone numbers and isolated data for each business.",
       url: "https://vocalenda.com",
       logo: {
         "@type": "ImageObject",
@@ -72,7 +72,7 @@ export default function Home() {
       "@type": "SoftwareApplication",
       name: "Vocalenda",
       description:
-        "Transform your business with automated voice booking. Your customers call, we handle everything - from checking availability to confirming appointments. Never miss a booking again.",
+        "AI receptionist service that transforms your business with 24/7 call answering and voice appointment scheduling. Your customers call, our virtual receptionist handles everything - from answering questions to booking appointments. Never miss a call or booking again.",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       offers: {
@@ -81,7 +81,9 @@ export default function Home() {
         priceCurrency: "GBP",
       },
       featureList: [
-        "24/7 AI voice booking",
+        "24/7 AI receptionist service",
+        "Virtual receptionist call answering",
+        "Voice appointment scheduling",
         "Real-time calendar integration",
         "Automatic SMS confirmations",
         "Natural conversation AI",
@@ -127,13 +129,13 @@ export default function Home() {
             <div className="w-full max-w-4xl mx-auto text-center lg:text-left lg:max-w-2xl lg:mx-0">
               {/* Main Headline */}
               <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-12">
-                {/* The Hook: Your new, powerful H1 - Optimized for LCP */}
+                {/* The Hook: Your new, powerful H1 - Optimized for LCP and SEO */}
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-white leading-tight">
-                  Stop losing customers to your voicemail
+                  AI Receptionist That Never Misses a Call
                 </h1>
                 {/* The Solution: Your new, clear H2 */}
                 <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-slate-200 leading-relaxed">
-                  Our AI agent books them for you
+                  24/7 call answering and voice appointment scheduling for UK businesses
                 </h2>
               </div>
 
@@ -185,11 +187,11 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-slate-900">
-                Everything You Need to Automate Bookings
+                Complete AI Phone Answering Service for Your Business
               </h2>
               <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                Our comprehensive platform handles every aspect of appointment
-                scheduling, from initial contact to confirmation.
+                Our virtual receptionist handles every call professionally - from answering questions to booking appointments, 
+                ensuring you never miss a business opportunity.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
@@ -198,12 +200,11 @@ export default function Home() {
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Phone className="h-6 w-6 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Voice AI</CardTitle>
+                  <CardTitle className="text-lg">AI Receptionist</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Natural conversations that feel human. Your customers book
-                    appointments as easily as talking to your staff.
+                    Professional virtual receptionist that answers calls 24/7, handles inquiries, and books appointments with natural conversation flow.
                   </CardDescription>
                 </CardContent>
               </Card>

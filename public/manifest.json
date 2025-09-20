@@ -1,7 +1,7 @@
 {
   "name": "Vocalenda - Multi-Tenant Voice Booking Automation",
   "short_name": "Vocalenda",
-  "description": "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+  "description": "AI receptionist and 24/7 call answering service for UK businesses. Professional virtual receptionist that never misses a call. Multi-tenant voice booking platform with dedicated phone numbers.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

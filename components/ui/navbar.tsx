@@ -78,7 +78,24 @@ export default function Navbar() {
 
         <div className="flex items-center space-x-3">
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Blog Link */}
+            <Link href="/blog">
+              <motion.div
+                style={{ color: textColor }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="transition-colors duration-300 hover:bg-white/10 cursor-pointer"
+                >
+                  Blog
+                </Button>
+              </motion.div>
+            </Link>
+            
             <SignedOut>
               <SignInButton>
                 <motion.div
@@ -141,7 +158,19 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Blog Link for Mobile */}
+            <Link href="/blog">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-3 py-1 text-sm rounded-md cursor-pointer"
+                style={{ color: textColor }}
+              >
+                Blog
+              </motion.button>
+            </Link>
+            
             <SignedOut>
               <SignInButton>
                 <motion.button

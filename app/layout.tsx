@@ -28,11 +28,11 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Vocalenda - Multi-Tenant Voice Booking Automation",
+  title: "AI Receptionist & 24/7 Call Answering Service UK | Vocalenda",
   description:
-    "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+    "Professional AI receptionist service for UK businesses. 24/7 call answering, voice appointment scheduling, and virtual receptionist that never misses a call. Multi-tenant platform with dedicated phone numbers.",
   keywords:
-    "multi-tenant voice booking, voice booking automation, appointment automation, AI phone calls, business automation, calendar booking, voice AI, appointment scheduling, 24/7 booking, automated receptionist, multi-tenant platform",
+    "AI receptionist, 24/7 call answering, virtual receptionist, AI phone answering service, voice appointment scheduler, AI receptionist UK, automated receptionist, business phone AI, AI call handler, frontdesk AI, multi-tenant voice booking, voice booking automation, appointment automation, AI phone calls, business automation, calendar booking, voice AI, appointment scheduling",
   authors: [{ name: "Vocalenda" }],
   creator: "Vocalenda",
   publisher: "Vocalenda",
@@ -74,9 +74,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://vocalenda.com",
-    title: "Vocalenda - Multi-Tenant Voice Booking Automation",
+    title: "AI Receptionist & 24/7 Call Answering Service UK | Vocalenda",
     description:
-      "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+      "Professional AI receptionist service for UK businesses. 24/7 call answering, voice appointment scheduling, and virtual receptionist that never misses a call. Multi-tenant platform with dedicated phone numbers.",
     siteName: "Vocalenda",
     images: [
       {
@@ -99,9 +99,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@vocalenda_app",
     creator: "@vocalenda_app",
-    title: "Vocalenda - Multi-Tenant Voice Booking Automation",
+    title: "AI Receptionist & 24/7 Call Answering Service UK | Vocalenda",
     description:
-      "Multi-tenant voice booking platform that helps businesses automate appointments and free up valuable time. Dedicated phone numbers and isolated data for each business.",
+      "Professional AI receptionist service for UK businesses. 24/7 call answering, voice appointment scheduling, and virtual receptionist that never misses a call. Multi-tenant platform with dedicated phone numbers.",
     images: ["https://vocalenda.com/vocalenda-logo.jpg"],
   },
   other: {
