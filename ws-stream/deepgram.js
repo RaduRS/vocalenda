@@ -14,9 +14,10 @@ import { ConnectionState } from "./managers/ConnectionState.js";
  * @returns {Promise<string>} - Greeting with variables replaced
  */
 async function replaceGreetingVariables(greeting, businessConfig, callerPhone) {
-  if (!greeting) return greeting;
+  if (!greeting) return { greeting, customerName: null };
   
   let processedGreeting = greeting;
+  let customerName = null;
   
   // Replace business name
   const businessName = businessConfig?.business?.name || "our business";
@@ -25,30 +26,29 @@ async function replaceGreetingVariables(greeting, businessConfig, callerPhone) {
   // Replace customer name if caller phone is available
   if (callerPhone && processedGreeting.includes("{customer_name}")) {
     try {
-      // Look up customer by phone number
-      const { data: existingBookings } = await supabase
-        .from("bookings")
-        .select("customer_name")
-        .eq("customer_phone", callerPhone)
+      // Look up customer by phone number in customer table
+      const { data: existingCustomers } = await supabase
+        .from("customers")
+        .select("first_name, last_name")
+        .eq("phone", callerPhone)
         .eq("business_id", businessConfig?.business?.id)
-        .not("customer_name", "is", null)
+        .not("first_name", "is", null)
         .order("created_at", { ascending: false })
         .limit(1);
       
-      if (existingBookings && existingBookings.length > 0) {
-        const customerName = existingBookings[0].customer_name;
+      if (existingCustomers && existingCustomers.length > 0) {
+        const customer = existingCustomers[0];
+        customerName = customer.first_name + (customer.last_name ? ` ${customer.last_name}` : '');
         processedGreeting = processedGreeting.replace(/{customer_name}/g, customerName);
-        console.log(`🎯 Personalized greeting for known customer: ${customerName}`);
       } else {
         // If no customer found, remove the {customer_name} variable
         processedGreeting = processedGreeting.replace(/{customer_name}/g, "");
         // Clean up any extra spaces or punctuation that might result
         processedGreeting = processedGreeting.replace(/Hi\s*!/g, "Hi!");
         processedGreeting = processedGreeting.replace(/\s+/g, " ").trim();
-        console.log(`🔍 No existing customer found for phone: ${callerPhone}`);
       }
     } catch (error) {
-      console.error("❌ Error looking up customer for greeting:", error);
+      console.error("Error looking up customer for greeting:", error);
       // Fallback: remove the variable
       processedGreeting = processedGreeting.replace(/{customer_name}/g, "");
       processedGreeting = processedGreeting.replace(/Hi\s*!/g, "Hi!");
@@ -56,8 +56,7 @@ async function replaceGreetingVariables(greeting, businessConfig, callerPhone) {
     }
   }
   
-  console.log(`🔧 Final processed greeting: "${processedGreeting}"`);
-  return processedGreeting;
+  return { greeting: processedGreeting, customerName };
 }
 
 // Get configuration
@@ -148,8 +147,23 @@ export async function initializeDeepgram(businessConfig, callContext) {
             `[${timestamp}] ✅ WELCOME: Received - sending agent configuration...`
           );
 
-          // Generate system prompt
-          const systemPrompt = generateSystemPrompt(businessConfig);
+          // First, extract customer name from greeting to include in system prompt
+          const greetingSource = businessConfig.business?.ai_greeting ||
+            "Thank you for calling, how can I help you today?";
+          
+          const { greeting, customerName } = await replaceGreetingVariables(
+            greetingSource,
+            businessConfig,
+            callContext.callerPhone
+          );
+          
+          // Store customer name in call context
+          if (customerName) {
+            callContext.customerName = customerName;
+          }
+
+          // Generate system prompt with customer context
+          const systemPrompt = generateSystemPrompt(businessConfig, callContext);
 
           console.log(
             `[${timestamp}] 📝 PROMPT: Generated length:`,
@@ -219,12 +233,7 @@ export async function initializeDeepgram(businessConfig, callContext) {
                   model: businessConfig.config?.ai_voice || "aura-2-thalia-en",
                 },
               },
-              greeting: await replaceGreetingVariables(
-              businessConfig.business?.ai_greeting ||
-                "Thank you for calling, how can I help you today?",
-              businessConfig,
-              callContext.callerPhone
-            ),
+              greeting: greeting,
             },
           };
 
