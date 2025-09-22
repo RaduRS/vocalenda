@@ -89,7 +89,7 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="transition-colors duration-300 hover:bg-white/10 cursor-pointer"
+                  className="transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100 cursor-pointer rounded-lg"
                 >
                   Blog
                 </Button>
@@ -100,11 +100,13 @@ export default function Navbar() {
               <SignInButton>
                 <motion.div
                   style={{ color: textColor }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="transition-colors duration-300 hover:bg-white/10 cursor-pointer"
+                    className="transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100 cursor-pointer rounded-lg"
                   >
                     Sign In
                   </Button>
@@ -128,11 +130,13 @@ export default function Navbar() {
               <Link href="/dashboard">
                 <motion.div
                   style={{ color: textColor }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="transition-colors duration-300 hover:bg-white/10 cursor-pointer"
+                    className="transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100 cursor-pointer rounded-lg"
                   >
                     Dashboard
                   </Button>
@@ -164,7 +168,7 @@ export default function Navbar() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-3 py-1 text-sm rounded-md cursor-pointer"
+                className="px-3 py-1 text-sm rounded-lg cursor-pointer transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 style={{ color: textColor }}
               >
                 Blog
@@ -176,7 +180,7 @@ export default function Navbar() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-md cursor-pointer"
+                  className="p-2 rounded-lg cursor-pointer transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                   style={{ color: textColor }}
                 >
                   <User className="h-6 w-6" />
@@ -189,7 +193,7 @@ export default function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-3 py-1 text-sm rounded-md cursor-pointer"
+                    className="px-3 py-1 text-sm rounded-lg cursor-pointer transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                     style={{ color: textColor }}
                   >
                     Dashboard

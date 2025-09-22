@@ -88,10 +88,10 @@ export default function SetupWizard() {
     const checkBusinessStatus = async () => {
       if (user) {
         try {
-          const response = await fetch('/api/dashboard');
+          const response = await fetch('/api/business/status');
           if (response.ok) {
             const data = await response.json();
-            if (data.business) {
+            if (data.hasBusiness) {
               router.push('/dashboard');
               return;
             }
@@ -687,15 +687,20 @@ export default function SetupWizard() {
                             <Label htmlFor={`service-price-${index}`}>Price (£)</Label>
                             <Input
                               id={`service-price-${index}`}
-                              type="number"
-                              step="0.01"
+                              type="text"
+                              inputMode="decimal"
                               value={service.price}
                               onChange={(e) => {
-                                const services = [...(businessData.services || [])];
-                                services[index] = { ...service, price: parseFloat(e.target.value) || 0 };
-                                handleInputChange('services', services);
+                                const value = e.target.value;
+                                // Only allow numbers and decimal point
+                                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                  const services = [...(businessData.services || [])];
+                                  services[index] = { ...service, price: parseFloat(value) || 0 };
+                                  handleInputChange('services', services);
+                                }
                               }}
                               className="mt-1"
+                              placeholder="0.00"
                             />
                           </div>
                           <Button

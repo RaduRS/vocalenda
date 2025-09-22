@@ -67,11 +67,25 @@ function Dashboard() {
 
   // Handle redirect to setup if no business found
   useEffect(() => {
-    if (data && !data.business && !hasRedirected) {
-      setHasRedirected(true);
-      router.push("/setup");
-    }
-  }, [data, router, hasRedirected]);
+    const checkBusinessStatus = async () => {
+      if (user && !hasRedirected) {
+        try {
+          const response = await fetch('/api/business/status');
+          if (response.ok) {
+            const statusData = await response.json();
+            if (!statusData.hasBusiness) {
+              setHasRedirected(true);
+              router.push("/setup");
+            }
+          }
+        } catch (error) {
+          console.error('Failed to check business status:', error);
+        }
+      }
+    };
+
+    checkBusinessStatus();
+  }, [user, router, hasRedirected]);
 
   // Memoize stats cards to prevent unnecessary re-renders
   const statsCards = useMemo(

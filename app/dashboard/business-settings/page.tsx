@@ -705,16 +705,20 @@ export default function BusinessSettings() {
                             £
                           </span>
                           <Input
-                            type="number"
-                            step="0.01"
+                            type="text"
+                            inputMode="decimal"
                             value={service.price}
-                            onChange={(e) =>
-                              updateService(
-                                index,
-                                "price",
-                                parseFloat(e.target.value)
-                              )
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              // Only allow numbers and decimal point
+                              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                updateService(
+                                  index,
+                                  "price",
+                                  parseFloat(value) || 0
+                                );
+                              }
+                            }}
                             placeholder="50.00"
                             className="h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500 pl-8"
                           />
