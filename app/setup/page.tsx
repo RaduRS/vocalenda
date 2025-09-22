@@ -688,20 +688,23 @@ export default function SetupWizard() {
                             <Label htmlFor={`service-price-${index}`}>Price (£) <span className="text-red-500">*</span></Label>
                             <Input
                               id={`service-price-${index}`}
-                              type="text"
+                              type="number"
                               inputMode="decimal"
-                              value={service.price}
+                              step="0.01"
+                              min="0.01"
+                              value={service.price || ''}
                               required
                               onChange={(e) => {
                                 const value = e.target.value;
-                                // Allow numbers, one dot, and max 1 decimal place (no empty for required field)
-                                if (/^\d*\.?\d{0,1}$/.test(value) && value !== '') {
-                                  const numericValue = parseFloat(value);
-                                  if (!isNaN(numericValue) && numericValue > 0) {
-                                    const services = [...(businessData.services || [])];
-                                    services[index] = { ...service, price: numericValue };
-                                    handleInputChange('services', services);
-                                  }
+                                if (value === '') {
+                                  // Allow empty for user to clear and retype
+                                  return;
+                                }
+                                const numericValue = parseFloat(value);
+                                if (!isNaN(numericValue) && numericValue > 0) {
+                                  const services = [...(businessData.services || [])];
+                                  services[index] = { ...service, price: numericValue };
+                                  handleInputChange('services', services);
                                 }
                               }}
                               className="mt-1"

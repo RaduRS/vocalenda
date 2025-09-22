@@ -197,7 +197,7 @@ function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-brand-primary-1">
-                {business.name}
+                {business?.name || 'Loading...'}
               </h1>
               <p className="text-brand-primary-2">
                 Welcome back, {user?.firstName}!

@@ -706,22 +706,25 @@ export default function BusinessSettings() {
                             £
                           </span>
                           <Input
-                            type="text"
+                            type="number"
                             inputMode="decimal"
-                            value={service.price}
+                            step="0.01"
+                            min="0.01"
+                            value={service.price || ''}
                             required
                             onChange={(e) => {
                               const value = e.target.value;
-                              // Allow numbers, one dot, and max 1 decimal place (no empty for required field)
-                              if (/^\d*\.?\d{0,1}$/.test(value) && value !== '') {
-                                const numericValue = parseFloat(value);
-                                if (!isNaN(numericValue) && numericValue > 0) {
-                                  updateService(
-                                    index,
-                                    "price",
-                                    numericValue
-                                  );
-                                }
+                              if (value === '') {
+                                // Allow empty for user to clear and retype
+                                return;
+                              }
+                              const numericValue = parseFloat(value);
+                              if (!isNaN(numericValue) && numericValue > 0) {
+                                updateService(
+                                  index,
+                                  "price",
+                                  numericValue
+                                );
                               }
                             }}
                             placeholder="50.00"
