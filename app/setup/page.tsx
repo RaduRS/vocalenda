@@ -688,26 +688,50 @@ export default function SetupWizard() {
                             <Label htmlFor={`service-price-${index}`}>Price (£) <span className="text-red-500">*</span></Label>
                             <Input
                               id={`service-price-${index}`}
-                              type="number"
+                              type="text"
                               inputMode="decimal"
-                              step="0.01"
-                              min="0.01"
-                              value={service.price || ''}
-                              required
+                              value={service.price === 0 ? '' : service.price.toString()}
                               onChange={(e) => {
                                 const value = e.target.value;
+                                const services = [...(businessData.services || [])];
+                                
+                                // Allow empty input (user can clear everything)
                                 if (value === '') {
-                                  // Allow empty for user to clear and retype
+                                  services[index] = { ...service, price: 0 };
+                                  handleInputChange('services', services);
                                   return;
                                 }
-                                const numericValue = parseFloat(value);
-                                if (!isNaN(numericValue) && numericValue > 0) {
-                                  const services = [...(businessData.services || [])];
-                                  services[index] = { ...service, price: numericValue };
+                                
+                                // Strip any non-numeric characters except decimal point
+                                const cleanedValue = value.replace(/[^0-9.]/g, '');
+                                
+                                // Prevent multiple decimal points
+                                const parts = cleanedValue.split('.');
+                                const finalValue = parts.length > 2 
+                                  ? parts[0] + '.' + parts.slice(1).join('') 
+                                  : cleanedValue;
+                                
+                                // Validate decimal format: numbers, one optional dot, max 2 decimal places
+                                if (/^\d*\.?\d{0,2}$/.test(finalValue)) {
+                                  const numericValue = parseFloat(finalValue);
+                                  services[index] = { 
+                                    ...service, 
+                                    price: !isNaN(numericValue) ? numericValue : 0
+                                  };
                                   handleInputChange('services', services);
                                 }
                               }}
-                              className="mt-1"
+                              onBlur={(e) => {
+                                const value = e.target.value;
+                                const services = [...(businessData.services || [])];
+                                
+                                // On blur, if empty or just a dot, set to 0
+                                if (value === '' || value === '.') {
+                                  services[index] = { ...service, price: 0 };
+                                  handleInputChange('services', services);
+                                }
+                              }}
+                              className="mt-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="0.00"
                             />
                           </div>

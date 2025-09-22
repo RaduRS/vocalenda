@@ -706,29 +706,47 @@ export default function BusinessSettings() {
                             £
                           </span>
                           <Input
-                            type="number"
+                            type="text"
                             inputMode="decimal"
-                            step="0.01"
-                            min="0.01"
-                            value={service.price || ''}
-                            required
+                            value={service.price === 0 ? '' : service.price.toString()}
                             onChange={(e) => {
                               const value = e.target.value;
+                              
+                              // Allow empty input (user can clear everything)
                               if (value === '') {
-                                // Allow empty for user to clear and retype
+                                updateService(index, "price", 0);
                                 return;
                               }
-                              const numericValue = parseFloat(value);
-                              if (!isNaN(numericValue) && numericValue > 0) {
+                              
+                              // Strip any non-numeric characters except decimal point
+                              const cleanedValue = value.replace(/[^0-9.]/g, '');
+                              
+                              // Prevent multiple decimal points
+                              const parts = cleanedValue.split('.');
+                              const finalValue = parts.length > 2 
+                                ? parts[0] + '.' + parts.slice(1).join('') 
+                                : cleanedValue;
+                              
+                              // Validate decimal format: numbers, one optional dot, max 2 decimal places
+                              if (/^\d*\.?\d{0,2}$/.test(finalValue)) {
+                                const numericValue = parseFloat(finalValue);
                                 updateService(
                                   index,
                                   "price",
-                                  numericValue
+                                  !isNaN(numericValue) ? numericValue : 0
                                 );
                               }
                             }}
+                            onBlur={(e) => {
+                              const value = e.target.value;
+                              
+                              // On blur, if empty or just a dot, set to 0
+                              if (value === '' || value === '.') {
+                                updateService(index, "price", 0);
+                              }
+                            }}
                             placeholder="50.00"
-                            className="h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500 pl-8"
+                            className="h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500 pl-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         </div>
                       </div>
