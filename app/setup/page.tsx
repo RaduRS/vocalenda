@@ -52,6 +52,9 @@ export default function SetupWizard() {
     slug?: boolean;
     phone?: boolean;
   }>({});
+  
+  // State to track display values for price inputs
+  const [priceDisplayValues, setPriceDisplayValues] = useState<{[key: number]: string}>({});
   const [businessData, setBusinessData] = useState<Partial<ComprehensiveBusinessData>>({
     name: '',
     slug: '',
@@ -690,40 +693,39 @@ export default function SetupWizard() {
                               id={`service-price-${index}`}
                               type="text"
                               inputMode="decimal"
-                              value={service.price === 0 ? '' : service.price.toString()}
+                              value={priceDisplayValues[index] !== undefined ? priceDisplayValues[index] : (service.price === 0 ? '' : service.price.toString())}
                               onChange={(e) => {
                                 const value = e.target.value;
                                 const services = [...(businessData.services || [])];
                                 
                                 // Allow empty input (user can clear everything)
                                 if (value === '') {
+                                  setPriceDisplayValues(prev => ({ ...prev, [index]: '' }));
                                   services[index] = { ...service, price: 0 };
                                   handleInputChange('services', services);
                                   return;
                                 }
                                 
-                                // Strip any non-numeric characters except decimal point
-                                const cleanedValue = value.replace(/[^0-9.]/g, '');
-                                
-                                // Prevent multiple decimal points
-                                const parts = cleanedValue.split('.');
-                                const finalValue = parts.length > 2 
-                                  ? parts[0] + '.' + parts.slice(1).join('') 
-                                  : cleanedValue;
-                                
-                                // Allow standalone dot, numbers, or valid decimal format
-                                if (finalValue === '.' || /^\d*\.?\d{0,2}$/.test(finalValue)) {
-                                  // For standalone dot, keep price as 0 but allow the display
-                                  if (finalValue === '.') {
-                                    services[index] = { ...service, price: 0 };
-                                  } else {
-                                    const numericValue = parseFloat(finalValue);
-                                    services[index] = { 
-                                      ...service, 
-                                      price: !isNaN(numericValue) ? numericValue : 0
-                                    };
+                                // Only allow numbers and one decimal point
+                                if (/^[0-9]*\.?[0-9]*$/.test(value)) {
+                                  // Prevent multiple decimal points
+                                  const dotCount = (value.match(/\./g) || []).length;
+                                  if (dotCount <= 1) {
+                                    // Limit to 2 decimal places
+                                    const parts = value.split('.');
+                                    if (parts.length === 1 || parts[1].length <= 2) {
+                                      // Update display value
+                                      setPriceDisplayValues(prev => ({ ...prev, [index]: value }));
+                                      
+                                      // Update actual price value
+                                      const numericValue = parseFloat(value);
+                                      services[index] = { 
+                                        ...service, 
+                                        price: !isNaN(numericValue) ? numericValue : 0
+                                      };
+                                      handleInputChange('services', services);
+                                    }
                                   }
-                                  handleInputChange('services', services);
                                 }
                               }}
                               onBlur={(e) => {
@@ -734,6 +736,14 @@ export default function SetupWizard() {
                                 if (value === '' || value === '.') {
                                   services[index] = { ...service, price: 0 };
                                   handleInputChange('services', services);
+                                  setPriceDisplayValues(prev => ({ ...prev, [index]: '' }));
+                                } else {
+                                  // Clean up display value to match the actual price
+                                  setPriceDisplayValues(prev => {
+                                    const newState = { ...prev };
+                                    delete newState[index];
+                                    return newState;
+                                  });
                                 }
                               }}
                               className="mt-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

@@ -85,6 +85,9 @@ export default function BusinessSettings() {
     "basic" | "hours" | "services" | "staff" | "holidays" | "ai" | "sms"
   >("basic");
 
+  // State to track display values for price inputs
+  const [priceDisplayValues, setPriceDisplayValues] = useState<{[key: number]: string}>({});
+
   // Update local state when hook data changes
   useEffect(() => {
     if (hookBusinessData) {
@@ -708,37 +711,36 @@ export default function BusinessSettings() {
                           <Input
                             type="text"
                             inputMode="decimal"
-                            value={service.price === 0 ? '' : service.price.toString()}
+                            value={priceDisplayValues[index] !== undefined ? priceDisplayValues[index] : (service.price === 0 ? '' : service.price.toString())}
                             onChange={(e) => {
                               const value = e.target.value;
                               
                               // Allow empty input (user can clear everything)
                               if (value === '') {
+                                setPriceDisplayValues(prev => ({ ...prev, [index]: '' }));
                                 updateService(index, "price", 0);
                                 return;
                               }
                               
-                              // Strip any non-numeric characters except decimal point
-                              const cleanedValue = value.replace(/[^0-9.]/g, '');
-                              
-                              // Prevent multiple decimal points
-                              const parts = cleanedValue.split('.');
-                              const finalValue = parts.length > 2 
-                                ? parts[0] + '.' + parts.slice(1).join('') 
-                                : cleanedValue;
-                              
-                              // Allow standalone dot, numbers, or valid decimal format
-                              if (finalValue === '.' || /^\d*\.?\d{0,2}$/.test(finalValue)) {
-                                // For standalone dot, keep price as 0 but allow the display
-                                if (finalValue === '.') {
-                                  updateService(index, "price", 0);
-                                } else {
-                                  const numericValue = parseFloat(finalValue);
-                                  updateService(
-                                    index,
-                                    "price",
-                                    !isNaN(numericValue) ? numericValue : 0
-                                  );
+                              // Only allow numbers and one decimal point
+                              if (/^[0-9]*\.?[0-9]*$/.test(value)) {
+                                // Prevent multiple decimal points
+                                const dotCount = (value.match(/\./g) || []).length;
+                                if (dotCount <= 1) {
+                                  // Limit to 2 decimal places
+                                  const parts = value.split('.');
+                                  if (parts.length === 1 || parts[1].length <= 2) {
+                                    // Update display value
+                                    setPriceDisplayValues(prev => ({ ...prev, [index]: value }));
+                                    
+                                    // Update actual price value
+                                    const numericValue = parseFloat(value);
+                                    updateService(
+                                      index,
+                                      "price",
+                                      !isNaN(numericValue) ? numericValue : 0
+                                    );
+                                  }
                                 }
                               }
                             }}
@@ -748,6 +750,14 @@ export default function BusinessSettings() {
                               // On blur, if empty or just a dot, set to 0
                               if (value === '' || value === '.') {
                                 updateService(index, "price", 0);
+                                setPriceDisplayValues(prev => ({ ...prev, [index]: '' }));
+                              } else {
+                                // Clean up display value to match the actual price
+                                setPriceDisplayValues(prev => {
+                                  const newState = { ...prev };
+                                  delete newState[index];
+                                  return newState;
+                                });
                               }
                             }}
                             placeholder="50.00"
