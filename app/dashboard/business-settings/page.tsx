@@ -727,14 +727,19 @@ export default function BusinessSettings() {
                                 ? parts[0] + '.' + parts.slice(1).join('') 
                                 : cleanedValue;
                               
-                              // Validate decimal format: numbers, one optional dot, max 2 decimal places
-                              if (/^\d*\.?\d{0,2}$/.test(finalValue)) {
-                                const numericValue = parseFloat(finalValue);
-                                updateService(
-                                  index,
-                                  "price",
-                                  !isNaN(numericValue) ? numericValue : 0
-                                );
+                              // Allow standalone dot, numbers, or valid decimal format
+                              if (finalValue === '.' || /^\d*\.?\d{0,2}$/.test(finalValue)) {
+                                // For standalone dot, keep price as 0 but allow the display
+                                if (finalValue === '.') {
+                                  updateService(index, "price", 0);
+                                } else {
+                                  const numericValue = parseFloat(finalValue);
+                                  updateService(
+                                    index,
+                                    "price",
+                                    !isNaN(numericValue) ? numericValue : 0
+                                  );
+                                }
                               }
                             }}
                             onBlur={(e) => {
