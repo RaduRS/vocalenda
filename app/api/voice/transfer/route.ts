@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Return TwiML error response
     const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">I'm sorry, but we encountered an error while transferring your call. Please try calling back later.</Say>
+  <Say voice="aura-2-thalia-en">I'm sorry, but we encountered an error while transferring your call. Please try calling back later.</Say>
   <Hangup/>
 </Response>`;
     

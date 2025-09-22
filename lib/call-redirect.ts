@@ -22,11 +22,11 @@ export function generateRedirectTwiML(options: RedirectOptions): string {
   
   const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">${defaultMessage}</Say>
+  <Say voice="aura-2-thalia-en">${defaultMessage}</Say>
   <Dial timeout="30" record="record-from-ringing">
     <Number>${bypassPhone}</Number>
   </Dial>
-  <Say voice="alice">I'm sorry, but no one is available to take your call right now. Please try calling back later.</Say>
+  <Say voice="aura-2-thalia-en">I'm sorry, but no one is available to take your call right now. Please try calling back later.</Say>
 </Response>`;
   
   console.log(`📞 Generated redirect TwiML for ${bypassPhone}, reason: ${reason}`);

@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
       staff_members,
       ai_configuration,
       customer_notes_enabled,
-      booking_policies
+      booking_policies,
+      bypass_phone_number
     } = body;
     
     // Use the email from Clerk, not from the request body
@@ -123,15 +124,17 @@ export async function POST(request: NextRequest) {
     const businessId = businessData.id;
 
     // Create business config for AI settings
-    if (ai_configuration) {
+    if (ai_configuration || bypass_phone_number) {
       const { error: configError } = await supabaseAdmin
         .from('business_config')
         .insert({
           business_id: businessId,
-          ai_response_mode: ai_configuration.response_mode || 'flexible',
-          allowed_ai_topics: ai_configuration.allowed_topics || [],
-          restricted_ai_topics: ai_configuration.restricted_topics || [],
-          ai_prompt: ai_configuration.custom_prompt
+          ai_response_mode: ai_configuration?.response_mode || 'flexible',
+          allowed_ai_topics: ai_configuration?.allowed_topics || [],
+          restricted_ai_topics: ai_configuration?.restricted_topics || [],
+          ai_prompt: ai_configuration?.custom_prompt,
+          ai_voice: ai_configuration?.voice || 'aura-2-thalia-en',
+          bypass_phone_number: bypass_phone_number || null
         });
 
       if (configError) {

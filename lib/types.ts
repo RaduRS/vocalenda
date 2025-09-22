@@ -155,6 +155,7 @@ export const defaultAIConfiguration: AIConfiguration = {
   key_information: "",
   allowed_topics: [],
   restricted_topics: [],
+  voice: "aura-2-thalia-en",
 };
 
 export const defaultSMSConfiguration: SMSConfiguration = {

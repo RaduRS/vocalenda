@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       // Return TwiML to play a message and hang up
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">Sorry, this number is not configured for voice bookings. Please try again later.</Say>
+  <Say voice="aura-2-thalia-en">Sorry, this number is not configured for voice bookings. Please try again later.</Say>
   <Hangup/>
 </Response>`;
       
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         // Return TwiML to politely decline the call
         const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">Thank you for calling. We are currently at capacity and cannot take your call at this time. Please try calling back later or visit our website to book online.</Say>
+  <Say voice="aura-2-thalia-en">Thank you for calling. We are currently at capacity and cannot take your call at this time. Please try calling back later or visit our website to book online.</Say>
   <Hangup/>
 </Response>`;
         
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     // Return error TwiML
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">Sorry, we're experiencing technical difficulties. Please try again later.</Say>
+  <Say voice="aura-2-thalia-en">Sorry, we're experiencing technical difficulties. Please try again later.</Say>
   <Hangup/>
 </Response>`;
     
