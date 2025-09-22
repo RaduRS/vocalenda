@@ -653,7 +653,7 @@ export default function SetupWizard() {
                           />
                         </div>
                         <div>
-                          <Label htmlFor={`service-duration-${index}`}>Duration</Label>
+                          <Label htmlFor={`service-duration-${index}`}>Duration <span className="text-red-500">*</span></Label>
                           <Select
                             value={service.duration.toString()}
                             onValueChange={(value) => {
@@ -661,6 +661,7 @@ export default function SetupWizard() {
                               services[index] = { ...service, duration: parseInt(value) };
                               handleInputChange('services', services);
                             }}
+                            required
                           >
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder="Select duration" />
@@ -684,19 +685,23 @@ export default function SetupWizard() {
                         </div>
                         <div className="flex items-end gap-2">
                           <div className="flex-1">
-                            <Label htmlFor={`service-price-${index}`}>Price (£)</Label>
+                            <Label htmlFor={`service-price-${index}`}>Price (£) <span className="text-red-500">*</span></Label>
                             <Input
                               id={`service-price-${index}`}
                               type="text"
                               inputMode="decimal"
                               value={service.price}
+                              required
                               onChange={(e) => {
                                 const value = e.target.value;
-                                // Only allow numbers and decimal point
-                                if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                                  const services = [...(businessData.services || [])];
-                                  services[index] = { ...service, price: parseFloat(value) || 0 };
-                                  handleInputChange('services', services);
+                                // Allow numbers, one dot, and max 1 decimal place (no empty for required field)
+                                if (/^\d*\.?\d{0,1}$/.test(value) && value !== '') {
+                                  const numericValue = parseFloat(value);
+                                  if (!isNaN(numericValue) && numericValue > 0) {
+                                    const services = [...(businessData.services || [])];
+                                    services[index] = { ...service, price: numericValue };
+                                    handleInputChange('services', services);
+                                  }
                                 }
                               }}
                               className="mt-1"

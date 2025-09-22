@@ -261,7 +261,7 @@ Customer: ${customerName}
 Phone: ${customerPhone || "Not provided"}
 Price: ${
       service.price
-        ? `${service.currency || "$"} ${service.price}`
+        ? `${service.currency || "£"}${service.price}`
         : "Not specified"
     }
 ${notes ? `\nNotes: ${notes}` : ""}

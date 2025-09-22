@@ -667,13 +667,14 @@ export default function BusinessSettings() {
                       <div className="lg:col-span-3">
                         <Label className="text-sm font-medium text-gray-700 mb-2 block flex items-center">
                           <Clock className="w-4 h-4 mr-1 text-gray-500" />
-                          Duration
+                          Duration <span className="text-red-500">*</span>
                         </Label>
                         <Select
                           value={service.duration.toString()}
                           onValueChange={(value) =>
                             updateService(index, "duration", parseInt(value))
                           }
+                          required
                         >
                           <SelectTrigger className="h-12 border-gray-200 focus:border-purple-500 focus:ring-purple-500">
                             <SelectValue placeholder="Select duration" />
@@ -698,7 +699,7 @@ export default function BusinessSettings() {
 
                       <div className="lg:col-span-3">
                         <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                          Price
+                          Price <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -708,15 +709,19 @@ export default function BusinessSettings() {
                             type="text"
                             inputMode="decimal"
                             value={service.price}
+                            required
                             onChange={(e) => {
                               const value = e.target.value;
-                              // Only allow numbers and decimal point
-                              if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                                updateService(
-                                  index,
-                                  "price",
-                                  parseFloat(value) || 0
-                                );
+                              // Allow numbers, one dot, and max 1 decimal place (no empty for required field)
+                              if (/^\d*\.?\d{0,1}$/.test(value) && value !== '') {
+                                const numericValue = parseFloat(value);
+                                if (!isNaN(numericValue) && numericValue > 0) {
+                                  updateService(
+                                    index,
+                                    "price",
+                                    numericValue
+                                  );
+                                }
                               }
                             }}
                             placeholder="50.00"

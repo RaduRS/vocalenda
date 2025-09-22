@@ -185,24 +185,8 @@ function Dashboard() {
 
 
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return <DashboardSkeleton />;
-  }
-
-  if (!business) {
-    return (
-      <div className="min-h-screen bg-white pt-20 flex items-center justify-center">
-        <Card className="p-8 text-center">
-          <h2 className="text-xl font-semibold mb-4 text-brand-primary-1">
-            No Business Found
-          </h2>
-          <p className="text-brand-primary-2 mb-6">
-            It looks like you haven&apos;t set up your business yet.
-          </p>
-          <Button onClick={() => router.push("/setup")}>Set Up Business</Button>
-        </Card>
-      </div>
-    );
   }
 
   return (
