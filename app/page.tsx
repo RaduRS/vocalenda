@@ -9,40 +9,83 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Footer } from "@/components/ui/footer";
+import { AudioPlayer } from "@/components/ui/audio-player";
 import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 
 // Lazy load non-critical sections
-const StatsSection = dynamic(() => import("@/components/ui/stats-section").then(mod => ({ default: mod.StatsSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
-const ServicesSection = dynamic(() => import("@/components/ui/services-section").then(mod => ({ default: mod.ServicesSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
-const ProcessSection = dynamic(() => import("@/components/ui/process-section").then(mod => ({ default: mod.ProcessSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
-const TeamSection = dynamic(() => import("@/components/ui/team-section").then(mod => ({ default: mod.TeamSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
-const DemoSection = dynamic(() => import("@/components/ui/demo-section").then(mod => ({ default: mod.DemoSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
-const FAQSection = dynamic(() => import("@/components/ui/faq-section").then(mod => ({ default: mod.FAQSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
-const RoadmapSection = dynamic(() => import("@/components/ui/roadmap-section").then(mod => ({ default: mod.RoadmapSection })), {
-  loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
-  ssr: false
-});
+const StatsSection = dynamic(
+  () =>
+    import("@/components/ui/stats-section").then((mod) => ({
+      default: mod.StatsSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
+const ServicesSection = dynamic(
+  () =>
+    import("@/components/ui/services-section").then((mod) => ({
+      default: mod.ServicesSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
+const ProcessSection = dynamic(
+  () =>
+    import("@/components/ui/process-section").then((mod) => ({
+      default: mod.ProcessSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
+const TeamSection = dynamic(
+  () =>
+    import("@/components/ui/team-section").then((mod) => ({
+      default: mod.TeamSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
+const DemoSection = dynamic(
+  () =>
+    import("@/components/ui/demo-section").then((mod) => ({
+      default: mod.DemoSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
+const FAQSection = dynamic(
+  () =>
+    import("@/components/ui/faq-section").then((mod) => ({
+      default: mod.FAQSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
+const RoadmapSection = dynamic(
+  () =>
+    import("@/components/ui/roadmap-section").then((mod) => ({
+      default: mod.RoadmapSection,
+    })),
+  {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: false,
+  }
+);
 export default function Home() {
   const structuredData = [
     {
@@ -135,7 +178,8 @@ export default function Home() {
                 </h1>
                 {/* The Solution: Your new, clear H2 */}
                 <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-slate-200 leading-relaxed">
-                  24/7 call answering and voice appointment scheduling for UK businesses
+                  24/7 call answering and voice appointment scheduling for UK
+                  businesses
                 </h2>
               </div>
 
@@ -190,8 +234,9 @@ export default function Home() {
                 Complete AI Phone Answering Service for Your Business
               </h2>
               <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                Our virtual receptionist handles every call professionally - from answering questions to booking appointments, 
-                ensuring you never miss a business opportunity.
+                Our virtual receptionist handles every call professionally -
+                from answering questions to booking appointments, ensuring you
+                never miss a business opportunity.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
@@ -204,7 +249,9 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Professional virtual receptionist that answers calls 24/7, handles inquiries, and books appointments with natural conversation flow.
+                    Professional virtual receptionist that answers calls 24/7,
+                    handles inquiries, and books appointments with natural
+                    conversation flow.
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -252,6 +299,26 @@ export default function Home() {
                   </CardDescription>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Audio Demo Section */}
+            <div className="max-w-2xl mx-auto">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  Hear Our AI Receptionist in Action
+                </h3>
+                <p className="text-slate-600">
+                  Listen to a sample conversation showing how our AI handles
+                  customer calls professionally
+                </p>
+              </div>
+              <AudioPlayer
+                src="/recordings/no-double-booking.wav"
+                title="AI Receptionist Demo Call"
+                voiceName="Thalia"
+                avatarUrl="/recordings/avatars/Thalia.jpg"
+                className="max-w-lg mx-auto"
+              />
             </div>
           </div>
         </section>
