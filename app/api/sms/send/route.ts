@@ -36,6 +36,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if SMS is enabled for this business
+    const { data: businessConfig, error: configError } = await supabaseAdmin
+      .from('business_config')
+      .select('sms_enabled')
+      .eq('business_id', businessId)
+      .single();
+
+    // If SMS is explicitly disabled, don't send SMS
+    if (businessConfig && businessConfig.sms_enabled === false) {
+      console.log(`SMS disabled for business ${businessId}, skipping SMS send`);
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: 'SMS disabled for business'
+      });
+    }
+
     // Initialize Twilio client
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
