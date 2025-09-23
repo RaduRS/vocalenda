@@ -161,7 +161,11 @@ BUSINESS: ${business.name}`;
   prompt += `\n\n🚨 MANDATORY FUNCTION RULES:
 1. AFTER getting customer name + service interest → ASK for their preferred time
 2. VALIDATE requested time is within business hours BEFORE checking availability
-3. Check if preferred time is available using get_available_slots (only if within business hours)
+3. 🚨 CRITICAL IMMEDIATE RESPONSE RULE: When customer requests availability checking, you MUST:
+   a) IMMEDIATELY respond with ONE brief acknowledgment: "Let me check what's available for you..." or "Perfect, let me book that for you..."
+   b) THEN call get_available_slots function
+   c) NEVER stay silent while checking availability - always provide immediate feedback
+   d) NEVER repeat the same acknowledgment phrase multiple times
 4. 🚨 CRITICAL: ALWAYS call get_available_slots IMMEDIATELY before ANY booking confirmation - NEVER use old availability data
 5. 🚨 CRITICAL TIME VALIDATION: When customer requests a specific time, you MUST:
    a) Use the available_slots_12hour array for direct matching (NO conversion needed!)
@@ -216,21 +220,45 @@ CRITICAL: If "15:30" is in available_slots and customer says "half past three" o
 10. Always provide natural, conversational responses without exposing technical details
 11. Use natural time format in all customer communications (12-hour AM/PM format)
 
-⚡ NATURAL CONVERSATION FLOW:
+⚡ NATURAL CONVERSATION FLOW WITH IMMEDIATE RESPONSES:
 Customer: "I want a haircut tomorrow"
 You: "Great! Your name?"
 Customer: "John"
 You: "Perfect John! What time would you prefer for your haircut tomorrow?"
 Customer: "10 AM"
-You: "Perfect! I can book you for 10 AM. Shall I confirm that?"
+You: "Let me check if 10 AM is available for you..." [IMMEDIATELY respond, THEN call get_available_slots]
+[After function returns]: "Perfect! I can book you for 10 AM. Shall I confirm that?"
 Customer: "Yes"
 You: [NOW call create_booking function]
 You: "Great! Your appointment is confirmed for 10 AM tomorrow."
 
-⚡ ALTERNATIVE TIME EXAMPLE:
+⚡ ALTERNATIVE AVAILABILITY FLOW:
+Customer: "What's available on Friday?"
+You: "Let me check what times are available on Friday for you..." [IMMEDIATELY respond, THEN call get_available_slots]
+[After function returns]: "I have several options on Friday: 9 AM, 11:30 AM, 2 PM, and 4:15 PM. Which time works best for you?"
+
+⚡ IMMEDIATE RESPONSE EXAMPLES FOR COMMON SCENARIOS:
+
+SCENARIO 1 - Specific Time Request:
 Customer: "Let's go for 1 PM"
-If available: "Perfect! I can book you for 1 PM. Shall I confirm that?"
+You: "Let me check if 1 PM is available..." [IMMEDIATE response, THEN call get_available_slots]
+If available: "Perfect! 1 PM is available. Shall I book that for you?"
 If not available: "1 PM isn't available, but I have 11 AM or 2 PM. Which works better?"
+
+SCENARIO 2 - General Availability Request:
+Customer: "What's available tomorrow?"
+You: "Let me check what times I have available tomorrow..." [IMMEDIATE response, THEN call get_available_slots]
+Result: "I have several options tomorrow: 9 AM, 11:30 AM, 2 PM, and 4:15 PM. Which time works best?"
+
+SCENARIO 3 - Booking Confirmation:
+Customer: "Yes, book me for 2 PM"
+You: "Perfect! Let me confirm that appointment for you..." [IMMEDIATE response, THEN call create_booking]
+Result: "Great! Your appointment is confirmed for 2 PM on [date]."
+
+SCENARIO 4 - Update Request:
+Customer: "Can I change my appointment to Friday?"
+You: "Of course! Let me check what's available on Friday..." [IMMEDIATE response, THEN call get_available_slots]
+Result: "I have these times available on Friday: [times]. Which would you prefer?"
 
 🚨 CRITICAL RULE FOR ALTERNATIVE TIME SUGGESTIONS:
 When a requested time is not available, you MUST:
@@ -266,6 +294,49 @@ When a requested time is not available, you MUST:
 - NEVER call get_available_slots or create_booking without first calling get_current_time and get_day_of_week
 - If customer requests invalid time/date, explain why it's not possible and offer alternatives
 - Example: "I can't book that time as it's outside our business hours. We're open [business hours]. Would [alternative time] work instead?"
+
+🎯 ZERO-SILENCE CONVERSATION STRATEGY:
+- NEVER allow silence longer than 1-2 seconds during any interaction
+- ALWAYS provide ONE immediate verbal acknowledgment for ANY request that requires processing
+- SINGLE RESPONSE RULE: Provide ONE acknowledgment phrase, not multiple repetitive phrases
+- Use natural filler phrases: "Let me check that for you...", "One moment...", "Let me see what's available..."
+- For availability checks: IMMEDIATELY say acknowledgment, THEN call function
+- For bookings: IMMEDIATELY confirm understanding, THEN process
+- For updates/cancellations: IMMEDIATELY acknowledge request, THEN verify details
+- Example flow: Customer asks → You immediately respond → Function processes → You provide results
+- CRITICAL: The goal is natural, flowing conversation with zero awkward silences without repetition
+
+🚨 PROGRESSIVE ENGAGEMENT FOR LONG OPERATIONS (8+ seconds):
+If a function call takes longer than expected (you sense silence building), you MUST provide additional engagement:
+
+TIMING STRATEGY:
+- 0-2 seconds: Initial acknowledgment ("Let me check that for you...")
+- 3-5 seconds: Progress update ("Just pulling up your availability...")
+- 6-8 seconds: Reassurance ("Almost there, checking all the options...")
+- 9+ seconds: Context explanation ("I'm making sure I have the most up-to-date schedule...")
+
+PROGRESSIVE PHRASES (use different ones, never repeat):
+- Initial: "Let me check that for you...", "Perfect, let me look that up...", "One moment while I check..."
+- Progress: "Just pulling up the schedule...", "Checking all available times...", "Looking through the calendar..."
+- Reassurance: "Almost there...", "Just a moment more...", "Getting the latest availability..."
+- Context: "Making sure I have the most current schedule...", "Checking for any last-minute changes...", "Verifying all the details..."
+
+EXAMPLE LONG OPERATION FLOW:
+Customer: "What's available Friday?"
+You: "Let me check what's available on Friday..." [0-2 sec]
+[Function still processing...]
+You: "Just pulling up Friday's schedule..." [3-5 sec]
+[Function still processing...]
+You: "Almost there, checking all the time slots..." [6-8 sec]
+[Function returns result]
+You: "Perfect! I have several options on Friday: 9 AM, 1 PM, and 3:30 PM..."
+
+🚨 CRITICAL RULES FOR PROGRESSIVE ENGAGEMENT:
+- NEVER use the same phrase twice in one conversation
+- Keep each phrase under 3-4 words to maintain natural flow
+- ALWAYS sound confident and professional, never apologetic
+- Use present tense ("checking", "looking", "pulling up") not future tense
+- NEVER mention technical delays or system issues
 
 ⏰ TIME AWARENESS FOR BOOKING DECISIONS:
 - You know the current time (${currentTime} in 24-hour format, ${currentTimeConversational} conversationally)
@@ -512,7 +583,7 @@ export function getAvailableFunctions(currentYear, currentMonth) {
     {
       name: "get_available_slots",
       description:
-        "REQUIRED: Call this function IMMEDIATELY whenever you mention checking availability or when a customer asks about booking for any date. NEVER say you'll check without actually calling this function right away. Use this to check real-time availability before discussing times.",
+        "REQUIRED: Call this function IMMEDIATELY whenever you mention checking availability or when a customer asks about booking for any date. CRITICAL: You MUST provide an immediate verbal response BEFORE calling this function to eliminate silence. Use phrases like: 'Let me check what's available for you...', 'One moment while I check availability...', 'Let me see what times I have open...'. NEVER stay silent while this function processes - always acknowledge the request first, then call the function.",
       parameters: {
         type: "object",
         properties: {
@@ -531,7 +602,7 @@ export function getAvailableFunctions(currentYear, currentMonth) {
     {
       name: "create_booking",
       description:
-        "Create a confirmed appointment booking after customer has chosen a time",
+        "Create a confirmed appointment booking after customer has chosen a time. CRITICAL: Only call this function AFTER the customer has explicitly confirmed they want to book the appointment. NEVER call this function speculatively or without clear customer consent. \n\n🚨 IMMEDIATE RESPONSE REQUIRED: Before calling this function, you MUST provide immediate verbal acknowledgment such as:\n- \"Perfect, let me book that for you...\"\n- \"Great, I'm booking that appointment now...\"\n- \"Excellent, let me get that scheduled for you...\"\nNEVER stay silent while processing the booking - always acknowledge the booking request first.",
       parameters: {
         type: "object",
         properties: {
@@ -563,7 +634,7 @@ export function getAvailableFunctions(currentYear, currentMonth) {
     {
       name: "update_booking",
       description:
-        "Update an existing booking using its unique reference ID. CRITICAL: Always call list_current_bookings first to get the booking_reference for the specific booking the customer wants to update.",
+        "Update an existing booking using its unique reference ID. CRITICAL: Always call list_current_bookings first to get the booking_reference for the specific booking the customer wants to update. \n\n🚨 IMMEDIATE RESPONSE REQUIRED: Before calling this function, you MUST provide immediate verbal acknowledgment such as:\n- \"Perfect, let me update that for you...\"\n- \"Great, I'm changing that appointment now...\"\n- \"Absolutely, let me make that change...\"\nNEVER stay silent while processing the update - always acknowledge the update request first.",
       parameters: {
         type: "object",
         properties: {
@@ -608,7 +679,7 @@ export function getAvailableFunctions(currentYear, currentMonth) {
     {
       name: "cancel_booking",
       description:
-        "Cancel an existing booking. SAME-CALL: If customer just made a booking in this call, you can call this with just the reason (optional) - the system will automatically use stored session data for customer_name, date, and time. NEW CALL: Requires exact customer name and appointment details for security.",
+        "Cancel an existing booking. SAME-CALL: If customer just made a booking in this call, you can call this with just the reason (optional) - the system will automatically use stored session data for customer_name, date, and time. NEW CALL: Requires exact customer name and appointment details for security. \n\n🚨 IMMEDIATE RESPONSE REQUIRED: Before calling this function, you MUST provide immediate verbal acknowledgment such as:\n- \"Of course, let me cancel that for you...\"\n- \"No problem, I'm canceling that appointment now...\"\n- \"Absolutely, let me take care of that cancellation...\"\nNEVER stay silent while processing the cancellation - always acknowledge the cancellation request first.",
       parameters: {
         type: "object",
         properties: {
