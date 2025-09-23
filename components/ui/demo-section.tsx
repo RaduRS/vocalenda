@@ -1,4 +1,4 @@
-import { Phone, Calendar, MessageSquare, Shield, Clock, CheckCircle } from "lucide-react";
+import { Phone, Calendar, MessageSquare, Shield, Clock, CheckCircle, Bot, User } from "lucide-react";
 
 export function DemoSection() {
   return (
@@ -22,47 +22,59 @@ export function DemoSection() {
             </h3>
             
             <div className="space-y-4">
-              <div className="flex gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 text-sm font-semibold">C</span>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-3 flex-1">
-                  <p className="text-sm text-blue-900">
+              {/* User Message */}
+              <div className="flex gap-3 justify-end">
+                <div className="max-w-xs sm:max-w-sm lg:max-w-md px-4 py-2 rounded-lg break-words overflow-hidden bg-blue-500 text-white rounded-br-none">
+                  <div className="text-sm break-words">
                     Hi, I&rsquo;d like to schedule an appointment for next Tuesday.
-                  </p>
+                  </div>
+                </div>
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-blue-600" />
+                  </div>
                 </div>
               </div>
               
-              <div className="flex gap-3">
-                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-sm font-semibold">AI</span>
+              {/* AI Response */}
+              <div className="flex gap-3 justify-start">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Bot className="h-4 w-4 text-green-600" />
+                  </div>
                 </div>
-                <div className="bg-slate-100 rounded-lg p-3 flex-1">
-                  <p className="text-sm text-slate-900">
-                    I&rsquo;d be happy to help you schedule an appointment. Let me check our availability for next Tuesday. What time would work best for you?
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 text-sm font-semibold">C</span>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-3 flex-1">
-                  <p className="text-sm text-blue-900">
-                    Around 2 PM would be perfect.
-                  </p>
+                <div className="max-w-xs sm:max-w-sm lg:max-w-md px-4 py-2 rounded-lg break-words overflow-hidden bg-white border border-gray-200 text-gray-800 rounded-bl-none">
+                  <div className="text-sm break-words">
+                    I&rsquo;d be happy to help you schedule an appointment! What time works best for you on Tuesday?
+                  </div>
                 </div>
               </div>
               
-              <div className="flex gap-3">
-                <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-sm font-semibold">AI</span>
+              {/* User Message */}
+              <div className="flex gap-3 justify-end">
+                <div className="max-w-xs sm:max-w-sm lg:max-w-md px-4 py-2 rounded-lg break-words overflow-hidden bg-blue-500 text-white rounded-br-none">
+                  <div className="text-sm break-words">
+                    How about 2 PM?
+                  </div>
                 </div>
-                <div className="bg-slate-100 rounded-lg p-3 flex-1">
-                  <p className="text-sm text-slate-900">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-blue-600" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* AI Response */}
+              <div className="flex gap-3 justify-start">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Bot className="h-4 w-4 text-green-600" />
+                  </div>
+                </div>
+                <div className="max-w-xs sm:max-w-sm lg:max-w-md px-4 py-2 rounded-lg break-words overflow-hidden bg-white border border-gray-200 text-gray-800 rounded-bl-none">
+                  <div className="text-sm break-words">
                     Perfect! I have Tuesday, January 16th at 2:00 PM available. I&rsquo;ll book that for you right now and send a confirmation SMS to this number.
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -128,7 +140,7 @@ export function DemoSection() {
               <Phone className="w-6 h-6 mx-auto mb-4 text-slate-700" />
               <h4 className="font-semibold mb-2 text-slate-900">Voice-Only Support</h4>
               <p className="text-sm text-slate-600">
-                Professional phone-based booking system for all appointment types
+                Phone-based booking system for all appointment types
               </p>
             </div>
             
@@ -136,7 +148,7 @@ export function DemoSection() {
               <Shield className="w-6 h-6 mx-auto mb-4 text-slate-700" />
               <h4 className="font-semibold mb-2 text-slate-900">Data Security</h4>
               <p className="text-sm text-slate-600">
-                Enterprise-grade security for beauty and wellness businesses
+                Enterprise-grade security for all businesses
               </p>
             </div>
           </div>

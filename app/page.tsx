@@ -248,7 +248,7 @@ export default function Home() {
                   <CardTitle className="text-lg">AI Receptionist</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
+                  <CardDescription className="text-center">
                     Professional virtual receptionist that answers calls 24/7,
                     handles inquiries, and books appointments with natural
                     conversation flow.
@@ -264,7 +264,7 @@ export default function Home() {
                   <CardTitle className="text-lg">Google Calendar</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
+                  <CardDescription className="text-center">
                     Real-time availability checking and automatic appointment
                     scheduling
                   </CardDescription>
@@ -279,7 +279,7 @@ export default function Home() {
                   <CardTitle className="text-lg">SMS Confirmations</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
+                  <CardDescription className="text-center">
                     Automatic SMS confirmations sent from the same number
                     customers called
                   </CardDescription>
@@ -294,7 +294,7 @@ export default function Home() {
                   <CardTitle className="text-lg">Multi-Tenant</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
+                  <CardDescription className="text-center">
                     Dedicated phone numbers and isolated data for each business
                   </CardDescription>
                 </CardContent>
@@ -329,13 +329,13 @@ export default function Home() {
 
         <ProcessSection />
 
-        <TeamSection />
+        {/* <TeamSection /> */}
 
         <DemoSection />
 
         <FAQSection />
 
-        <RoadmapSection />
+        {/* <RoadmapSection /> */}
 
         <Footer />
       </main>
