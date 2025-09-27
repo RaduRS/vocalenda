@@ -30,7 +30,8 @@ export default function Navbar() {
     pathname === "/terms" ||
     pathname === "/about" ||
     pathname === "/blog" ||
-    pathname?.startsWith("/blog/");
+    pathname?.startsWith("/blog/") ||
+    pathname?.startsWith("/auth");
 
   const textColor = useTransform(
     scrollY,
