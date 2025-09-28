@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 // Sample text for voice previews
-const PREVIEW_TEXT = "Hello! This is a sample of how I sound. I'm ready to help with your business calls.";
+const PREVIEW_TEXT = "Hello! Thank you for calling Vocalenda. How can I help you today?";
 
 /**
  * Preview a Deepgram voice by generating and playing a sample audio
