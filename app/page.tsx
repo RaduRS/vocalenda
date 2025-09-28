@@ -302,23 +302,49 @@ export default function Home() {
             </div>
 
             {/* Audio Demo Section */}
-            <div className="max-w-2xl mx-auto">
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-6 md:mb-8">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">
                   Hear Our AI Receptionist in Action
                 </h3>
-                <p className="text-slate-600">
+                <p className="text-sm sm:text-base text-slate-600">
                   Listen to a sample conversation showing how our AI handles
                   customer calls professionally
                 </p>
               </div>
-              <AudioPlayer
-                src="/recordings/no-double-booking.wav"
-                title="AI Receptionist Demo Call"
-                voiceName="Thalia"
-                avatarUrl="/recordings/avatars/Thalia.jpg"
-                className="max-w-lg mx-auto"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {/* Top Row */}
+                <AudioPlayer
+                  src="/recordings/orion-making appointment.m4a"
+                  title="Making an Appointment"
+                  voiceName="Orion"
+                  avatarUrl="/recordings/avatars/Orion.jpg"
+                  className="w-full max-w-lg mx-auto"
+                />
+                <AudioPlayer
+                  src="/recordings/draco-update appointment.m4a"
+                  title="Updating an Appointment"
+                  voiceName="Draco"
+                  avatarUrl="/recordings/avatars/Draco.jpg"
+                  className="w-full max-w-lg mx-auto"
+                />
+                
+                {/* Bottom Row */}
+                <AudioPlayer
+                  src="/recordings/athena-cancel appointment.m4a"
+                  title="Canceling an Appointment"
+                  voiceName="Athena"
+                  avatarUrl="/recordings/avatars/Athena.jpg"
+                  className="w-full max-w-lg mx-auto"
+                />
+                <AudioPlayer
+                  src="/recordings/no-double-booking.wav"
+                  title="Preventing Double Booking"
+                  voiceName="Thalia"
+                  avatarUrl="/recordings/avatars/Thalia.jpg"
+                  className="w-full max-w-lg mx-auto"
+                />
+              </div>
             </div>
           </div>
         </section>
