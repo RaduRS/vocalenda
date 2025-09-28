@@ -1,43 +1,71 @@
 import { toast } from "sonner";
 
-// Sample text for voice previews
-const PREVIEW_TEXT = "Hello! This is a sample of how I sound. I'm ready to help with your business calls.";
+/**
+ * Map voice IDs to their corresponding local audio file paths
+ * @param voiceId - The Deepgram voice ID (e.g., 'aura-2-thalia-en')
+ * @param useDemo - Whether to use demo recordings instead of voice previews
+ * @returns The path to the local audio file
+ */
+function getLocalAudioPath(voiceId: string, useDemo: boolean = false): string | null {
+  const BASE_PATH = useDemo 
+    ? '/recordings/voice-demo/voice_sample_' 
+    : '/recordings/voice-previews/voice_sample_';
+  
+  const voiceMap: Record<string, { name: string; accent: string; gender: string }> = {
+    'aura-2-thalia-en': { name: 'Thalia', accent: 'American', gender: 'feminine' },
+    'aura-2-orpheus-en': { name: 'Orpheus', accent: 'American', gender: 'masculine' },
+    'aura-2-arcas-en': { name: 'Arcas', accent: 'American', gender: 'masculine' },
+    'aura-2-apollo-en': { name: 'Apollo', accent: 'American', gender: 'masculine' },
+    'aura-2-zeus-en': { name: 'Zeus', accent: 'American', gender: 'masculine' },
+    'aura-2-orion-en': { name: 'Orion', accent: 'American', gender: 'masculine' },
+    'aura-2-draco-en': { name: 'Draco', accent: 'British', gender: 'masculine' },
+    'aura-2-luna-en': { name: 'Luna', accent: 'American', gender: 'feminine' },
+    'aura-2-aurora-en': { name: 'Aurora', accent: 'American', gender: 'feminine' },
+    'aura-2-athena-en': { name: 'Athena', accent: 'American', gender: 'feminine' },
+    'aura-2-hera-en': { name: 'Hera', accent: 'American', gender: 'feminine' },
+    'aura-2-asteria-en': { name: 'Asteria', accent: 'American', gender: 'feminine' },
+  };
+  
+  const voice = voiceMap[voiceId];
+  if (!voice) return null;
+  
+  return `${BASE_PATH}${voice.name}_${voice.accent}_${voice.gender}.mp3`;
+}
 
 /**
- * Preview a Deepgram voice by generating and playing a sample audio
+ * Get the demo recording path for a voice
  * @param voiceId - The Deepgram voice ID (e.g., 'aura-2-thalia-en')
+ * @returns The path to the demo recording file
  */
-export async function previewVoice(voiceId: string): Promise<void> {
+export function getDemoRecordingPath(voiceId: string): string | null {
+  return getLocalAudioPath(voiceId, true);
+}
+
+/**
+ * Preview a voice by playing a local audio sample
+ * @param voiceId - The Deepgram voice ID (e.g., 'aura-2-thalia-en')
+ * @param useDemo - Whether to use demo recordings instead of voice previews
+ */
+export async function previewVoice(voiceId: string, useDemo: boolean = false): Promise<void> {
   try {
     // Show loading state
-    const loadingToast = toast.loading("Generating voice preview...");
+    const loadingToast = toast.loading("Loading voice preview...");
     
-    // Call our API endpoint to generate the audio
-    const response = await fetch('/api/voice-preview', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        voice: voiceId,
-        text: PREVIEW_TEXT,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to generate voice preview: ${response.statusText}`);
+    // Get the local audio file path
+    const audioPath = getLocalAudioPath(voiceId, useDemo);
+    
+    if (!audioPath) {
+      throw new Error(`No audio sample available for voice: ${voiceId}`);
     }
-
-    // Get the audio blob
-    const audioBlob = await response.blob();
     
-    // Create audio URL and play it
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
+    // Create audio element and load the local file
+    const audio = new Audio(audioPath);
     
-    // Clean up the URL when audio ends
-    audio.addEventListener('ended', () => {
-      URL.revokeObjectURL(audioUrl);
+    // Wait for audio to load
+    await new Promise((resolve, reject) => {
+      audio.addEventListener('canplaythrough', resolve);
+      audio.addEventListener('error', reject);
+      audio.load();
     });
     
     // Play the audio
@@ -51,6 +79,14 @@ export async function previewVoice(voiceId: string): Promise<void> {
     console.error('Voice preview error:', error);
     toast.error("Failed to preview voice. Please try again.");
   }
+}
+
+/**
+ * Preview a voice using demo recordings
+ * @param voiceId - The Deepgram voice ID (e.g., 'aura-2-thalia-en')
+ */
+export async function previewVoiceDemo(voiceId: string): Promise<void> {
+  return previewVoice(voiceId, true);
 }
 
 /**

@@ -49,8 +49,22 @@ export function Footer() {
                   Live Demo
                 </Link>
               </li>
-              <li className="text-sm text-gray-300">Setup Guide</li>
-              <li className="text-sm text-gray-300">Feature Tour</li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="text-sm text-gray-300 hover:text-cyan-300 transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/voices"
+                  className="text-sm text-gray-300 hover:text-cyan-300 transition-colors"
+                >
+                  AI Voices
+                </Link>
+              </li>
               <li className="text-sm text-gray-300">System Status</li>
               <li className="text-sm text-gray-300">Support</li>
             </ul>
