@@ -54,6 +54,62 @@ export async function previewVoice(voiceId: string): Promise<void> {
 }
 
 /**
+ * Download a voice sample as an MP3 file
+ * @param voiceId - The Deepgram voice ID (e.g., 'aura-2-thalia-en')
+ */
+export async function downloadVoice(voiceId: string): Promise<void> {
+  try {
+    // Show loading state
+    const loadingToast = toast.loading("Generating voice sample...");
+    
+    // Call our API endpoint to generate the audio
+    const response = await fetch('/api/voice-preview', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        voice: voiceId,
+        text: PREVIEW_TEXT,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to generate voice sample: ${response.statusText}`);
+    }
+
+    // Get the audio blob
+    const audioBlob = await response.blob();
+    
+    // Create download link
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const link = document.createElement('a');
+    link.href = audioUrl;
+    
+    // Get voice display name for filename
+    const voiceDisplayName = getVoiceDisplayName(voiceId);
+    const cleanFileName = voiceDisplayName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+    link.download = `voice_sample_${cleanFileName}.mp3`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the URL
+    URL.revokeObjectURL(audioUrl);
+    
+    // Dismiss loading toast
+    toast.dismiss(loadingToast);
+    toast.success("Voice sample downloaded");
+    
+  } catch (error) {
+    console.error('Voice download error:', error);
+    toast.error("Failed to download voice sample. Please try again.");
+  }
+}
+
+/**
  * Get a user-friendly display name for a voice ID
  * @param voiceId - The Deepgram voice ID
  * @returns Formatted display name

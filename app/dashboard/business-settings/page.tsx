@@ -26,6 +26,7 @@ import {
   MessageSquare,
   Play,
   Loader2,
+  Download,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -38,11 +39,12 @@ import {
   defaultSMSConfiguration,
   validatePhoneNumber,
 } from "@/lib/types";
-import { previewVoice } from "@/lib/voice-preview";
+import { previewVoice, downloadVoice } from "@/lib/voice-preview";
 
 export default function BusinessSettings() {
   const { businessData: hookBusinessData, isLoading, updateBusiness, isUpdating } = useBusinessSettings();
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isDownloadLoading, setIsDownloadLoading] = useState(false);
   const [businessData, setBusinessData] = useState<ComprehensiveBusinessData>({
     name: "",
     business_type: "",
@@ -1163,29 +1165,54 @@ export default function BusinessSettings() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center space-x-2 w-full sm:w-auto h-10"
-                      disabled={isPreviewLoading}
-                      onClick={async () => {
-                        const currentVoice = businessData.ai_configuration.voice || 'aura-2-thalia-en';
-                        setIsPreviewLoading(true);
-                        try {
-                          await previewVoice(currentVoice);
-                        } finally {
-                          setIsPreviewLoading(false);
-                        }
-                      }}
-                    >
-                      {isPreviewLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                      <span className="text-sm">{isPreviewLoading ? 'Loading...' : 'Preview'}</span>
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center space-x-2 w-full sm:w-auto h-10"
+                        disabled={isPreviewLoading || isDownloadLoading}
+                        onClick={async () => {
+                          const currentVoice = businessData.ai_configuration.voice || 'aura-2-thalia-en';
+                          setIsPreviewLoading(true);
+                          try {
+                            await previewVoice(currentVoice);
+                          } finally {
+                            setIsPreviewLoading(false);
+                          }
+                        }}
+                      >
+                        {isPreviewLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
+                        <span className="text-sm">{isPreviewLoading ? 'Loading...' : 'Preview'}</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center space-x-2 w-full sm:w-auto h-10"
+                        disabled={isPreviewLoading || isDownloadLoading}
+                        onClick={async () => {
+                          const currentVoice = businessData.ai_configuration.voice || 'aura-2-thalia-en';
+                          setIsDownloadLoading(true);
+                          try {
+                            await downloadVoice(currentVoice);
+                          } finally {
+                            setIsDownloadLoading(false);
+                          }
+                        }}
+                      >
+                        {isDownloadLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
+                        <span className="text-sm">{isDownloadLoading ? 'Downloading...' : 'Download'}</span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
