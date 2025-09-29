@@ -669,16 +669,49 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
         let hasSetupFee = false
         if (invoice.lines?.data) {
           for (const line of invoice.lines.data) {
-            // Type assertion to access price/plan properties
+            // Type assertion to access price/plan properties and additional fields
             const lineItem = line as Stripe.InvoiceLineItem & { 
               price?: { id: string }
-              plan?: { id: string } 
+              plan?: { id: string }
+              type?: string
+              proration?: boolean
+              period?: { start: number; end: number } | null
             }
-            // Check if the line item price ID matches our setup fee price ID
+            
+            // Primary detection: Check if the line item price ID matches our setup fee price ID
             const priceId = lineItem.price?.id || lineItem.plan?.id
             if (priceId === businessProSetupFeeId) {
               hasSetupFee = true
-              console.log('🎯 Setup fee detected in invoice line item:', priceId)
+              console.log('🎯 Setup fee detected by price ID:', priceId)
+              break
+            }
+            
+            // Fallback detection: Look for setup fee patterns in description and amount
+            // Setup fees often appear as "BUSINESS PRO" without monthly indicators
+            const isBusinessProSetupFee = line.description === 'BUSINESS PRO' && 
+                                         line.amount > 0 && 
+                                         !line.description.includes('month') &&
+                                         !line.description.includes('×')
+            
+            // Additional fallback: Check for one-time charges with setup fee indicators
+            const isOneTimeCharge = lineItem.type === 'invoiceitem' || 
+                                   (lineItem.proration === false && !lineItem.period)
+            
+            const hasSetupFeeIndicators = line.description?.toLowerCase().includes('setup') ||
+                                         line.description?.toLowerCase().includes('onboarding') ||
+                                         line.description?.toLowerCase().includes('initial') ||
+                                         line.description?.toLowerCase().includes('activation')
+            
+            if (isBusinessProSetupFee || (isOneTimeCharge && hasSetupFeeIndicators)) {
+              hasSetupFee = true
+              console.log('🎯 Setup fee detected by pattern matching:', {
+                description: line.description,
+                amount: line.amount / 100,
+                detectionMethod: isBusinessProSetupFee ? 'business_pro_pattern' : 'one_time_charge_with_indicators',
+                type: lineItem.type,
+                proration: lineItem.proration,
+                period: lineItem.period
+              })
               break
             }
           }
