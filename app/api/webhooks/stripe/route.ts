@@ -553,14 +553,25 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         }
       }
 
+      // Extract timestamps from subscription items (same fix as handleSubscriptionChange)
+      const subscriptionItem = subscription.items.data[0]
+      if (!subscriptionItem) {
+        throw new Error('No subscription items found in checkout session')
+      }
+
+      console.log('🔍 Extracting timestamps from subscription item:', {
+        current_period_start: subscriptionItem.current_period_start,
+        current_period_end: subscriptionItem.current_period_end
+      })
+
       const rpcParams = {
         p_business_id: businessId,
         p_stripe_subscription_id: subscription.id,
         p_stripe_customer_id: session.customer as string,
         p_stripe_price_id: subscription.items.data[0].price.id,
         p_status: subscription.status as SubscriptionStatus,
-        p_current_period_start: safeConvertTimestamp(subscription.current_period_start, 'current_period_start'),
-        p_current_period_end: safeConvertTimestamp(subscription.current_period_end, 'current_period_end'),
+        p_current_period_start: safeConvertTimestamp(subscriptionItem.current_period_start, 'current_period_start'),
+        p_current_period_end: safeConvertTimestamp(subscriptionItem.current_period_end, 'current_period_end'),
         p_amount_per_month: subscription.items.data[0].price.unit_amount || 0,
         p_currency: subscription.currency
       }

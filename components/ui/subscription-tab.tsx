@@ -9,7 +9,6 @@ import {
   CreditCard,
   Calendar,
   Clock,
-  DollarSign,
   AlertCircle,
   CheckCircle,
   XCircle,
@@ -75,63 +74,35 @@ export function SubscriptionTab() {
     }
   };
 
-  const handleCancelSubscription = async () => {
+  const handleManageSubscription = async () => {
     if (!subscription) return;
     
     setActionLoading(true);
     try {
-      const response = await fetch('/api/subscriptions', {
-        method: 'PATCH',
+      const response = await fetch('/api/subscriptions/portal', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action: 'cancel' }),
       });
 
       const data = await response.json();
       
-      if (response.ok) {
-        toast.success('Subscription will be canceled at the end of the current period');
-        fetchSubscription(); // Refresh subscription data
+      if (response.ok && data.url) {
+        // Redirect to Stripe customer portal
+        window.location.href = data.url;
       } else {
-        toast.error(data.error || 'Failed to cancel subscription');
+        toast.error(data.error || 'Failed to open subscription management');
       }
     } catch (error) {
-      console.error('Error canceling subscription:', error);
-      toast.error('Failed to cancel subscription');
+      console.error('Error opening subscription management:', error);
+      toast.error('Failed to open subscription management');
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleReactivateSubscription = async () => {
-    if (!subscription) return;
-    
-    setActionLoading(true);
-    try {
-      const response = await fetch('/api/subscriptions', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'reactivate' }),
-      });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        toast.success('Subscription reactivated successfully');
-        fetchSubscription(); // Refresh subscription data
-      } else {
-        toast.error(data.error || 'Failed to reactivate subscription');
-      }
-    } catch (error) {
-      console.error('Error reactivating subscription:', error);
-      toast.error('Failed to reactivate subscription');
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   const getStatusBadge = (status: string, cancelAtPeriodEnd: boolean) => {
     if (cancelAtPeriodEnd) {
@@ -275,7 +246,7 @@ export function SubscriptionTab() {
           {getStatusBadge(subscription.status, subscription.cancel_at_period_end)}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Plan Details */}
           <div className="space-y-2">
             <div className="flex items-center text-sm text-gray-500">
@@ -284,20 +255,6 @@ export function SubscriptionTab() {
             </div>
             <div className="text-lg font-semibold text-gray-900">
               {subscription.plan_name}
-            </div>
-          </div>
-
-          {/* Billing Amount */}
-          <div className="space-y-2">
-            <div className="flex items-center text-sm text-gray-500">
-              <DollarSign className="w-4 h-4 mr-2" />
-              Billing Amount
-            </div>
-            <div className="text-lg font-semibold text-gray-900">
-              {formatCurrency(subscription.amount, subscription.currency)}
-              <span className="text-sm text-gray-500 ml-1">
-                /{subscription.interval}
-              </span>
             </div>
           </div>
 
@@ -325,42 +282,7 @@ export function SubscriptionTab() {
         </div>
       </Card>
 
-      {/* Usage Overview */}
-      <Card className="p-8 bg-white shadow-sm border border-gray-200">
-        <div className="mb-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-2">Monthly Usage</h4>
-          <p className="text-gray-600">Track your AI assistant minute usage for this billing period</p>
-        </div>
 
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">Minutes Used</span>
-            <span className="text-sm text-gray-600">
-              {subscription.monthly_minutes_used} / {subscription.monthly_minutes_included} minutes
-            </span>
-          </div>
-          
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                minutesUsagePercentage > 90
-                  ? 'bg-red-500'
-                  : minutesUsagePercentage > 75
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
-              }`}
-              style={{ width: `${Math.min(minutesUsagePercentage, 100)}%` }}
-            />
-          </div>
-          
-          {minutesUsagePercentage > 90 && (
-            <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-            <AlertCircle className="w-4 h-4 mr-2" />
-            You&apos;re approaching your monthly minute limit. Consider upgrading your plan.
-          </div>
-          )}
-        </div>
-      </Card>
 
       {/* Subscription Actions */}
       <Card className="p-8 bg-white shadow-sm border border-gray-200">
@@ -370,55 +292,21 @@ export function SubscriptionTab() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          {subscription.cancel_at_period_end ? (
-            <Button
-              onClick={handleReactivateSubscription}
-              disabled={actionLoading}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {actionLoading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <CheckCircle className="w-4 h-4 mr-2" />
-              )}
-              Reactivate Subscription
-            </Button>
-          ) : (
-            <Button
-              onClick={handleCancelSubscription}
-              disabled={actionLoading}
-              variant="destructive"
-            >
-              {actionLoading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <XCircle className="w-4 h-4 mr-2" />
-              )}
-              Cancel Subscription
-            </Button>
-          )}
-          
-          <Button variant="outline" disabled>
-            <CreditCard className="w-4 h-4 mr-2" />
-            Change Plan (Coming Soon)
-          </Button>
-          
-          <Button variant="outline" disabled>
-            Update Payment Method (Coming Soon)
+          <Button
+            onClick={handleManageSubscription}
+            disabled={actionLoading}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {actionLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <CreditCard className="w-4 h-4 mr-2" />
+            )}
+            Manage Subscription
           </Button>
         </div>
 
-        {subscription.cancel_at_period_end && (
-          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center text-yellow-800">
-              <AlertCircle className="w-4 h-4 mr-2" />
-              <span className="text-sm">
-                Your subscription will be canceled on {formatDate(subscription.current_period_end)}. 
-                You&apos;ll continue to have access until then.
-              </span>
-            </div>
-          </div>
-        )}
+
       </Card>
     </div>
   );
