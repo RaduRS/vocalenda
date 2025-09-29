@@ -1,5 +1,5 @@
 -- Fix the create_or_update_subscription function
--- The original function had incorrect parameter mapping in the VALUES clause
+-- The original function had incorrect conflict handling for business_id UNIQUE constraint
 
 CREATE OR REPLACE FUNCTION create_or_update_subscription(
     p_business_id UUID,
@@ -28,7 +28,7 @@ BEGIN
         currency
     ) VALUES (
         p_business_id,
-        p_stripe_subscription_id,  -- This was mapped incorrectly in the original
+        p_stripe_subscription_id,
         p_stripe_customer_id,
         p_stripe_price_id,
         p_status,
@@ -37,8 +37,11 @@ BEGIN
         p_amount_per_month,
         p_currency
     )
-    ON CONFLICT (stripe_subscription_id) 
+    ON CONFLICT (business_id) 
     DO UPDATE SET
+        stripe_subscription_id = EXCLUDED.stripe_subscription_id,
+        stripe_customer_id = EXCLUDED.stripe_customer_id,
+        stripe_price_id = EXCLUDED.stripe_price_id,
         status = EXCLUDED.status,
         current_period_start = EXCLUDED.current_period_start,
         current_period_end = EXCLUDED.current_period_end,

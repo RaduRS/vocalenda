@@ -267,7 +267,23 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       .single()
 
     if (existingSubscription) {
-      const existingPeriodStart = new Date(existingSubscription.current_period_start).getTime()
+      console.log('🔍 Debug existing subscription data:', {
+        current_period_start: existingSubscription.current_period_start,
+        type: typeof existingSubscription.current_period_start,
+        value: existingSubscription.current_period_start
+      })
+      
+      let existingPeriodStart: number
+      try {
+        existingPeriodStart = new Date(existingSubscription.current_period_start).getTime()
+      } catch (error) {
+        console.error('❌ Invalid time value error in existing subscription:', {
+          error: error instanceof Error ? error.message : String(error),
+          current_period_start: existingSubscription.current_period_start,
+          type: typeof existingSubscription.current_period_start
+        })
+        throw error
+      }
       const newPeriodStart = extendedSubscription.current_period_start * 1000
       
       // Skip if the subscription already has the same status and period
