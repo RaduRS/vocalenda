@@ -256,27 +256,44 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     
     console.log(`✅ Business verified: ${businessData.name} (${businessData.id})`)
 
-    const extendedSubscription = subscription as ExtendedStripeSubscription
+    // Extract period dates from subscription items (where they actually exist in Stripe webhooks)
+    const subscriptionItem = subscription.items.data[0]
+    const current_period_start = subscriptionItem?.current_period_start
+    const current_period_end = subscriptionItem?.current_period_end
 
-    // Debug and validate subscription timestamps
-    console.log('🔍 Debug subscription timestamps:', {
-      current_period_start: extendedSubscription.current_period_start,
-      current_period_end: extendedSubscription.current_period_end,
-      current_period_start_type: typeof extendedSubscription.current_period_start,
-      current_period_end_type: typeof extendedSubscription.current_period_end,
-      subscription_status: extendedSubscription.status,
-      subscription_id: extendedSubscription.id
+    // Debug subscription structure and timestamps
+    console.log('🔍 Debug subscription structure:', {
+      subscription_id: subscription.id,
+      subscription_status: subscription.status,
+      has_items: !!subscription.items?.data?.length,
+      first_item_id: subscriptionItem?.id,
+      current_period_start: current_period_start,
+      current_period_end: current_period_end,
+      current_period_start_type: typeof current_period_start,
+      current_period_end_type: typeof current_period_end,
+      subscription_start_date: subscription.start_date,
+      subscription_created: subscription.created
     })
 
     // Validate that required timestamps are present
-    if (extendedSubscription.current_period_start === undefined || extendedSubscription.current_period_start === null) {
-      console.error('❌ current_period_start is undefined/null in subscription:', extendedSubscription.id)
-      throw new Error(`Invalid current_period_start: ${extendedSubscription.current_period_start}`)
+    if (current_period_start === undefined || current_period_start === null) {
+      console.error('❌ current_period_start is undefined/null in subscription item:', subscription.id)
+      throw new Error(`Invalid current_period_start: ${current_period_start}`)
     }
 
-    if (extendedSubscription.current_period_end === undefined || extendedSubscription.current_period_end === null) {
-      console.error('❌ current_period_end is undefined/null in subscription:', extendedSubscription.id)
-      throw new Error(`Invalid current_period_end: ${extendedSubscription.current_period_end}`)
+    if (current_period_end === undefined || current_period_end === null) {
+      console.error('❌ current_period_end is undefined/null in subscription item:', subscription.id)
+      throw new Error(`Invalid current_period_end: ${current_period_end}`)
+    }
+
+    // Create extended subscription with correct period dates
+    const extendedSubscription: ExtendedStripeSubscription = {
+      ...subscription,
+      current_period_start: current_period_start,
+      current_period_end: current_period_end,
+      trial_start: subscription.trial_start,
+      trial_end: subscription.trial_end,
+      canceled_at: subscription.canceled_at
     }
 
     // Idempotency check: Check if this subscription update was already processed
