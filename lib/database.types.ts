@@ -183,6 +183,7 @@ export type Database = {
           booking_policies: Json | null
           minutes_allowed: number
           minutes_used: number
+          subscription_id: string | null
           created_at: string
           updated_at: string
         }
@@ -208,6 +209,7 @@ export type Database = {
           booking_policies?: Json | null
           minutes_allowed?: number
           minutes_used?: number
+          subscription_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -233,6 +235,7 @@ export type Database = {
           booking_policies?: Json | null
           minutes_allowed?: number
           minutes_used?: number
+          subscription_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -627,6 +630,210 @@ export type Database = {
           }
         ]
       }
+      subscriptions: {
+        Row: {
+          id: string
+          business_id: string
+          stripe_subscription_id: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          plan: 'business_pro'
+          status: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused'
+          current_period_start: string
+          current_period_end: string
+          trial_start: string | null
+          trial_end: string | null
+          cancel_at_period_end: boolean
+          canceled_at: string | null
+          monthly_minutes_included: number
+          monthly_minutes_used: number
+          minutes_reset_date: string | null
+          amount_per_month: number
+          currency: string
+          setup_fee: number
+          setup_fee_paid: boolean
+          metadata: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          business_id: string
+          stripe_subscription_id: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          plan?: 'business_pro'
+          status?: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused'
+          current_period_start: string
+          current_period_end: string
+          trial_start?: string | null
+          trial_end?: string | null
+          cancel_at_period_end?: boolean
+          canceled_at?: string | null
+          monthly_minutes_included?: number
+          monthly_minutes_used?: number
+          minutes_reset_date?: string | null
+          amount_per_month: number
+          currency?: string
+          setup_fee?: number
+          setup_fee_paid?: boolean
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          business_id?: string
+          stripe_subscription_id?: string
+          stripe_customer_id?: string
+          stripe_price_id?: string
+          plan?: 'business_pro'
+          status?: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused'
+          current_period_start?: string
+          current_period_end?: string
+          trial_start?: string | null
+          trial_end?: string | null
+          cancel_at_period_end?: boolean
+          canceled_at?: string | null
+          monthly_minutes_included?: number
+          monthly_minutes_used?: number
+          minutes_reset_date?: string | null
+          amount_per_month?: number
+          currency?: string
+          setup_fee?: number
+          setup_fee_paid?: boolean
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      subscription_events: {
+        Row: {
+          id: string
+          subscription_id: string | null
+          business_id: string | null
+          event_type: string
+          stripe_event_id: string | null
+          previous_status: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused' | null
+          new_status: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused' | null
+          event_data: Json
+          occurred_at: string
+          processed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          subscription_id?: string | null
+          business_id?: string | null
+          event_type: string
+          stripe_event_id?: string | null
+          previous_status?: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused' | null
+          new_status?: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused' | null
+          event_data?: Json
+          occurred_at?: string
+          processed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          subscription_id?: string | null
+          business_id?: string | null
+          event_type?: string
+          stripe_event_id?: string | null
+          previous_status?: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused' | null
+          new_status?: 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'trialing' | 'paused' | null
+          event_data?: Json
+          occurred_at?: string
+          processed_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_events_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      subscription_usage: {
+        Row: {
+          id: string
+          subscription_id: string
+          business_id: string
+          call_log_id: string | null
+          minutes_used: number
+          usage_date: string
+          usage_month: number
+          usage_year: number
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          subscription_id: string
+          business_id: string
+          call_log_id?: string | null
+          minutes_used: number
+          usage_date?: string
+          usage_month?: number
+          usage_year?: number
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          subscription_id?: string
+          business_id?: string
+          call_log_id?: string | null
+          minutes_used?: number
+          usage_date?: string
+          usage_month?: number
+          usage_year?: number
+          metadata?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_usage_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_usage_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_usage_call_log_id_fkey"
+            columns: ["call_log_id"]
+            isOneToOne: false
+            referencedRelation: "call_logs"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -704,6 +911,74 @@ export type Database = {
           p_business_phone: string
           p_caller_phone: string
           p_twilio_call_sid: string
+        }
+        Returns: string
+      }
+      get_business_subscription: {
+        Args: {
+          p_business_id: string
+        }
+        Returns: {
+          id: string
+          business_id: string
+          stripe_subscription_id: string
+          stripe_customer_id: string
+          stripe_price_id: string
+          plan: string
+          status: string
+          current_period_start: string
+          current_period_end: string
+          trial_start: string | null
+          trial_end: string | null
+          cancel_at_period_end: boolean
+          canceled_at: string | null
+          monthly_minutes_included: number
+          monthly_minutes_used: number
+          minutes_reset_date: string | null
+          amount_per_month: number
+          currency: string
+          setup_fee: number
+          setup_fee_paid: boolean
+          metadata: Json
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      track_minutes_usage: {
+        Args: {
+          p_business_id: string
+          p_minutes_used: number
+          p_call_log_id?: string
+          p_metadata?: Json
+        }
+        Returns: boolean
+      }
+      reset_monthly_usage: {
+        Args: {
+          p_business_id: string
+        }
+        Returns: boolean
+      }
+      create_or_update_subscription: {
+        Args: {
+          p_business_id: string
+          p_stripe_subscription_id: string
+          p_stripe_customer_id: string
+          p_stripe_price_id: string
+          p_plan?: string
+          p_status?: string
+          p_current_period_start?: string
+          p_current_period_end?: string
+          p_trial_start?: string
+          p_trial_end?: string
+          p_cancel_at_period_end?: boolean
+          p_canceled_at?: string
+          p_monthly_minutes_included?: number
+          p_amount_per_month?: number
+          p_currency?: string
+          p_setup_fee?: number
+          p_setup_fee_paid?: boolean
+          p_metadata?: Json
         }
         Returns: string
       }

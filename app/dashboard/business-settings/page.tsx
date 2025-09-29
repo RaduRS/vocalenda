@@ -26,6 +26,7 @@ import {
   MessageSquare,
   Play,
   Loader2,
+  CreditCard,
 } from "lucide-react";
 import {
   ComprehensiveBusinessData,
@@ -39,6 +40,7 @@ import {
   validatePhoneNumber,
 } from "@/lib/types";
 import { previewVoice } from "@/lib/voice-preview";
+import { SubscriptionTab } from "@/components/ui/subscription-tab";
 
 export default function BusinessSettings() {
   const { businessData: hookBusinessData, isLoading, updateBusiness, isUpdating } = useBusinessSettings();
@@ -82,7 +84,7 @@ export default function BusinessSettings() {
   });
 
   const [activeTab, setActiveTab] = useState<
-    "basic" | "hours" | "services" | "staff" | "holidays" | "ai" | "sms"
+    "basic" | "hours" | "services" | "staff" | "holidays" | "ai" | "sms" | "subscription"
   >("basic");
 
   // State to track display values for price inputs
@@ -362,6 +364,12 @@ export default function BusinessSettings() {
                     <span>SMS Messages</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="subscription">
+                  <div className="flex items-center space-x-2">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Subscription</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -377,6 +385,7 @@ export default function BusinessSettings() {
                 { id: "holidays", label: "Holidays", icon: Calendar },
                 { id: "ai", label: "AI & Policies", icon: Bot },
                 { id: "sms", label: "SMS Messages", icon: MessageSquare },
+                { id: "subscription", label: "Subscription", icon: CreditCard },
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -392,6 +401,7 @@ export default function BusinessSettings() {
                           | "holidays"
                           | "ai"
                           | "sms"
+                          | "subscription"
                       )
                     }
                     className={`flex items-center space-x-1 py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex-shrink-0 ${
@@ -1389,6 +1399,13 @@ export default function BusinessSettings() {
                 )}
               </div>
             </Card>
+          </div>
+        )}
+
+        {/* Subscription Tab */}
+        {activeTab === "subscription" && (
+          <div className="space-y-6">
+            <SubscriptionTab />
           </div>
         )}
       </div>
