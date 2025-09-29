@@ -305,6 +305,7 @@ export default function BusinessSettings() {
                     | "holidays"
                     | "ai"
                     | "sms"
+                    | "subscription"
                 )
               }
             >
@@ -318,6 +319,7 @@ export default function BusinessSettings() {
                     {activeTab === "holidays" && <><Calendar className="w-4 h-4" /><span>Holidays</span></>}
                     {activeTab === "ai" && <><Bot className="w-4 h-4" /><span>AI & Policies</span></>}
                     {activeTab === "sms" && <><MessageSquare className="w-4 h-4" /><span>SMS Messages</span></>}
+                    {activeTab === "subscription" && <><CreditCard className="w-4 h-4" /><span>Subscription</span></>}
                   </div>
                 </SelectValue>
               </SelectTrigger>
