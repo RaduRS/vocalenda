@@ -409,11 +409,11 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       console.log('📋 RPC Result:', rpcResult)
     }
 
-    // Update business with subscription_id
-    console.log(`🏢 Updating business ${businessId} with subscription_id: ${subscription.id}`)
+    // Update business with subscription_id (using the UUID returned by RPC)
+    console.log(`🏢 Updating business ${businessId} with subscription_id: ${rpcResult}`)
     const { data: updateData, error: businessError } = await supabaseAdmin
       .from('businesses')
-      .update({ subscription_id: subscription.id })
+      .update({ subscription_id: rpcResult })
       .eq('id', businessId)
       .select()
 
