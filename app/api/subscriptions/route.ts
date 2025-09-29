@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH - Update subscription (e.g., cancel, change plan)
+// PATCH - Update subscription (e.g., cancel, change plan, sync)
 export async function PATCH(req: NextRequest) {
   try {
     const { userId } = await auth()
@@ -247,6 +247,32 @@ export async function PATCH(req: NextRequest) {
             price: priceId
           }]
         })
+        break
+      
+      case 'sync':
+        // Fetch latest subscription data from Stripe and update database
+        const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionData.stripe_subscription_id)
+        
+        // Update database with latest Stripe data
+        const { error: updateError } = await supabaseAdmin.rpc('create_or_update_subscription', {
+          p_business_id: user.business_id,
+          p_stripe_subscription_id: stripeSubscription.id,
+          p_stripe_customer_id: stripeSubscription.customer as string,
+          p_stripe_price_id: stripeSubscription.items.data[0]?.price.id || '',
+          p_status: stripeSubscription.status as 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid' | 'paused',
+          p_current_period_start: new Date((stripeSubscription as unknown as { current_period_start: number }).current_period_start * 1000).toISOString(),
+          p_current_period_end: new Date((stripeSubscription as unknown as { current_period_end: number }).current_period_end * 1000).toISOString(),
+          p_amount_per_month: stripeSubscription.items.data[0]?.price.unit_amount || 0,
+          p_currency: stripeSubscription.items.data[0]?.price.currency || 'gbp',
+          p_cancel_at_period_end: (stripeSubscription as unknown as { cancel_at_period_end: boolean }).cancel_at_period_end
+        })
+
+        if (updateError) {
+          console.error('Error syncing subscription:', updateError)
+          return NextResponse.json({ error: 'Failed to sync subscription' }, { status: 500 })
+        }
+
+        result = stripeSubscription
         break
       
       default:

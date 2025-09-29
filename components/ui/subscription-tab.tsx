@@ -331,20 +331,43 @@ export function SubscriptionTab() {
           </Button>
           
           <Button
-            onClick={() => {
-              setLoading(true);
-              fetchSubscription();
+            onClick={async () => {
+              setActionLoading(true);
+              try {
+                // First sync with Stripe
+                const syncResponse = await fetch('/api/subscriptions', {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ action: 'sync' }),
+                });
+
+                if (syncResponse.ok) {
+                  toast.success('Subscription synced with Stripe');
+                  // Then fetch updated data
+                  await fetchSubscription();
+                } else {
+                  const errorData = await syncResponse.json();
+                  toast.error(errorData.error || 'Failed to sync subscription');
+                }
+              } catch (error) {
+                console.error('Error syncing subscription:', error);
+                toast.error('Failed to sync subscription');
+              } finally {
+                setActionLoading(false);
+              }
             }}
             disabled={loading || actionLoading}
             variant="outline"
             className="border-gray-300 hover:bg-gray-50"
           >
-            {loading ? (
+            {actionLoading ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <RefreshCw className="w-4 h-4 mr-2" />
             )}
-            Refresh Status
+            Refresh
           </Button>
         </div>
 
