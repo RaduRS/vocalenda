@@ -126,28 +126,50 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Create subscription
-    const subscription = await stripe.subscriptions.create({
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
       customer: customer.id,
-      items: [{ price: priceId }],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent'],
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vocalenda.com'}/dashboard/business-settings?tab=subscription&success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vocalenda.com'}/dashboard/business-settings?tab=subscription&canceled=true`,
       metadata: {
         business_id: user.business_id
+      },
+      subscription_data: {
+        metadata: {
+          business_id: user.business_id
+        }
       }
     })
 
-    const latestInvoice = subscription.latest_invoice as Stripe.Invoice & {
-      payment_intent?: Stripe.PaymentIntent
-    }
     return NextResponse.json({
-      subscriptionId: subscription.id,
-      clientSecret: latestInvoice?.payment_intent?.client_secret
+      sessionId: session.id,
+      url: session.url
     })
   } catch (error) {
     console.error('Error creating subscription:', error)
-    return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 })
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('No such price')) {
+        return NextResponse.json({ error: 'Invalid price ID. Please contact support.' }, { status: 400 })
+      }
+      if (error.message.includes('customer')) {
+        return NextResponse.json({ error: 'Customer creation failed. Please try again.' }, { status: 400 })
+      }
+    }
+    
+    return NextResponse.json({ 
+      error: 'Failed to create subscription. Please try again or contact support.',
+      details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : 'Unknown error' : undefined
+    }, { status: 500 })
   }
 }
 

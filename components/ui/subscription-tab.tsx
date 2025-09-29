@@ -43,6 +43,18 @@ export function SubscriptionTab() {
 
   useEffect(() => {
     fetchSubscription();
+    
+    // Check for success/cancel parameters from Stripe redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      toast.success('Payment successful! Your subscription is now active.');
+      // Clean up URL parameters
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (urlParams.get('canceled') === 'true') {
+      toast.error('Payment was canceled. You can try again anytime.');
+      // Clean up URL parameters
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, []);
 
   const fetchSubscription = async () => {
@@ -188,20 +200,13 @@ export function SubscriptionTab() {
         throw new Error(error.error || 'Failed to create checkout session');
       }
 
-      const { clientSecret } = await response.json();
+      const { url } = await response.json();
       
-      if (clientSecret) {
+      if (url) {
         // Redirect to Stripe's hosted checkout page
-        const stripe = await import('@stripe/stripe-js').then(mod => 
-          mod.loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-        );
-        
-        if (stripe) {
-          // For payment intents, we would typically redirect to a payment confirmation page
-          // For now, let's show a success message and refresh the subscription data
-          toast.success('Subscription created! Please complete payment.');
-          fetchSubscription(); // Refresh subscription data
-        }
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Checkout error:', error);
