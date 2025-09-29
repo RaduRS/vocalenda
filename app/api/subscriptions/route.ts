@@ -8,6 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 const businessProPriceId = process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRO_PRICE_ID!
+const businessProSetupFeeId = process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRO_FLAT_FEE_PRICE_ID!
 
 // GET - Get subscription details for the current business
 export async function GET() {
@@ -104,13 +105,16 @@ export async function POST(req: NextRequest) {
     // Check if subscription already exists
     const { data: existingSubscription } = await supabaseAdmin
       .from('subscriptions')
-      .select('id')
+      .select('id, setup_fee_paid')
       .eq('business_id', user.business_id)
       .single()
 
     if (existingSubscription) {
       return NextResponse.json({ error: 'Subscription already exists' }, { status: 400 })
     }
+
+    // Since no subscription exists, this is a first-time customer who needs to pay setup fee
+    const isFirstTimeCustomer = true
 
     // Create or retrieve Stripe customer
     let customer: Stripe.Customer
@@ -137,16 +141,27 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Prepare line items based on whether this is a first-time customer
+    const lineItems = [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ]
+
+    // Add setup fee for first-time customers
+    if (isFirstTimeCustomer) {
+      lineItems.unshift({
+        price: businessProSetupFeeId,
+        quantity: 1,
+      })
+    }
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: 'subscription',
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vocalenda.com'}/dashboard/business-settings?tab=subscription&success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vocalenda.com'}/dashboard/business-settings?tab=subscription&canceled=true`,

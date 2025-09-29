@@ -8,6 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 const businessProPriceId = process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRO_PRICE_ID!
+const businessProSetupFeeId = process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRO_FLAT_FEE_PRICE_ID!
 
 const relevantEvents = new Set([
   "checkout.session.completed",
@@ -410,6 +411,20 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       console.log('📋 RPC Result:', rpcResult)
     }
 
+    // Handle subscription cancellation - update database when cancellation is requested
+    if (subscription.cancellation_details?.reason === 'cancellation_requested' && subscription.cancel_at_period_end) {
+      // Update the subscription to mark it as cancelled at period end
+      const { error: cancelError } = await supabaseAdmin
+        .from('subscriptions')
+        .update({ cancel_at_period_end: true })
+        .eq('stripe_subscription_id', subscription.id)
+
+      if (cancelError) {
+        console.error('❌ Error updating cancellation status:', cancelError)
+        throw new Error(`Failed to update cancellation status: ${cancelError.message}`)
+      }
+    }
+
     // Update business with subscription_id (using the UUID returned by RPC)
     console.log(`🏢 Updating business ${businessId} with subscription_id: ${rpcResult}`)
     const { data: updateData, error: businessError } = await supabaseAdmin
@@ -631,14 +646,43 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     const extendedInvoice = invoice as ExtendedStripeInvoice
     const subscriptionId = extendedInvoice.subscription
     if (subscriptionId && typeof subscriptionId === 'string') {
-      // Reset monthly usage if this is a recurring payment
+      // Get subscription details
       const { data: subscription } = await supabaseAdmin
         .from('subscriptions')
-        .select('business_id')
+        .select('business_id, setup_fee_paid')
         .eq('stripe_subscription_id', subscriptionId)
         .single()
 
       if (subscription) {
+        // Check if this invoice contains the setup fee by examining line items
+        let hasSetupFee = false
+        if (invoice.lines?.data) {
+          for (const line of invoice.lines.data) {
+            // Type assertion to access price/plan properties
+            const lineItem = line as Stripe.InvoiceLineItem & { 
+              price?: { id: string }
+              plan?: { id: string } 
+            }
+            // Check if the line item price ID matches our setup fee price ID
+            const priceId = lineItem.price?.id || lineItem.plan?.id
+            if (priceId === businessProSetupFeeId) {
+              hasSetupFee = true
+              console.log('🎯 Setup fee detected in invoice line item:', priceId)
+              break
+            }
+          }
+        }
+
+        // If setup fee is present or this is the first payment, mark setup fee as paid
+        if ((hasSetupFee || !subscription.setup_fee_paid) && !subscription.setup_fee_paid) {
+          console.log('🎯 Setup fee payment detected, marking as paid for subscription:', subscriptionId)
+          await supabaseAdmin
+            .from('subscriptions')
+            .update({ setup_fee_paid: true })
+            .eq('stripe_subscription_id', subscriptionId)
+        }
+
+        // Reset monthly usage if this is a recurring payment
         await supabaseAdmin.rpc('reset_monthly_usage', {
           p_business_id: subscription.business_id
         })
