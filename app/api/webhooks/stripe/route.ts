@@ -301,7 +301,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     console.log('🔍 Checking for existing subscription...')
     const { data: existingSubscription } = await supabaseAdmin
       .from('subscriptions')
-      .select('id, status, stripe_subscription_id, current_period_start, current_period_end')
+      .select('id, status, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end')
       .eq('stripe_subscription_id', subscription.id)
       .single()
 
@@ -341,12 +341,29 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       }
       const newPeriodStart = extendedSubscription.current_period_start * 1000
       
-      // Skip if the subscription already has the same status and period
+      // Skip if the subscription already has the same status, period, and cancel_at_period_end
+      const existingCancelAtPeriodEnd = Boolean(existingSubscription.cancel_at_period_end)
+      const newCancelAtPeriodEnd = Boolean(subscription.cancel_at_period_end)
+      
       if (existingSubscription.status === subscription.status && 
-          existingPeriodStart === newPeriodStart) {
+          existingPeriodStart === newPeriodStart &&
+          existingCancelAtPeriodEnd === newCancelAtPeriodEnd) {
         console.log('✅ Subscription already up to date, skipping processing:', subscription.id)
         return
       }
+      
+      // Log what changed to help with debugging
+      const changes = []
+      if (existingSubscription.status !== subscription.status) {
+        changes.push(`status: ${existingSubscription.status} → ${subscription.status}`)
+      }
+      if (existingPeriodStart !== newPeriodStart) {
+        changes.push(`period: ${new Date(existingPeriodStart).toISOString()} → ${new Date(newPeriodStart).toISOString()}`)
+      }
+      if (existingCancelAtPeriodEnd !== newCancelAtPeriodEnd) {
+        changes.push(`cancel_at_period_end: ${existingCancelAtPeriodEnd} → ${newCancelAtPeriodEnd}`)
+      }
+      console.log(`🔄 Subscription needs updating. Changes: ${changes.join(', ')}`);
       console.log('🔄 Subscription exists but needs updating')
     } else {
       console.log('🆕 New subscription, proceeding with creation')
