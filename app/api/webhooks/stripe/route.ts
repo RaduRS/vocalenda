@@ -388,7 +388,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       p_current_period_start: safeConvertTimestamp(extendedSubscription.current_period_start, 'current_period_start'),
       p_current_period_end: safeConvertTimestamp(extendedSubscription.current_period_end, 'current_period_end'),
       p_amount_per_month: subscription.items.data[0]?.price.unit_amount || 0,
-      p_currency: subscription.items.data[0]?.price.currency || 'gbp'
+      p_currency: subscription.items.data[0]?.price.currency || 'gbp',
+      p_cancel_at_period_end: subscription.cancel_at_period_end || false
     }
     
     // Call the RPC function with the correct parameters that match the database function signature
