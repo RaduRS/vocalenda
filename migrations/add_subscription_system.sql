@@ -48,7 +48,7 @@ CREATE TABLE subscriptions (
     
     -- Pricing
     amount_per_month INTEGER NOT NULL, -- Amount in cents
-    currency VARCHAR(3) DEFAULT 'USD',
+    currency VARCHAR(3) DEFAULT 'GBP',
     setup_fee INTEGER DEFAULT 0, -- One-time setup fee in cents
     setup_fee_paid BOOLEAN DEFAULT false,
     
@@ -245,7 +245,7 @@ CREATE OR REPLACE FUNCTION create_or_update_subscription(
     p_current_period_start TIMESTAMP WITH TIME ZONE,
     p_current_period_end TIMESTAMP WITH TIME ZONE,
     p_amount_per_month INTEGER,
-    p_currency VARCHAR DEFAULT 'USD'
+    p_currency VARCHAR DEFAULT 'GBP'
 )
 RETURNS UUID AS $$
 DECLARE
