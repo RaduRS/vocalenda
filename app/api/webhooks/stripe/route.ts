@@ -301,7 +301,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     console.log('🔍 Checking for existing subscription...')
     const { data: existingSubscription } = await supabaseAdmin
       .from('subscriptions')
-      .select('id, status, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end')
+      .select('id, status, stripe_subscription_id, current_period_start, current_period_end, cancel_at_period_end, setup_fee_paid')
       .eq('stripe_subscription_id', subscription.id)
       .single()
 
@@ -400,6 +400,9 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     // Ensure cancel_at_period_end is properly set as boolean
     const cancelAtPeriodEnd = Boolean(subscription.cancel_at_period_end)
 
+    // Preserve existing setup_fee_paid value - once paid, it should stay true
+    const currentSetupFeePaid = existingSubscription?.setup_fee_paid || false
+
     const rpcParams = {
       p_business_id: businessId,
       p_stripe_subscription_id: subscription.id,
@@ -411,7 +414,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       p_amount_per_month: subscription.items.data[0]?.price.unit_amount || 0,
       p_currency: subscription.items.data[0]?.price.currency || 'gbp',
       p_cancel_at_period_end: cancelAtPeriodEnd,
-      p_setup_fee_paid: false // Will be set to true when invoice.paid event is received
+      p_setup_fee_paid: currentSetupFeePaid // Preserve existing value - once paid, stays true
     }
     
     // Call the RPC function with the correct parameters that match the database function signature
