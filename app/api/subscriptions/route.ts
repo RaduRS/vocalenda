@@ -7,6 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
 })
 
+const businessProPriceId = process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRO_PRICE_ID!
+
 // GET - Get subscription details for the current business
 export async function GET() {
   try {
@@ -59,6 +61,11 @@ export async function POST(req: NextRequest) {
 
     if (!priceId) {
       return NextResponse.json({ error: 'Price ID is required' }, { status: 400 })
+    }
+
+    // Validate that the price ID matches our business pro plan
+    if (priceId !== businessProPriceId) {
+      return NextResponse.json({ error: 'Invalid price ID' }, { status: 400 })
     }
 
     // Get user's business

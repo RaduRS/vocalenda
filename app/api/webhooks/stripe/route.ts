@@ -7,6 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+const businessProPriceId = process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRO_PRICE_ID!
 
 // Extend Stripe types to include timestamp properties that are sometimes missing from the official types
 interface ExtendedStripeSubscription extends Omit<Stripe.Subscription, 'trial_start' | 'trial_end' | 'canceled_at'> {
@@ -99,11 +100,18 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     }
 
     const extendedSubscription = subscription as ExtendedStripeSubscription
+    const priceId = subscription.items.data[0]?.price.id || ''
+    
+    // Validate that this is our expected business pro price
+    if (priceId !== businessProPriceId) {
+      console.warn(`Unexpected price ID in subscription: ${priceId}, expected: ${businessProPriceId}`)
+    }
+    
     const { error } = await supabaseAdmin.rpc('create_or_update_subscription', {
        p_business_id: businessId,
        p_stripe_subscription_id: subscription.id,
        p_stripe_customer_id: subscription.customer as string,
-       p_stripe_price_id: subscription.items.data[0]?.price.id || '',
+       p_stripe_price_id: priceId,
        p_plan: 'business_pro',
        p_status: subscription.status as SubscriptionStatus,
        p_current_period_start: new Date(extendedSubscription.current_period_start * 1000).toISOString(),
