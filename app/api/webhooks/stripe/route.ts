@@ -258,6 +258,27 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
 
     const extendedSubscription = subscription as ExtendedStripeSubscription
 
+    // Debug and validate subscription timestamps
+    console.log('🔍 Debug subscription timestamps:', {
+      current_period_start: extendedSubscription.current_period_start,
+      current_period_end: extendedSubscription.current_period_end,
+      current_period_start_type: typeof extendedSubscription.current_period_start,
+      current_period_end_type: typeof extendedSubscription.current_period_end,
+      subscription_status: extendedSubscription.status,
+      subscription_id: extendedSubscription.id
+    })
+
+    // Validate that required timestamps are present
+    if (extendedSubscription.current_period_start === undefined || extendedSubscription.current_period_start === null) {
+      console.error('❌ current_period_start is undefined/null in subscription:', extendedSubscription.id)
+      throw new Error(`Invalid current_period_start: ${extendedSubscription.current_period_start}`)
+    }
+
+    if (extendedSubscription.current_period_end === undefined || extendedSubscription.current_period_end === null) {
+      console.error('❌ current_period_end is undefined/null in subscription:', extendedSubscription.id)
+      throw new Error(`Invalid current_period_end: ${extendedSubscription.current_period_end}`)
+    }
+
     // Idempotency check: Check if this subscription update was already processed
     console.log('🔍 Checking for existing subscription...')
     const { data: existingSubscription } = await supabaseAdmin
