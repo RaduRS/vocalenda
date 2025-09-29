@@ -380,6 +380,9 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       }
     }
 
+    // Ensure cancel_at_period_end is properly set as boolean
+    const cancelAtPeriodEnd = Boolean(subscription.cancel_at_period_end)
+
     const rpcParams = {
       p_business_id: businessId,
       p_stripe_subscription_id: subscription.id,
@@ -390,7 +393,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       p_current_period_end: safeConvertTimestamp(extendedSubscription.current_period_end, 'current_period_end'),
       p_amount_per_month: subscription.items.data[0]?.price.unit_amount || 0,
       p_currency: subscription.items.data[0]?.price.currency || 'gbp',
-      p_cancel_at_period_end: subscription.cancel_at_period_end || false
+      p_cancel_at_period_end: cancelAtPeriodEnd
     }
     
     // Call the RPC function with the correct parameters that match the database function signature
@@ -411,19 +414,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       console.log('📋 RPC Result:', rpcResult)
     }
 
-    // Handle subscription cancellation - update database when cancellation is requested
-    if (subscription.cancellation_details?.reason === 'cancellation_requested' && subscription.cancel_at_period_end) {
-      // Update the subscription to mark it as cancelled at period end
-      const { error: cancelError } = await supabaseAdmin
-        .from('subscriptions')
-        .update({ cancel_at_period_end: true })
-        .eq('stripe_subscription_id', subscription.id)
 
-      if (cancelError) {
-        console.error('❌ Error updating cancellation status:', cancelError)
-        throw new Error(`Failed to update cancellation status: ${cancelError.message}`)
-      }
-    }
 
     // Update business with subscription_id (using the UUID returned by RPC)
     console.log(`🏢 Updating business ${businessId} with subscription_id: ${rpcResult}`)
