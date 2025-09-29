@@ -274,15 +274,31 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       })
       
       let existingPeriodStart: number
-      try {
-        existingPeriodStart = new Date(existingSubscription.current_period_start).getTime()
-      } catch (error) {
-        console.error('❌ Invalid time value error in existing subscription:', {
-          error: error instanceof Error ? error.message : String(error),
-          current_period_start: existingSubscription.current_period_start,
-          type: typeof existingSubscription.current_period_start
-        })
-        throw error
+      
+      // Handle null or undefined current_period_start
+      if (!existingSubscription.current_period_start) {
+        console.log('⚠️ Existing subscription has no current_period_start, proceeding with update')
+        existingPeriodStart = 0 // Force update by using 0
+      } else {
+        try {
+          existingPeriodStart = new Date(existingSubscription.current_period_start).getTime()
+          
+          // Check if the date is valid
+          if (isNaN(existingPeriodStart)) {
+            console.error('❌ Invalid date from database:', {
+              current_period_start: existingSubscription.current_period_start,
+              type: typeof existingSubscription.current_period_start
+            })
+            existingPeriodStart = 0 // Force update by using 0
+          }
+        } catch (error) {
+          console.error('❌ Invalid time value error in existing subscription:', {
+            error: error instanceof Error ? error.message : String(error),
+            current_period_start: existingSubscription.current_period_start,
+            type: typeof existingSubscription.current_period_start
+          })
+          existingPeriodStart = 0 // Force update by using 0
+        }
       }
       const newPeriodStart = extendedSubscription.current_period_start * 1000
       
@@ -306,14 +322,33 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     }
     
     // Prepare RPC parameters
+    // Safely convert timestamps with validation
+    const safeConvertTimestamp = (timestamp: number | null | undefined, fieldName: string): string => {
+      if (!timestamp || typeof timestamp !== 'number') {
+        console.error(`❌ Invalid ${fieldName}:`, timestamp)
+        throw new Error(`Invalid ${fieldName}: ${timestamp}`)
+      }
+      
+      try {
+        const date = new Date(timestamp * 1000)
+        if (isNaN(date.getTime())) {
+          throw new Error(`Invalid date from timestamp: ${timestamp}`)
+        }
+        return date.toISOString()
+      } catch (error) {
+        console.error(`❌ Error converting ${fieldName}:`, error)
+        throw error
+      }
+    }
+
     const rpcParams = {
       p_business_id: businessId,
       p_stripe_subscription_id: subscription.id,
       p_stripe_customer_id: subscription.customer as string,
       p_stripe_price_id: priceId,
       p_status: subscription.status as SubscriptionStatus,
-      p_current_period_start: new Date(extendedSubscription.current_period_start * 1000).toISOString(),
-      p_current_period_end: new Date(extendedSubscription.current_period_end * 1000).toISOString(),
+      p_current_period_start: safeConvertTimestamp(extendedSubscription.current_period_start, 'current_period_start'),
+      p_current_period_end: safeConvertTimestamp(extendedSubscription.current_period_end, 'current_period_end'),
       p_amount_per_month: subscription.items.data[0]?.price.unit_amount || 0,
       p_currency: subscription.items.data[0]?.price.currency || 'gbp'
     }
@@ -461,14 +496,33 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       console.log('✅ Business found:', business.name)
 
       // Create subscription using RPC function
+      // Safely convert timestamps with validation
+      const safeConvertTimestamp = (timestamp: number | null | undefined, fieldName: string): string => {
+        if (!timestamp || typeof timestamp !== 'number') {
+          console.error(`❌ Invalid ${fieldName}:`, timestamp)
+          throw new Error(`Invalid ${fieldName}: ${timestamp}`)
+        }
+        
+        try {
+          const date = new Date(timestamp * 1000)
+          if (isNaN(date.getTime())) {
+            throw new Error(`Invalid date from timestamp: ${timestamp}`)
+          }
+          return date.toISOString()
+        } catch (error) {
+          console.error(`❌ Error converting ${fieldName}:`, error)
+          throw error
+        }
+      }
+
       const rpcParams = {
         p_business_id: businessId,
         p_stripe_subscription_id: subscription.id,
         p_stripe_customer_id: session.customer as string,
         p_stripe_price_id: subscription.items.data[0].price.id,
         p_status: subscription.status as SubscriptionStatus,
-        p_current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-        p_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+        p_current_period_start: safeConvertTimestamp(subscription.current_period_start, 'current_period_start'),
+        p_current_period_end: safeConvertTimestamp(subscription.current_period_end, 'current_period_end'),
         p_amount_per_month: subscription.items.data[0].price.unit_amount || 0,
         p_currency: subscription.currency
       }
