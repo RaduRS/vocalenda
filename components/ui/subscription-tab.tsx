@@ -18,19 +18,27 @@ import {
 
 interface Subscription {
   id: string;
+  business_id: string;
   stripe_subscription_id: string;
   stripe_customer_id: string;
-  status: 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid';
-  plan_name: string;
-  plan_id: string;
-  amount: number;
-  currency: string;
-  interval: 'month' | 'year';
+  stripe_price_id: string;
+  plan: 'business_pro';
+  plan_name: string; // Added by API mapping
+  status: 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid' | 'paused';
   current_period_start: string;
   current_period_end: string;
+  trial_start: string | null;
+  trial_end: string | null;
   cancel_at_period_end: boolean;
+  canceled_at: string | null;
   monthly_minutes_included: number;
   monthly_minutes_used: number;
+  minutes_reset_date: string | null;
+  amount_per_month: number;
+  currency: string;
+  setup_fee: number;
+  setup_fee_paid: boolean;
+  metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -109,7 +117,7 @@ export function SubscriptionTab() {
     if (cancelAtPeriodEnd) {
       return <Badge variant="destructive" className="flex items-center gap-1">
         <XCircle className="w-3 h-3" />
-        Canceling
+        Cancelled
       </Badge>;
     }
 
@@ -277,13 +285,29 @@ export function SubscriptionTab() {
               {subscription.cancel_at_period_end ? 'Expires' : 'Next Billing'}
             </div>
             <div className="text-sm font-medium text-gray-900">
-              {formatDate(subscription.current_period_end)}
+              {subscription.cancel_at_period_end ? '—' : formatDate(subscription.current_period_end)}
             </div>
           </div>
         </div>
       </Card>
 
-
+      {/* Cancellation Notice */}
+      {subscription.cancel_at_period_end && (
+        <Card className="p-6 bg-amber-50 border border-amber-200">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+            <div>
+              <h4 className="text-lg font-semibold text-amber-800 mb-2">Subscription Cancelled</h4>
+              <p className="text-amber-700 mb-2">
+                 Your subscription has been cancelled and will not renew. You&apos;ll continue to have access to all features until the end of your current billing period.
+               </p>
+              <p className="text-sm text-amber-600">
+                <strong>Access expires:</strong> {formatDate(subscription.current_period_end)}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Subscription Actions */}
       <Card className="p-8 bg-white shadow-sm border border-gray-200">

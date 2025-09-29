@@ -41,7 +41,18 @@ export async function GET() {
       return NextResponse.json({ subscription: null })
     }
 
-    return NextResponse.json({ subscription })
+    // Map plan enum to readable plan name
+    const planNameMap: Record<string, string> = {
+      'business_pro': 'Business Pro'
+    }
+
+    // Add plan_name to the subscription object
+    const subscriptionWithPlanName = {
+      ...subscription,
+      plan_name: planNameMap[subscription.plan] || subscription.plan
+    }
+
+    return NextResponse.json({ subscription: subscriptionWithPlanName })
   } catch (error) {
     console.error('Error fetching subscription:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
