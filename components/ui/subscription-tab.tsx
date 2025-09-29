@@ -13,6 +13,7 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 
 interface Subscription {
@@ -303,6 +304,23 @@ export function SubscriptionTab() {
               <CreditCard className="w-4 h-4 mr-2" />
             )}
             Manage Subscription
+          </Button>
+          
+          <Button
+            onClick={() => {
+              setLoading(true);
+              fetchSubscription();
+            }}
+            disabled={loading || actionLoading}
+            variant="outline"
+            className="border-gray-300 hover:bg-gray-50"
+          >
+            {loading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Refresh Status
           </Button>
         </div>
 
