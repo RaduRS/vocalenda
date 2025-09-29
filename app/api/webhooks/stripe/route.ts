@@ -393,7 +393,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       p_current_period_end: safeConvertTimestamp(extendedSubscription.current_period_end, 'current_period_end'),
       p_amount_per_month: subscription.items.data[0]?.price.unit_amount || 0,
       p_currency: subscription.items.data[0]?.price.currency || 'gbp',
-      p_cancel_at_period_end: cancelAtPeriodEnd
+      p_cancel_at_period_end: cancelAtPeriodEnd,
+      p_setup_fee_paid: false // Will be set to true when invoice.paid event is received
     }
     
     // Call the RPC function with the correct parameters that match the database function signature
@@ -580,7 +581,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         p_current_period_start: safeConvertTimestamp(subscriptionItem.current_period_start, 'current_period_start'),
         p_current_period_end: safeConvertTimestamp(subscriptionItem.current_period_end, 'current_period_end'),
         p_amount_per_month: subscription.items.data[0].price.unit_amount || 0,
-        p_currency: subscription.currency
+        p_currency: subscription.currency,
+        p_cancel_at_period_end: false, // New subscriptions start with false
+        p_setup_fee_paid: true // Checkout completed means setup fee was paid
       }
 
       console.log('📝 Creating subscription with RPC params:', rpcParams)
