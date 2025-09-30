@@ -212,7 +212,7 @@ export async function GET(request: Request) {
     );
     
     // Get business minutes allocation
-    const minutesAllowed = user.businesses?.minutes_allowed || 500;
+    const minutesAllowed = user.businesses?.minutes_allowed || 0;
     const minutesLeft = calculateMinutesLeft(minutesAllowed, currentMinutesUsed);
     
     // Update the business record with current usage if it differs

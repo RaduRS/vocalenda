@@ -538,13 +538,25 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       // Check if this subscription was already processed (idempotency check)
       const { data: existingSubscription } = await supabaseAdmin
         .from('subscriptions')
-        .select('id, stripe_subscription_id')
+        .select('id, stripe_subscription_id, status')
         .eq('stripe_subscription_id', subscription.id)
         .single()
 
-      if (existingSubscription) {
+      if (existingSubscription && existingSubscription.status !== 'trialing') {
         console.log('✅ Subscription already processed:', subscription.id)
         return
+      }
+
+      // Check if there's an existing trial subscription for this business
+      const { data: trialSubscription } = await supabaseAdmin
+        .from('subscriptions')
+        .select('id, status, stripe_subscription_id')
+        .eq('business_id', businessId)
+        .eq('status', 'trialing')
+        .single()
+
+      if (trialSubscription) {
+        console.log('🔄 Found existing trial subscription, upgrading to paid:', trialSubscription.id)
       }
 
       // Verify business exists
@@ -612,17 +624,17 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         .rpc('create_or_update_subscription', rpcParams)
 
       if (rpcError) {
-        console.error('❌ RPC Error creating subscription:', rpcError)
+        console.error('❌ RPC Error creating/updating subscription:', rpcError)
         throw rpcError
       }
 
-      console.log('✅ Subscription created successfully:', subscriptionId)
+      console.log('✅ Subscription created/updated successfully:', subscriptionId)
 
-      // Update business subscription status
+      // Update business to link it to the subscription and update status
       const { error: businessUpdateError } = await supabaseAdmin
         .from('businesses')
         .update({ 
-          subscription_status: subscription.status,
+          subscription_id: subscriptionId,
           updated_at: new Date().toISOString()
         })
         .eq('id', businessId)

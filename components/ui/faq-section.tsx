@@ -45,7 +45,7 @@ const faqItems: FAQItem[] = [
     id: "pricing",
     question: "How much does an AI receptionist cost in the UK?",
     answer:
-      "Our complete AI receptionist service is £139/month. This includes 500 minutes of AI call handling, unlimited SMS confirmations, and a dedicated UK phone number. There is a one-time £399 setup fee for configuration and number porting or setup. No hidden fees.",
+      "Our complete AI receptionist service is £139/month. This includes 500 minutes of AI call handling, unlimited SMS confirmations, and a dedicated UK phone number. There is a one-time £399 setup fee for configuration and number porting or setup. No hidden fees. New accounts start with a 30-minute free trial.",
   },
   {
     id: "customization",
