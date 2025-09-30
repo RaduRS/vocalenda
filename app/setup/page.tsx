@@ -297,7 +297,7 @@ export default function SetupWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4 mt-16">
       <Card className="w-full max-w-2xl p-4 sm:p-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2">Welcome to Vocalenda!</h1>
@@ -503,6 +503,8 @@ export default function SetupWizard() {
                 </div>
               </div>
 
+              {/* Timezone selection temporarily disabled: defaulting to Europe/London */}
+              {/*
               <div>
                 <Label htmlFor="timezone">Timezone *</Label>
                 <Select value={businessData.timezone || ''} onValueChange={(value) => handleInputChange('timezone', value)}>
@@ -521,6 +523,7 @@ export default function SetupWizard() {
                   </SelectContent>
                 </Select>
               </div>
+              */}
 
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -903,6 +906,8 @@ export default function SetupWizard() {
                 <p className="text-sm text-gray-500 mt-1">This message will greet customers when they call</p>
               </div>
               
+              {/* Key Information for AI temporarily disabled */}
+              {/**
               <div>
                 <Label htmlFor="ai-instructions">Key Information for AI *</Label>
                 <Textarea
@@ -921,6 +926,7 @@ export default function SetupWizard() {
                 />
                 <p className="text-sm text-gray-500 mt-1">Provide context to help the AI assist customers effectively</p>
               </div>
+              */}
 
               <div>
                 <Label htmlFor="ai-voice">AI Voice *</Label>
@@ -996,6 +1002,8 @@ export default function SetupWizard() {
                 )}
               </div>
 
+              {/* Booking Policies temporarily disabled */}
+              {/**
               <div>
                 <Label>Booking Policies</Label>
                 <div className="mt-2 space-y-3">
@@ -1031,6 +1039,7 @@ export default function SetupWizard() {
                   </div>
                 </div>
               </div>
+              */}
             </div>
           </div>
         )}

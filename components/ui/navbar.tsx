@@ -32,7 +32,8 @@ export default function Navbar() {
     pathname === "/blog" ||
     pathname?.startsWith("/blog/") ||
     pathname?.startsWith("/auth") ||
-    pathname?.startsWith("/voices");
+    pathname?.startsWith("/voices") ||
+    pathname === "/setup";
 
   const textColor = useTransform(
     scrollY,

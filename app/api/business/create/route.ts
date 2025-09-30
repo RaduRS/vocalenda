@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
             : null, // Phone numbers assigned by admin
         email: email,
         address,
-        timezone,
+        timezone: timezone || 'Europe/London',
         business_type,
         payment_methods,
         business_hours,

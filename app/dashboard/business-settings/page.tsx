@@ -1090,7 +1090,8 @@ export default function BusinessSettings() {
                   </div>
                 </div>
 
-                {/* AI Instructions Section */}
+                {/* AI Instructions Section temporarily disabled */}
+                {/**
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -1131,6 +1132,7 @@ export default function BusinessSettings() {
                     rows={4}
                   />
                 </div>
+                */}
 
                 {/* AI Voice Selection */}
                 <div className="space-y-3 sm:space-y-4">
@@ -1201,7 +1203,8 @@ export default function BusinessSettings() {
                   </div>
                 </div>
 
-                {/* Booking Policies Section */}
+                {/* Booking Policies Section temporarily disabled */}
+                {/**
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center space-x-2">
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-amber-100 rounded-lg flex items-center justify-center">
@@ -1230,6 +1233,7 @@ export default function BusinessSettings() {
                     rows={4}
                   />
                 </div>
+                */}
 
                 {/* Human Handoff Phone Number Section */}
                 <div className="space-y-3 sm:space-y-4">
