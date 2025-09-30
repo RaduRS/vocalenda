@@ -105,12 +105,14 @@ export async function POST(req: NextRequest) {
     // Check if subscription already exists
     const { data: existingSubscription } = await supabaseAdmin
       .from('subscriptions')
-      .select('id, setup_fee_paid')
+      .select('id, setup_fee_paid, status, stripe_subscription_id')
       .eq('business_id', user.business_id)
       .single()
 
     if (existingSubscription) {
-      return NextResponse.json({ error: 'Subscription already exists' }, { status: 400 })
+      // Log the existing subscription status but don't block - let the checkout proceed
+      const status = existingSubscription.status
+      console.log(`Processing checkout for existing subscription with status: ${status} for business ${user.business_id}`)
     }
 
     // Since no subscription exists, this is a first-time customer who needs to pay setup fee
