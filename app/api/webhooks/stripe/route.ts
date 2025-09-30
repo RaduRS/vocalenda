@@ -430,7 +430,52 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       console.error('❌ RPC Error message:', rpcError.message)
       console.error('❌ RPC Error details:', rpcError.details)
       console.error('❌ RPC Error hint:', rpcError.hint)
-      throw new Error(`RPC call failed: ${rpcError.message}`)
+      
+      // Handle unique constraint violation specifically
+      if (rpcError.message && rpcError.message.includes('duplicate key value violates unique constraint "subscriptions_business_id_key"')) {
+        console.log('🔄 Unique constraint violation detected, attempting to update existing subscription by business_id')
+        
+        // Find the existing subscription by business_id and update it
+        const { data: existingByBusiness } = await supabaseAdmin
+          .from('subscriptions')
+          .select('id')
+          .eq('business_id', businessId)
+          .single()
+        
+        if (existingByBusiness) {
+          console.log('🔄 Found existing subscription by business_id, updating:', existingByBusiness.id)
+          
+          const { error: updateError } = await supabaseAdmin
+            .from('subscriptions')
+            .update({
+              stripe_subscription_id: subscription.id,
+              stripe_customer_id: subscription.customer as string,
+              stripe_price_id: priceId,
+              status: subscription.status as SubscriptionStatus,
+              current_period_start: safeConvertTimestamp(extendedSubscription.current_period_start, 'current_period_start'),
+              current_period_end: safeConvertTimestamp(extendedSubscription.current_period_end, 'current_period_end'),
+              amount_per_month: subscriptionItem?.price.unit_amount || 0,
+              currency: subscriptionItem?.price.currency || 'gbp',
+              cancel_at_period_end: cancelAtPeriodEnd,
+              setup_fee_paid: currentSetupFeePaid,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingByBusiness.id)
+          
+          if (updateError) {
+            console.error('❌ Error updating existing subscription by business_id:', updateError)
+            throw new Error(`Failed to update existing subscription: ${updateError.message}`)
+          }
+          
+          console.log('✅ Successfully updated existing subscription by business_id')
+          // Use the existing subscription ID for business update
+          const rpcResult = existingByBusiness.id
+        } else {
+          throw new Error(`RPC call failed: ${rpcError.message}`)
+        }
+      } else {
+        throw new Error(`RPC call failed: ${rpcError.message}`)
+      }
     } else {
       console.log('✅ Successfully created/updated subscription in Supabase')
       console.log('📋 RPC Result:', rpcResult)
@@ -512,155 +557,115 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   try {
     console.log('🛒 Processing checkout session completed:', session.id)
     
-    if (!session?.customer || !session?.subscription) {
-      console.log('⚠️ Missing customer or subscription in checkout session')
+    if (!session.subscription) {
+      console.log('⚠️ No subscription found in checkout session')
       return
     }
 
-    // Get business_id from session metadata (this should be set when creating the checkout session)
-    const businessId = session.metadata?.business_id
-    
-    if (!businessId) {
-      console.error('❌ Missing business_id in checkout session metadata')
+    // Get the subscription details from Stripe
+    const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+    console.log('📋 Retrieved subscription from Stripe:', {
+      id: subscription.id,
+      status: subscription.status,
+      customer: subscription.customer
+    })
+
+    // Find business by customer ID
+    const { data: business, error: businessError } = await supabaseAdmin
+      .from('businesses')
+      .select('id')
+      .eq('stripe_customer_id', session.customer as string)
+      .single()
+
+    if (businessError || !business) {
+      console.error('❌ Business not found for customer:', session.customer, businessError)
       return
     }
 
-    console.log('📋 Business ID from metadata:', businessId)
+    const businessId = business.id
+    console.log('🏢 Found business:', businessId)
 
-    try {
-      // Get subscription details from Stripe
-      const subscriptionResponse = await stripe.subscriptions.retrieve(
-        session.subscription as string
-      )
-      const subscription = subscriptionResponse as unknown as ExtendedStripeSubscription
+    // Find existing subscription by business_id and update it
+    const { data: existingSubscription, error: existingError } = await supabaseAdmin
+      .from('subscriptions')
+      .select('id')
+      .eq('business_id', businessId)
+      .single()
 
-      console.log('📊 Retrieved subscription:', subscription.id, 'status:', subscription.status)
+    if (existingError) {
+      console.error('❌ No existing subscription found for business:', businessId, existingError)
+      return
+    }
 
-      // Check if this subscription was already processed (idempotency check)
-      const { data: existingSubscription } = await supabaseAdmin
-        .from('subscriptions')
-        .select('id, stripe_subscription_id, status, setup_fee_paid')
-        .eq('stripe_subscription_id', subscription.id)
-        .single()
+    console.log('🔍 Found existing subscription:', existingSubscription.id)
 
-      if (existingSubscription && existingSubscription.status !== 'trialing') {
-        console.log('✅ Subscription already processed:', subscription.id)
-        return
+    // Helper function to safely convert timestamps
+    const safeConvertTimestamp = (timestamp: number | null, fieldName: string): string => {
+      if (!timestamp) {
+        throw new Error(`Missing required timestamp: ${fieldName}`)
       }
-
-      // Check if there's an existing trial subscription for this business
-      const { data: trialSubscription } = await supabaseAdmin
-        .from('subscriptions')
-        .select('id, status, stripe_subscription_id')
-        .eq('business_id', businessId)
-        .eq('status', 'trialing')
-        .single()
-
-      if (trialSubscription) {
-        console.log('🔄 Found existing trial subscription, upgrading to paid:', trialSubscription.id)
-      }
-
-      // Verify business exists
-      const { data: business, error: businessError } = await supabaseAdmin
-        .from('businesses')
-        .select('id, name')
-        .eq('id', businessId)
-        .single()
-
-      if (businessError || !business) {
-        console.error('❌ Business not found:', businessId, businessError)
-        return
-      }
-
-      console.log('✅ Business found:', business.name)
-
-      // Create subscription using RPC function
-      // Safely convert timestamps with validation
-      const safeConvertTimestamp = (timestamp: number | null | undefined, fieldName: string): string => {
-        if (!timestamp || typeof timestamp !== 'number') {
-          console.error(`❌ Invalid ${fieldName}:`, timestamp)
-          throw new Error(`Invalid ${fieldName}: ${timestamp}`)
-        }
         
-        try {
-          const date = new Date(timestamp * 1000)
-          if (isNaN(date.getTime())) {
-            throw new Error(`Invalid date from timestamp: ${timestamp}`)
-          }
-          return date.toISOString()
-        } catch (error) {
-          console.error(`❌ Error converting ${fieldName}:`, error)
-          throw error
+      try {
+        const date = new Date(timestamp * 1000)
+        if (isNaN(date.getTime())) {
+          throw new Error(`Invalid date from timestamp: ${timestamp}`)
         }
+        return date.toISOString()
+      } catch (error) {
+        console.error(`❌ Error converting ${fieldName}:`, error)
+        throw error
       }
+    }
 
-      // Extract timestamps from subscription items (same fix as handleSubscriptionChange)
-      const subscriptionItem = subscription.items.data[0]
-      if (!subscriptionItem) {
-        throw new Error('No subscription items found in checkout session')
-      }
+    // Extract timestamps from subscription items
+    const subscriptionItem = subscription.items.data[0]
+    if (!subscriptionItem) {
+      throw new Error('No subscription items found in checkout session')
+    }
 
-      console.log('🔍 Extracting timestamps from subscription item:', {
-        current_period_start: subscriptionItem.current_period_start,
-        current_period_end: subscriptionItem.current_period_end
+    console.log('🔍 Extracting timestamps from subscription item:', {
+      current_period_start: subscriptionItem.current_period_start,
+      current_period_end: subscriptionItem.current_period_end
+    })
+
+    // Update the existing subscription with missing info from Stripe
+    const { error: updateError } = await supabaseAdmin
+      .from('subscriptions')
+      .update({
+        stripe_subscription_id: subscription.id,
+        stripe_customer_id: session.customer as string,
+        stripe_price_id: subscription.items.data[0].price.id,
+        status: subscription.status as SubscriptionStatus,
+        current_period_start: safeConvertTimestamp(subscriptionItem.current_period_start, 'current_period_start'),
+        current_period_end: safeConvertTimestamp(subscriptionItem.current_period_end, 'current_period_end'),
+        amount_per_month: subscription.items.data[0].price.unit_amount || 0,
+        currency: subscription.currency,
+        cancel_at_period_end: false,
+        setup_fee_paid: true, // Checkout completed means setup fee was paid
+        updated_at: new Date().toISOString()
       })
+      .eq('id', existingSubscription.id)
 
-      const rpcParams = {
-        p_business_id: businessId,
-        p_stripe_subscription_id: subscription.id,
-        p_stripe_customer_id: session.customer as string,
-        p_stripe_price_id: subscription.items.data[0].price.id,
-        p_status: subscription.status as SubscriptionStatus,
-        p_current_period_start: safeConvertTimestamp(subscriptionItem.current_period_start, 'current_period_start'),
-        p_current_period_end: safeConvertTimestamp(subscriptionItem.current_period_end, 'current_period_end'),
-        p_amount_per_month: subscription.items.data[0].price.unit_amount || 0,
-        p_currency: subscription.currency,
-        p_cancel_at_period_end: false, // New subscriptions start with false
-        p_setup_fee_paid: true // Checkout completed means setup fee was paid
-      }
+    if (updateError) {
+      console.error('❌ Error updating existing subscription:', updateError)
+      throw updateError
+    }
 
-      console.log('📝 Creating subscription with RPC params:', rpcParams)
+    console.log('✅ Existing subscription updated with checkout info')
 
-      const { data: subscriptionId, error: rpcError } = await supabaseAdmin
-        .rpc('create_or_update_subscription', rpcParams)
+    // Update business to link it to the subscription
+    const { error: businessUpdateError } = await supabaseAdmin
+      .from('businesses')
+      .update({ 
+        subscription_id: existingSubscription.id,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', businessId)
 
-      if (rpcError) {
-        console.error('❌ RPC Error creating/updating subscription:', rpcError)
-        throw rpcError
-      }
-
-      console.log('✅ Subscription created/updated successfully:', subscriptionId)
-
-      // Update business to link it to the subscription and update status
-      const { error: businessUpdateError } = await supabaseAdmin
-        .from('businesses')
-        .update({ 
-          subscription_id: subscriptionId,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', businessId)
-
-      if (businessUpdateError) {
-        console.error('❌ Error updating business subscription status:', businessUpdateError)
-      } else {
-        console.log('✅ Business subscription status updated')
-      }
-
-
-      // Log the event
-      await logSubscriptionEvent(
-        subscription.id,
-        businessId,
-        'subscription_created',
-        subscription.status as SubscriptionStatus,
-        subscription
-      )
-
-      console.log('✅ Checkout session completed successfully processed')
-
-    } catch (error) {
-      console.error('❌ Error processing checkout session:', error)
-      throw error
+    if (businessUpdateError) {
+      console.error('❌ Error linking business to subscription:', businessUpdateError)
+    } else {
+      console.log('✅ Business linked to subscription')
     }
 
   } catch (error) {
