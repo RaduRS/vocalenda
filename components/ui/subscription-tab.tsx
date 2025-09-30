@@ -43,7 +43,12 @@ export function SubscriptionTab() {
       const data = await response.json();
       
       if (response.ok) {
-        setSubscription(data.subscription);
+        // Only set subscription if it has a valid stripe_subscription_id
+        if (data.subscription?.stripe_subscription_id) {
+          setSubscription(data.subscription);
+        } else {
+          setSubscription(null);
+        }
       } else {
         console.error('Error fetching subscription:', data.error);
       }

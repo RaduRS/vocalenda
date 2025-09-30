@@ -414,7 +414,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       p_amount_per_month: subscription.items.data[0]?.price.unit_amount || 0,
       p_currency: subscription.items.data[0]?.price.currency || 'gbp',
       p_cancel_at_period_end: cancelAtPeriodEnd,
-      p_setup_fee_paid: currentSetupFeePaid // Preserve existing value - once paid, stays true
+      p_setup_fee_paid: currentSetupFeePaid, // Preserve existing value - once paid, stays true
+      p_monthly_minutes_included: undefined // Explicitly set to undefined since we're not using this field
     }
     
     // Call the RPC function with the correct parameters that match the database function signature
@@ -538,7 +539,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       // Check if this subscription was already processed (idempotency check)
       const { data: existingSubscription } = await supabaseAdmin
         .from('subscriptions')
-        .select('id, stripe_subscription_id, status')
+        .select('id, stripe_subscription_id, status, setup_fee_paid')
         .eq('stripe_subscription_id', subscription.id)
         .single()
 
@@ -645,6 +646,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         console.log('✅ Business subscription status updated')
       }
 
+
       // Log the event
       await logSubscriptionEvent(
         subscription.id,
@@ -739,6 +741,38 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
             .from('subscriptions')
             .update({ setup_fee_paid: true })
             .eq('stripe_subscription_id', subscriptionId)
+
+          // Grant activation bonus minutes (+500) once when setup fee becomes paid
+          try {
+            console.log('🎁 Granting activation bonus minutes on invoice payment: +500')
+            const { data: businessMinutes, error: minutesFetchError } = await supabaseAdmin
+              .from('businesses')
+              .select('minutes_allowed')
+              .eq('id', subscription.business_id)
+              .single()
+
+            if (minutesFetchError) {
+              console.error('⚠️ Failed to fetch current minutes_allowed:', minutesFetchError)
+            } else {
+              const currentAllowed = businessMinutes?.minutes_allowed || 0
+              const updatedAllowed = currentAllowed + 500
+              const { error: minutesUpdateError } = await supabaseAdmin
+                .from('businesses')
+                .update({ 
+                  minutes_allowed: updatedAllowed,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', subscription.business_id)
+
+              if (minutesUpdateError) {
+                console.error('⚠️ Failed to grant activation bonus minutes:', minutesUpdateError)
+              } else {
+                console.log(`✅ Activation bonus applied on invoice. minutes_allowed: ${currentAllowed} → ${updatedAllowed}`)
+              }
+            }
+          } catch (bonusError) {
+            console.error('⚠️ Error applying activation bonus minutes on invoice:', bonusError)
+          }
         }
 
         // Reset monthly usage if this is a recurring payment
