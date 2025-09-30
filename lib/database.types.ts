@@ -14,7 +14,7 @@ export type Database = {
           id: string
           business_id: string
           customer_id: string
-          service_id: string | null
+          service_id: string
           staff_member_id: string | null
           appointment_date: string
           start_time: string
@@ -31,7 +31,7 @@ export type Database = {
           id?: string
           business_id: string
           customer_id: string
-          service_id?: string | null
+          service_id: string
           staff_member_id?: string | null
           appointment_date: string
           start_time: string
@@ -48,7 +48,7 @@ export type Database = {
           id?: string
           business_id?: string
           customer_id?: string
-          service_id?: string | null
+          service_id?: string
           staff_member_id?: string | null
           appointment_date?: string
           start_time?: string

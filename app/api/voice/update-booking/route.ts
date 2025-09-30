@@ -10,7 +10,7 @@ import { getFillerPhrase, FillerContext } from '@/lib/conversation-utils';
 type AppointmentWithRelations = {
   id: string;
   customer_id: string;
-  service_id: string | null;
+  service_id: string;
   appointment_date: string;
   start_time: string;
   end_time: string;
@@ -161,6 +161,33 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Found existing booking:', existingBooking.id);
+
+    // Validate that existing booking has a valid service_id
+    if (!existingBooking.service_id) {
+      console.error('❌ Existing booking has null service_id:', existingBooking.id);
+      return NextResponse.json(
+        { error: 'This booking has an invalid service configuration. Please contact support.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate new service_id if provided
+    if (new_service_id) {
+      const { data: newService, error: serviceError } = await supabaseAdmin
+        .from('services')
+        .select('id, name, duration_minutes')
+        .eq('id', new_service_id)
+        .eq('business_id', business_id)
+        .single();
+
+      if (serviceError || !newService) {
+        console.error('❌ Invalid new service_id:', new_service_id);
+        return NextResponse.json(
+          { error: 'Invalid service selected. Please choose a valid service.' },
+          { status: 400 }
+        );
+      }
+    }
 
     // STEP 2: Check availability for new time (if changing date/time)
     const finalDate = new_date || current_date;

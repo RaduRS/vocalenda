@@ -31,16 +31,24 @@ export async function POST(request: NextRequest) {
       sessionId,
     } = await request.json();
 
-    if (
-      !businessId ||
-      !serviceId ||
-      !appointmentDate ||
-      !startTime ||
-      !endTime ||
-      !customerName
-    ) {
+    // Explicit validation for critical fields
+    if (!businessId) {
       return NextResponse.json(
-        { error: "Missing required booking information" },
+        { error: "Business ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!serviceId) {
+      return NextResponse.json(
+        { error: "Service ID is required and cannot be null" },
+        { status: 400 }
+      );
+    }
+
+    if (!appointmentDate || !startTime || !endTime || !customerName) {
+      return NextResponse.json(
+        { error: "Missing required booking information: date, time, and customer name are required" },
         { status: 400 }
       );
     }

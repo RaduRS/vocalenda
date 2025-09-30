@@ -94,7 +94,7 @@ CREATE TABLE appointments (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     business_id UUID REFERENCES businesses(id) ON DELETE CASCADE,
     customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
-    service_id UUID REFERENCES services(id) ON DELETE SET NULL,
+    service_id UUID NOT NULL REFERENCES services(id) ON DELETE RESTRICT,
     staff_member_id UUID REFERENCES staff_members(id) ON DELETE SET NULL,
     appointment_date DATE NOT NULL,
     start_time TIME NOT NULL,
