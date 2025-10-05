@@ -138,7 +138,7 @@ BUSINESS: ${business.name}`;
   }
 
   // Add business hours information if available
-  const businessHours = businessConfig.config?.business_hours;
+  const businessHours = businessConfig.business?.business_hours;
   if (businessHours) {
     prompt += `\n\n🕐 BUSINESS HOURS:`;
     if (businessHours.monday)
@@ -155,7 +155,7 @@ BUSINESS: ${business.name}`;
       prompt += ` Sat: ${businessHours.saturday.open}-${businessHours.saturday.close}`;
     if (businessHours.sunday)
       prompt += ` Sun: ${businessHours.sunday.open}-${businessHours.sunday.close}`;
-    prompt += `\n\n⚠️ BUSINESS HOURS VALIDATION:\n- NEVER check availability for times outside business hours\n- If customer requests booking outside business hours, politely inform them of operating hours\n- Only call get_available_slots for times within business hours`;
+    prompt += `\n\n🚨 CRITICAL BUSINESS HOURS VALIDATION:\n- MANDATORY: Call check_business_status BEFORE making ANY statements about being open/closed\n- NEVER say "we are open" or "we are closed" without calling check_business_status first\n- When customer asks "Are you open?" → IMMEDIATELY call check_business_status\n- NEVER assume business status based on hours alone - always verify with check_business_status\n- NEVER check availability for times outside business hours\n- If customer requests booking outside business hours, politely inform them of operating hours\n- Only call get_available_slots for times within business hours`;
   }
 
   // Add payment methods information if available
@@ -514,7 +514,7 @@ Be friendly and helpful. Provide immediate responses about availability without 
  * @returns {Object} { isWithinHours: boolean, message?: string }
  */
 export function isWithinBusinessHours(date, time, businessConfig) {
-  const businessHours = businessConfig.config?.business_hours;
+  const businessHours = businessConfig.business?.business_hours;
 
   if (!businessHours) {
     // If no business hours configured, allow all times
@@ -528,7 +528,34 @@ export function isWithinBusinessHours(date, time, businessConfig) {
 
     const dayHours = businessHours[dayName];
 
-    if (!dayHours || !dayHours.open || !dayHours.close) {
+    // Enhanced closed day checking with debug logging
+    console.log(`🔍 Checking business hours for ${dayName}:`, dayHours);
+
+    // Check if day is closed - multiple conditions for robustness
+    if (!dayHours) {
+      console.log(`❌ No configuration found for ${dayName} - treating as closed`);
+      return {
+        isWithin: false,
+        message: `We're closed on ${
+          dayName.charAt(0).toUpperCase() + dayName.slice(1)
+        }s`,
+      };
+    }
+
+    // Check explicit closed flag (handle both boolean and string values)
+    if (dayHours.closed === true || dayHours.closed === "true" || dayHours.closed === 1) {
+      console.log(`❌ ${dayName} is explicitly marked as closed`);
+      return {
+        isWithin: false,
+        message: `We're closed on ${
+          dayName.charAt(0).toUpperCase() + dayName.slice(1)
+        }s`,
+      };
+    }
+
+    // If not explicitly closed, check if we have valid open/close times
+    if (!dayHours.open || !dayHours.close) {
+      console.log(`❌ ${dayName} missing open/close times - treating as closed`);
       return {
         isWithin: false,
         message: `We're closed on ${
@@ -548,6 +575,7 @@ export function isWithinBusinessHours(date, time, businessConfig) {
     const closeMinutes = closeHour * 60 + closeMin;
 
     if (requestMinutes < openMinutes || requestMinutes >= closeMinutes) {
+      console.log(`❌ ${time} is outside business hours ${dayHours.open}-${dayHours.close} on ${dayName}`);
       return {
         isWithin: false,
         message: `We're open ${dayHours.open}-${dayHours.close} on ${
@@ -556,6 +584,7 @@ export function isWithinBusinessHours(date, time, businessConfig) {
       };
     }
 
+    console.log(`✅ ${time} is within business hours on ${dayName}`);
     return { isWithin: true };
   } catch (error) {
     console.error("Error checking business hours:", error);
@@ -595,6 +624,21 @@ export function getAvailableFunctions(currentYear, currentMonth) {
       },
     },
     {
+      name: "check_business_status",
+      description:
+        "MANDATORY: Check if the business is currently open or closed. You MUST call this function BEFORE making ANY statements about business hours, opening status, or availability. This is REQUIRED whenever customers ask 'Are you open?', 'What are your hours?', or when you need to confirm business status before booking. NEVER assume the business is open without calling this function first.",
+      parameters: {
+        type: "object",
+        properties: {
+          date: {
+            type: "string",
+            description: "Optional date to check in YYYY-MM-DD format. If not provided, checks current date.",
+          },
+        },
+        required: [],
+      },
+    },
+    {
       name: "get_day_of_week",
       description:
         "MANDATORY: Get the day of the week for a given date. You MUST call this function BEFORE mentioning ANY day name (Monday, Tuesday, etc.) for ANY date. This is REQUIRED for ALL date communications including bookings, updates, confirmations, and reschedules. NEVER state what day a date is without calling this function first.",
@@ -603,7 +647,7 @@ export function getAvailableFunctions(currentYear, currentMonth) {
         properties: {
           date: {
             type: "string",
-            description: `Date in DD/MM/YYYY format (e.g., 16/09/${currentYear} for ${currentMonth} 16, ${currentYear})`,
+            description: `Date in DD/MM/YYYY format (e.g., 16/09/${currentYear}) or YYYY-MM-DD format (e.g., ${currentYear}-09-16)`,
           },
         },
         required: ["date"],

@@ -98,22 +98,6 @@ export const db = {
    * Log an incoming call
    */
   async logIncomingCall(businessId, callerPhone, businessPhone, twilioCallSid) {
-    // Check subscription status before allowing the call
-    try {
-      const { canMakeCall } = await import('./subscription-utils.js');
-      const canProceed = await canMakeCall(businessId);
-      
-      if (!canProceed.allowed) {
-        console.error(`🚫 Call blocked for business ${businessId}: ${canProceed.reason}`);
-        throw new Error(`Call not allowed: ${canProceed.reason}`);
-      }
-      
-      console.log(`✅ Subscription check passed for business ${businessId}`);
-    } catch (subscriptionError) {
-      console.error('❌ Subscription check failed:', subscriptionError);
-      throw new Error(`Subscription check failed: ${subscriptionError.message}`);
-    }
-
     const { data, error } = await supabase
       .from("call_logs")
       .insert({
@@ -158,42 +142,6 @@ export const db = {
     if (error) {
       console.error("Failed to update call status:", error);
       throw new Error(`Failed to update call status: ${error.message}`);
-    }
-
-    // Track minutes usage for completed calls
-    if (status === 'completed' && duration && data) {
-      try {
-        const { updateMinutesUsage, logSubscriptionUsage, calculateMinutesFromDuration } = await import('./subscription-utils.js');
-        
-        const minutesUsed = calculateMinutesFromDuration(duration);
-        if (minutesUsed > 0) {
-          console.log(`📊 Tracking ${minutesUsed} minutes for call ${twilioCallSid}`);
-          
-          // Update business minutes usage
-          await updateMinutesUsage(data.business_id, minutesUsed);
-          
-          // Log subscription usage if business has a subscription
-          const { data: business } = await supabase
-            .from('businesses')
-            .select('subscription_id')
-            .eq('id', data.business_id)
-            .single();
-            
-          if (business?.subscription_id) {
-            await logSubscriptionUsage(
-              business.subscription_id,
-              data.business_id,
-              data.id,
-              minutesUsed
-            );
-          }
-          
-          console.log(`✅ Minutes tracking completed for call ${twilioCallSid}`);
-        }
-      } catch (minutesError) {
-        console.error('❌ Error tracking minutes usage:', minutesError);
-        // Don't throw - we don't want to fail the call completion for tracking errors
-      }
     }
 
     return data;
