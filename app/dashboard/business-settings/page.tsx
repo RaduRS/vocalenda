@@ -1090,8 +1090,7 @@ export default function BusinessSettings() {
                   </div>
                 </div>
 
-                {/* AI Instructions Section temporarily disabled */}
-                {/**
+                
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -1132,7 +1131,7 @@ export default function BusinessSettings() {
                     rows={4}
                   />
                 </div>
-                */}
+                
 
                 {/* AI Voice Selection */}
                 <div className="space-y-3 sm:space-y-4">
