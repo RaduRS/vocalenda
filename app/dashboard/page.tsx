@@ -200,7 +200,7 @@ function Dashboard() {
                 {business?.name || 'Loading...'}
               </h1>
               <p className="text-brand-primary-2">
-                Welcome back, {user?.firstName}!
+                {user?.firstName ? `Welcome back, ${user.firstName}!` : 'Welcome back!'}
               </p>
             </div>
             {/* Refresh button removed as requested */}
