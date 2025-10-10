@@ -62,7 +62,18 @@ export async function GET() {
         sunday: { open: '09:00', close: '17:00', closed: true }
       }),
       holidays: (Array.isArray(business.holidays) ? business.holidays as unknown as Holiday[] : []),
-      services: business.services?.map((service: {
+      services: business.services?.filter((service: {
+        id: string;
+        business_id: string;
+        name: string;
+        description: string | null;
+        duration_minutes: number;
+        price: number | null;
+        currency: string;
+        is_active: boolean;
+        created_at: string;
+        updated_at: string;
+      }) => service.is_active).map((service: {
         id: string;
         business_id: string;
         name: string;
@@ -210,33 +221,29 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update AI configuration' }, { status: 500 });
     }
 
-    // Update services - delete existing and insert new ones
-    const { error: deleteServicesError } = await supabaseAdmin
-      .from('services')
-      .delete()
-      .eq('business_id', user.business_id);
+    // Services: insert only newly added services (without id), leave existing untouched
+    if (businessData.services) {
+      const newServices = businessData.services.filter(s => !s.id);
+      if (newServices.length > 0) {
+        const servicesToInsert = newServices.map(service => ({
+          business_id: user.business_id!,
+          name: service.name,
+          duration_minutes: service.duration,
+          price: service.price,
+          description: service.description || null,
+          currency: service.currency || 'GBP',
+          is_active: service.is_active ?? true,
+          updated_at: getCurrentUKDateTime().toISOString()
+        }));
 
-    if (deleteServicesError) {
-      console.error('Failed to delete existing services:', deleteServicesError);
-    }
+        const { error: insertServicesError } = await supabaseAdmin
+          .from('services')
+          .insert(servicesToInsert);
 
-    if (businessData.services && businessData.services.length > 0) {
-      const servicesToInsert = businessData.services.map(service => ({
-        business_id: user.business_id!,
-        name: service.name,
-        duration_minutes: service.duration,
-        price: service.price,
-        description: service.description || null,
-        is_active: service.is_active ?? true
-      }));
-
-      const { error: servicesError } = await supabaseAdmin
-        .from('services')
-        .insert(servicesToInsert);
-
-      if (servicesError) {
-        console.error('Failed to insert services:', servicesError);
-        return NextResponse.json({ error: 'Failed to update services' }, { status: 500 });
+        if (insertServicesError) {
+          console.error('Failed to insert new services:', insertServicesError);
+          return NextResponse.json({ error: 'Failed to insert new services' }, { status: 500 });
+        }
       }
     }
 

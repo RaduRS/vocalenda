@@ -110,7 +110,15 @@ export default function BusinessSettings() {
     }
 
     try {
-      updateBusiness(businessData);
+      // Send only newly added services (without id). If none, omit services.
+      const newServices = (businessData.services || []).filter((s): s is Service => !s.id);
+      const { services: _services, ...rest } = businessData;
+      const payload: Partial<ComprehensiveBusinessData> =
+        newServices.length > 0
+          ? { ...rest, services: newServices }
+          : { ...rest }; // omit services when none are new
+
+      updateBusiness(payload);
       toast.success("Business settings updated successfully!");
     } catch {
       toast.error("Failed to save business settings");
