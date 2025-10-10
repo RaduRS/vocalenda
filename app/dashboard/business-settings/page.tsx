@@ -478,7 +478,11 @@ export default function BusinessSettings() {
                     />
                     <p className="text-xs text-gray-500 mt-2 flex items-center">
                       <span className="w-2 h-2 bg-amber-400 rounded-full mr-2"></span>
-                      Contact <a href="mailto:support@vocalenda.com?subject=Phone Number Update Request" className="underline text-blue-600 hover:text-blue-800">support</a> to update your phone number
+                      Contact{" "}
+                      <a href="mailto:support@vocalenda.com?subject=Phone Number Update Request" className="underline text-blue-600 hover:text-blue-900">
+                        support
+                      </a>{" "}
+                      to update your phone number
                     </p>
                   </div>
                 </div>
