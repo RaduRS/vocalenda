@@ -89,6 +89,8 @@ export default function BusinessSettings() {
 
   // State to track display values for price inputs
   const [priceDisplayValues, setPriceDisplayValues] = useState<{[key: number]: string}>({});
+  // Track deleted service IDs to soft-delete on save
+  const [deletedServiceIds, setDeletedServiceIds] = useState<string[]>([]);
 
   // Update local state when hook data changes
   useEffect(() => {
@@ -110,13 +112,13 @@ export default function BusinessSettings() {
     }
 
     try {
-      // Send only newly added services (without id). If none, omit services.
+      // Send only newly added services (without id) and deleted IDs.
       const newServices = (businessData.services || []).filter((s): s is Service => !s.id);
       const { services: _services, ...rest } = businessData;
-      const payload: Partial<ComprehensiveBusinessData> =
-        newServices.length > 0
-          ? { ...rest, services: newServices }
-          : { ...rest }; // omit services when none are new
+      const payload =
+        newServices.length > 0 || deletedServiceIds.length > 0
+          ? { ...rest, services: newServices, deleted_service_ids: deletedServiceIds }
+          : { ...rest }; // omit services when none are new and nothing deleted
 
       updateBusiness(payload);
       toast.success("Business settings updated successfully!");
@@ -175,10 +177,17 @@ export default function BusinessSettings() {
   };
 
   const removeService = (index: number) => {
-    setBusinessData((prev) => ({
-      ...prev,
-      services: prev.services.filter((_, i) => i !== index),
-    }));
+    setBusinessData((prev) => {
+      const toRemove = prev.services[index];
+      // If the service has an id, track it for deletion
+      if (toRemove?.id) {
+        setDeletedServiceIds((ids) => Array.from(new Set([...ids, toRemove.id!])));
+      }
+      return {
+        ...prev,
+        services: prev.services.filter((_, i) => i !== index),
+      };
+    });
   };
 
   const addStaffMember = () => {

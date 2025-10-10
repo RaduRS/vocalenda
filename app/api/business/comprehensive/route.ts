@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import { ComprehensiveBusinessData, PaymentMethod, BusinessHours, Holiday } from '@/lib/types';
+import { ComprehensiveBusinessData, PaymentMethod, BusinessHours, Holiday, UpdateBusinessPayload } from '@/lib/types';
 import { Json } from '@/lib/database.types';
 import { getCurrentUKDateTime } from '@/lib/date-utils';
 
@@ -89,6 +89,7 @@ export async function GET() {
         name: service.name,
         duration: service.duration_minutes,
         price: service.price || 0,
+        currency: service.currency || 'GBP',
         description: service.description || undefined,
         is_active: service.is_active
       })) || [],
@@ -133,7 +134,7 @@ export async function GET() {
         reminder_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_reminder_template : business.business_config?.sms_reminder_template) || 'Reminder: {customer_name}, you have an appointment at {business_name} tomorrow ({date}) at {time} for {service_name}. See you then! {business_phone}',
         cancellation_message: (Array.isArray(business.business_config) ? business.business_config[0]?.sms_cancellation_template : business.business_config?.sms_cancellation_template) || 'Hi {customer_name}, your appointment at {business_name} on {date} at {time} for {service_name} has been cancelled. Call {business_phone} to reschedule.'
       },
-      bypass_phone_number: (Array.isArray(business.business_config) ? business.business_config[0]?.bypass_phone_number : business.business_config?.bypass_phone_number) || null
+      bypass_phone_number: (Array.isArray(business.business_config) ? business.business_config[0]?.bypass_phone_number : business.business_config?.bypass_phone_number) || ''
     };
 
     return NextResponse.json(comprehensiveData);
@@ -167,7 +168,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
-    const businessData: ComprehensiveBusinessData = await request.json();
+    const businessData: UpdateBusinessPayload = await request.json();
 
     // Update businesses table
     const { error: businessError } = await supabaseAdmin
@@ -183,8 +184,8 @@ export async function PUT(request: NextRequest) {
         payment_methods: businessData.payment_methods,
         business_hours: businessData.business_hours as unknown as Json,
         holidays: businessData.holidays as unknown as Json,
-        ai_greeting: businessData.ai_configuration.greeting,
-        key_information: businessData.ai_configuration.key_information,
+        ai_greeting: businessData.ai_configuration?.greeting,
+        key_information: businessData.ai_configuration?.key_information,
         customer_notes_enabled: businessData.customer_notes_enabled,
         booking_policies: businessData.booking_policies as unknown as Json,
         updated_at: getCurrentUKDateTime().toISOString()
@@ -201,11 +202,11 @@ export async function PUT(request: NextRequest) {
       .from('business_config')
       .upsert({
         business_id: user.business_id,
-        ai_response_mode: businessData.ai_configuration.response_mode,
-        allowed_ai_topics: businessData.ai_configuration.allowed_topics,
-        restricted_ai_topics: businessData.ai_configuration.restricted_topics,
-        ai_prompt: businessData.ai_configuration.custom_prompt,
-        ai_voice: businessData.ai_configuration.voice || 'aura-2-thalia-en',
+        ai_response_mode: businessData.ai_configuration?.response_mode,
+        allowed_ai_topics: businessData.ai_configuration?.allowed_topics,
+        restricted_ai_topics: businessData.ai_configuration?.restricted_topics,
+        ai_prompt: businessData.ai_configuration?.custom_prompt,
+        ai_voice: businessData.ai_configuration?.voice || 'aura-2-thalia-en',
         sms_enabled: businessData.sms_configuration?.enabled || false,
         sms_confirmation_template: businessData.sms_configuration?.confirmation_message || null,
         sms_reminder_template: businessData.sms_configuration?.reminder_message || null,
@@ -221,7 +222,22 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update AI configuration' }, { status: 500 });
     }
 
-    // Services: insert only newly added services (without id), leave existing untouched
+    // Services: handle deletions and insert only newly added services
+    // If client sends deleted_service_ids, mark those services inactive
+    const deletedIds = businessData.deleted_service_ids;
+    if (deletedIds && deletedIds.length > 0) {
+      const { error: deactivateError } = await supabaseAdmin
+        .from('services')
+        .update({ is_active: false, updated_at: getCurrentUKDateTime().toISOString() })
+        .in('id', deletedIds)
+        .eq('business_id', user.business_id);
+      if (deactivateError) {
+        console.error('Failed to deactivate deleted services:', deactivateError);
+        return NextResponse.json({ error: 'Failed to delete services' }, { status: 500 });
+      }
+    }
+
+    // Insert only newly added services (without id), leave existing untouched
     if (businessData.services) {
       const newServices = businessData.services.filter(s => !s.id);
       if (newServices.length > 0) {

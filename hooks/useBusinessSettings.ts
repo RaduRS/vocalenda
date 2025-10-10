@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
-import { ComprehensiveBusinessData } from '@/lib/types';
+import { ComprehensiveBusinessData, UpdateBusinessPayload } from '@/lib/types';
 
 export function useBusinessSettings() {
   const { user } = useUser();
@@ -21,7 +21,7 @@ export function useBusinessSettings() {
   });
 
   const updateBusinessMutation = useMutation({
-    mutationFn: async (updatedData: Partial<ComprehensiveBusinessData>) => {
+    mutationFn: async (updatedData: UpdateBusinessPayload) => {
       const response = await fetch('/api/business/comprehensive', {
         method: 'PUT',
         headers: {

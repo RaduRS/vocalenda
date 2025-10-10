@@ -97,6 +97,12 @@ export interface ComprehensiveBusinessData {
   bypass_phone_number: string; // Required for human handoff
 }
 
+// Payload used when updating business settings from the client.
+// Allows sending only partial fields plus identifiers of services to delete.
+export interface UpdateBusinessPayload extends Partial<ComprehensiveBusinessData> {
+  deleted_service_ids?: string[];
+}
+
 export type PaymentMethod =
   | "cash"
   | "card"
