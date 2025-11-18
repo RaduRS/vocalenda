@@ -212,7 +212,7 @@ export default function Home() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 items-center lg:items-start justify-center lg:justify-start">
-                <SignUpButton>
+                <SignUpButton fallbackRedirectUrl="/">
                   <Button
                     size="lg"
                     className="bg-brand-secondary-1 hover:bg-brand-secondary-1/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto cursor-pointer"
@@ -220,7 +220,7 @@ export default function Home() {
                     Get Started
                   </Button>
                 </SignUpButton>
-                <SignInButton>
+                <SignInButton fallbackRedirectUrl="/">
                   <Button
                     size="lg"
                     variant="outline"

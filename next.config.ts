@@ -154,14 +154,14 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               // Script sources - 'unsafe-inline' required for Next.js and component functionality
-              `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://clerk.vocalenda.com https://*.clerk.accounts.dev https://challenges.cloudflare.com`,
+              `script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : ''} https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://clerk.vocalenda.com https://*.clerk.accounts.dev https://challenges.cloudflare.com https://chatsmith-liart.vercel.app`,
               // Style sources - 'unsafe-inline' required for Clerk components
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https://www.google-analytics.com https://ssl.google-analytics.com https://img.clerk.com https://images.clerk.dev blob:",
               // Connect sources - restricted to necessary domains only
               "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://www.googletagmanager.com https://clerk.vocalenda.com https://api.clerk.com https://*.clerk.accounts.dev https://img.clerk.com https://images.clerk.dev",
-              "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+              "frame-src 'self' https://*.clerk.accounts.dev https://challenges.cloudflare.com https://chatsmith-liart.vercel.app",
               "worker-src 'self' blob:",
               "object-src 'none'",
               "base-uri 'self'",
