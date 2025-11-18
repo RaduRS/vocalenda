@@ -14,6 +14,8 @@ import { Phone, Calendar, MessageSquare, Zap } from "lucide-react";
 import { SignUpButton, SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import Script from "next/script";
+ 
 
 // Lazy load non-critical sections
 const StatsSection = dynamic(
@@ -145,6 +147,12 @@ export default function Home() {
 
   return (
     <>
+      <Script
+        src="https://chatsmith-liart.vercel.app/widget.js"
+        data-chatbot-id="78616b42-f087-4dfd-8e1a-e862e21bd5bf"
+        data-api-key="8b32694a17fe53a217e10735a03ffcaafed80972b96dabb3"
+        strategy="afterInteractive"
+      />
       {structuredData.map((data, index) => (
         <script
           key={index}
