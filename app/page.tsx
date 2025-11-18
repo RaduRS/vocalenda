@@ -149,7 +149,7 @@ export default function Home() {
     <>
       <Script
         src="https://chatsmith-liart.vercel.app/widget.js"
-        data-chatbot-id="78616b42-f087-4dfd-8e1a-e862e21bd5bf"
+        data-chatbot-id="61e10d2e-364f-42a6-a38c-faee168f6cc0"
         data-api-key="8b32694a17fe53a217e10735a03ffcaafed80972b96dabb3"
         strategy="afterInteractive"
       />
